@@ -1,0 +1,592 @@
+---
+title: "Role Analysis &"
+subtitle: "Community Detection in R"
+author: "Jonathan H. Morgan, Ph.D."
+date: "11 May 2024"
+
+fontsize: 9pt
+classoption: "t, aspectratio=169"
+output: 
+  beamer_presentation:
+    latex_engine: xelatex
+    keep_tex: true
+header-includes:
+  - \usepackage{fontspec}
+  - \usepackage{xcolor}
+  - \usepackage{datetime}
+  - \usepackage{etoolbox}
+  - \usepackage{graphicx}
+  - \usepackage{subcaption}
+  - \usepackage{tikz}
+  - \usetikzlibrary{positioning}
+  - \usepackage[T1]{fontenc}
+  - \usepackage{mathpazo}
+  - \usepackage{url}
+  - \usepackage{hyperref}
+  - \usefonttheme{serif}
+  - \setbeamertemplate{navigation symbols}{}
+  - \setbeamercovered{transparent}
+  - \setbeamersize{text margin left=0pt,text margin right=0pt}
+  - \setbeamertemplate{items}[triangle]
+  - \setbeamertemplate{itemize items}[triangle]
+  - |
+    \newfontfamily{\headingfont}{CormorantGaramond-Regular.ttf}
+    \definecolor{CustomHeadingColor}{RGB}{5, 45, 117}
+  - |
+    \newcommand{\setPageBackground}{
+      \setbeamertemplate{background canvas}{
+        \includegraphics[width=\paperwidth, height=\paperheight]{DNAC_Slide_Base.pdf}
+      }
+    }
+  - |
+    \newcommand{\shadowtext}[1]{
+    \begin{tikzpicture}[baseline=(text.base)]
+        \node[inner sep=0pt,outer sep=0pt, text=CustomHeadingColor] (text) {#1}; % Original text
+        \node[inner sep=0pt,outer sep=0pt, text=gray, opacity=0.5, anchor=south west] at (text.south west) [xshift=0.5pt, yshift=-0.5pt] {#1}; % Shadow text
+    \end{tikzpicture}
+    }
+  - |
+    \newcommand{\blueText}[1]{\textcolor{blue}{#1}}
+  - |
+    \setbeamertemplate{frametitle}{
+      \vspace{1em} % Space above the frame title
+      \usebeamerfont{frametitle}\usebeamercolor[fg]{frametitle}
+      {\fontsize{15}{20}\selectfont\headingfont\shadowtext{\insertframetitle}} % Set font size and apply shadow
+    }
+  - |
+    \setbeamertemplate{section page}{
+      \centering
+      \vspace*{\fill}
+      \usebeamerfont{section title}
+      \Huge{\insertsection\par}
+      \vspace*{\fill}
+    }
+  - |
+    \def\footerdate{\the\month/\the\day/\the\year}
+    \setbeamertemplate{footline}{
+      \leavevmode%
+      \hbox{%
+      \begin{beamercolorbox}[wd=\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+        \ifnum\insertpagenumber>1\relax
+          \footerdate\hspace{2em}\insertframenumber\hspace{2ex}
+        \fi
+      \end{beamercolorbox}%
+      }%
+      \vskip0pt%
+    }
+  - \setbeamercolor{date in head/foot}{fg=lightgray}
+  - \setbeamercolor{page number in head/foot}{fg=lightgray}
+  - |
+    \setbeamertemplate{title page}{
+      \begin{center}
+        \usebackgroundtemplate{\includegraphics[width=\paperwidth]{DNAC_Slide_Base.pdf}}
+        \vspace*{0.75cm}
+        \begin{minipage}{\textwidth}
+            \begin{center}
+            {\shadowtext{\headingfont\color{CustomHeadingColor}\fontsize{25}{30}\selectfont\inserttitle\par}}
+            \end{center}
+        \end{minipage}
+        \vspace*{0.5cm}
+        \begin{minipage}{\textwidth}
+            \begin{center}
+            {\headingfont\color{CustomHeadingColor}\fontsize{25}{30}\selectfont\insertsubtitle\par}
+            \end{center}
+        \end{minipage}
+        \vspace*{1cm}
+        {\headingfont\color{CustomHeadingColor}\fontsize{15}{20}\selectfont\insertauthor\par}
+        \vspace*{0.1cm}
+        {\headingfont\color{CustomHeadingColor}\fontsize{15}{20}\selectfont\insertdate\par}
+      \end{center}
+      \vspace*{2cm}
+      \usebackgroundtemplate{}
+    }
+  - \setbeamercolor{section in toc}{fg=CustomHeadingColor}
+  - \setbeamerfont{section in toc}{size=\fontsize{15}{20}, series=\bfseries}
+  - \setbeamertemplate{section in toc}[sections numbered]
+  - \setPageBackground
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width=4.5, fig.height=3)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE, error = TRUE)
+knitr::opts_chunk$set(cache=FALSE)
+```
+
+## Outline
+\tableofcontents[hideallsubsections]
+
+# Setup
+
+## Loading Packages
+```{r libsetup}
+# Clear Out Console Script
+  cat("/014")
+
+# Options
+  options(stringsAsFactors = FALSE)
+  options(scipen = 999)
+  
+# Loading Packages
+  library(data.table)     #Used to identify total in-group degree
+  library("ideanet")      #Nice Network Utility Function
+  library("igraph")       #Necessary for Working with Network Objects
+  library("readr")        #Used to read-in graph layouts to save time
+```
+
+## Loading a Directory Function 
+This function makes sure that all the presentation resources go to this file location.
+
+\blueText{Note: Before running this step, create a directory for this lab. Otherwise, you will have a mess.} 
+
+```{r spcifying_directory_function}
+# Specifying Function
+  get_script_directory <- function() {
+    # This tries to find the path of the running script by looking at the call stack
+      for (i in seq_len(sys.nframe())) {
+        call_frame <- sys.frame(i)
+        if (exists(".FileName", envir = call_frame, inherits = FALSE)) {
+          return(dirname(call_frame$.FileName))
+        }
+      }
+        return(getwd())  # Returns the working directory if script path not found
+  }
+
+# Setting thet working directory for this lab
+  setwd(paste0(get_script_directory()))
+  getwd()
+```
+
+# Role Analysis
+
+
+## The Florentine Families
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\vspace{0.25cm}
+
+\begin{figure}
+\centering
+  \includegraphics[width=0.57\textwidth]{Medicis_Suttermans_1640.jpg}
+\caption*{}
+\end{figure}
+
+\end{column}
+\hspace{-10pt}
+\begin{column}{0.5\textwidth}
+\vspace{1cm}
+
+\begin{itemize}
+  \item  \href{https://www.sciencedirect.com/science/article/pii/0378873386900067}{ Breiger \& Pattison (1986)}, in their discussion of local role analysis, use a subset of data on the social relations among Renaissance Florentine families collected by John Padgett from historical documents. 
+  \vspace{0.25cm}  
+  \item The Florentine Families dataset consists of two relations: business ties and marriage alliances. We are looking at marriage alliances today.
+\end{itemize}
+
+\end{column}
+\end{columns}
+
+## Loading the Florentine Families
+```{r data_florentine_import}
+# Loading Nodes & Edges
+  florentine_nodes <- ideanet::florentine_nodes
+  florentine_edges <- ideanet::florentine_edges
+
+# Transforming into a Network Object
+  florentine_net <- netwrite(data_type = "edgelist", nodelist = florentine_nodes, node_id = "id",
+                             i_elements = florentine_edges$source, j_elements = florentine_edges$target,
+                             directed = FALSE, net_name = "florentine", shiny = FALSE)
+  rm(florentine_edges, florentine_nodes)
+```
+
+## Hierarchical Clustering Methods
+
+## Position Analysis with CONCOR
+
+# Community Detection
+
+## The World of Marvel
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\vspace{1cm}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{Marvel_Judgment-Day.png}
+\caption*{}
+\end{figure}
+
+\end{column}
+\hspace{-10pt}
+\begin{column}{0.5\textwidth}
+\vspace{1cm}
+
+\begin{itemize}
+  \item The Marvel Universe data was collected by \href{https://arxiv.org/pdf/cond-mat/0202174}{Alberich et al., 2002}
+  \vspace{0.25cm}  
+  \item Nodes are Marvel characters.
+  \vspace{0.25cm} 
+  \item Connections are co-occurrences in comic books.
+  \vspace{0.25cm} 
+  \item We are looking at a single-mode projection of this network, Marvel Characters x Marvel Characters -Co-Occurrences.
+\end{itemize}
+
+\end{column}
+\end{columns}
+
+## Downloading Functions & Marvel Data 
+```{r marvel_data_import}
+# Sourcing Presentation Functions
+  source("https://raw.githubusercontent.com/jhm18/IDEANet/main/SN%26H_2024/R_Scripts/Presentation_Functions.R")
+
+# Downloading Marvel Data
+  download.file("https://raw.githubusercontent.com/jhm18/IDEANet/main/SN%26H_2024/Data/marvel_net.net", 
+                "marvel_net.net", mode = "wb")
+  
+# Read-In File
+  read_net(paste0(getwd(),"/marvel_net.net"))
+  
+```
+
+## Creating Marvel Network Object
+```{r make_marvel_network}
+# Constructing iGraph Object & Transforming Vertices ID to Numeric
+  network_gen()
+  vertices$ID <- as.numeric(vertices$ID)
+  
+# Inspecting the Network
+  summary(marvel_net)
+  rm(ties)
+  
+# Converting Pajek Coordinates into iGrah Coordinates
+  fr_coordinates <- convert_pajek_to_igraph(data.frame(x_coord = as.numeric(vertices$`x-coord`), 
+                                                       y_coord = as.numeric(vertices$`y-coord`)))
+  
+# Specifying the Network's Layout
+  layout_matrix <- as.matrix(fr_coordinates, ncol=2)
+```
+## Inspecting the Network Visually
+```{r first_plot, fig.align='center', fig.width=3, fig.height=2.25}
+  par(mar=c(0,0,0,0))
+  vertex_degrees <- as.numeric(sqrt(degree(marvel_net)))
+  plot(marvel_net, vertex.size= vertex_degrees, vertex.label=NA, layout=layout_matrix)
+```
+
+## Looking at the Isolates
+\blueText{Before discarding the isolates, we should look at them as a class.} 
+
+\begin{itemize}
+  \item Are the isolates the individuals we are really interested in?
+  \item Are there implausible isolates? Wolverine, for example?
+  \item If there are implausible isolates, why?
+\end{itemize}
+
+```{r inspecting_isolates}
+# Identifying the Isolates
+  isolated = which(degree(marvel_net)==0)
+  isolated_nodes <- vertices[(isolated + 1) %in% vertices$ID, ]
+  head(isolated_nodes)
+```
+## Removing Isolates
+Now that we have inspected them, it is safe to remove them.
+
+\vspace{0.5cm}
+
+```{r dropping_isolates}
+# Dropping Isolates
+  marvel_net_2 = delete.vertices(marvel_net, isolated)
+```
+
+## Examining Ties Weights
+Co-Occurrence networks tend to be densely connected. 
+We will need to thin the network to get a better sense of its underlying structure before clustering it.
+We, however, first want to examine the distribution of tie weights to understand if using a universal threshold is appropriate.
+
+```{r inspecting_ties}
+# Looking at the Distrubtion of Tie Weights
+  tie_weights = E(marvel_net_2)$weight
+  mean(tie_weights)
+  sd(tie_weights)
+  median(tie_weights)
+```
+  
+## Plotting Tie Weights
+```{r plotting_ties}
+  
+# Plotting
+  plot(tie_weights, xlab='Observation Number', ylab= 'Tie Weight', las=1, type = "c",bty="n", 
+       col='blue', main='', cex.axis=0.80)
+  grid(lwd = 2)
+```
+
+## Tie Thinning Strategies
+There are multiple approaches to thinning a network such as:
+
+\begin{itemize}
+  \item Thinning the ties using a fixed threshold (e.g., weights < 2 are dropped)
+  \vspace{0.25cm}  
+  \item Thinning based on some probability of interaction
+  \vspace{0.25cm} 
+  \item \blueText{Thinning based on rank, where we retain each node's top \textit{k} connections.}
+\end{itemize}
+
+Given the ties' weight distribution, we will use ranked-based thinning because it drops lots of volume while retaining the network's star & community structure.
+
+## Rank-Based Thinning
+```{r network_thinning}
+# Extracting the Edgelist from mavel_net_2 & Making Numeric for the Purposes of Processing
+  edges = data.frame(person_i = get.edgelist(marvel_net_2)[,1], 
+                     person_j = get.edgelist(marvel_net_2)[,2], 
+                     weight = get.edge.attribute(marvel_net_2, 'weight'))
+  edges <- as.data.frame(lapply(edges, function(x) as.numeric(x)))
+  
+# Thinning the Edges
+  thinned_edges <- rank_based_thinning(edges, 10, direction = "target", 
+                                       symmetrize = TRUE, reduce_self_loop = TRUE)
+  rm(edges)
+```
+  
+## Creating the Thinned Graph
+```{r creating_thinned_network}
+  
+# Creating Thinned Network iGraph object
+  thinned_edges <- as.data.frame(lapply(thinned_edges, function(x) as.numeric(x)))
+  nodes <- data.frame(id = sort(unique(c(thinned_edges$source_id, thinned_edges$target_id))))
+  nodes$label <- vertices$Label[vertices$ID %in% (nodes$id + 1)]
+  colnames(nodes)[[2]] <- c('attr')
+  marvel_net_3 <- graph_from_data_frame(d = thinned_edges[c(1,2)], 
+                                        directed = F, vertices = nodes) 
+    
+# Adding edge weights
+  igraph::edge.attributes(marvel_net_3)$weight <- as.integer(thinned_edges$weight)
+  rm(edges, thinned_edges)  
+  
+# Inspecting Network
+  summary(marvel_net_3)
+```
+## Visual Inspection of the Thinned Network
+```{r plotting_thinned_network,  fig.align='center', fig.width=2, fig.height=1.5}
+# Creating Layout: This Step Takes Time
+# kk_layout <- igraph::layout.kamada.kawai(marvel_net_3)
+# readr::write_csv(data.frame(x_coord = kk_layout[,1], y_coord =  kk_layout[,2]), file="Thinned_Graph_Coordinates.csv")
+
+# Plotting the Thinned Network
+  par(mar=c(0.5, 0.5, 0.5, 0.5)) 
+  kk_layout <- readr::read_csv("Thinned_Graph_Coordinates.csv")
+  vertex_degrees <- as.numeric(sqrt(degree(marvel_net_3))) 
+  plot(marvel_net_3, vertex.size=vertex_degrees, vertex.label=NA, layout= as.matrix(kk_layout))
+
+```
+## Community Detection Methods
+These results are from Jim Moody's (2024) working paper, \textit{Evaluating Network Community Detection I: Heuristic Performance in Noisy Networks}. Given these results, we are going to focus on iGraph's implementation of the \href{https://arxiv.org/abs/1810.08473}{Leiden} community detection method. \href{https://arxiv.org/abs/cond-mat/0603718}{Spin Glass} is a nice alternative for graphs under 5,000 nodes. For networks of this size and density, it is intractable. 
+
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\vspace{0.15cm}
+
+\begin{figure}
+\centering
+  \includegraphics[width=0.8\textwidth]{Example_Sociogram (Moody, 2024).pdf}
+\caption*{}
+\end{figure}
+
+\end{column}
+\hspace{-10pt}
+\begin{column}{0.5\textwidth}
+\vspace{0.15cm}
+
+\begin{figure}
+\centering
+  \includegraphics[width=0.8\textwidth]{Cluster_Recovery.pdf}
+\caption*{}
+\end{figure}
+
+\end{column}
+\end{columns}
+
+## Isolating the Larget Weakly Connected Component
+```{r isolating_largest_component}
+# Isolating the Largest Component to Cluster
+  components <- clusters(marvel_net_3)
+  biggest_cluster_id <- which.max(components$csize)
+  comp_ids <- V(marvel_net_3)[components$membership == biggest_cluster_id]
+  marvel_lc <- igraph::induced_subgraph(marvel_net_3, comp_ids)
+  rm(biggest_cluster_id, comp_ids)
+```
+  
+## Performing Community Detection: Take 1  
+```{r community detection_take_1}  
+# Code for Performing Spin Glass Community Detection on the Graph's Largest Component
+# sg_comm <- spinglass.community(marvel_lc)
+  
+# Performing Leiden Community Detection with a Resolution Parameter of 1
+  community_leiden <- cluster_leiden(marvel_lc, resolution = 1)
+
+# Assign Community Membership as an Attribute
+  V(marvel_lc)$community <- community_leiden$membership
+```  
+  
+## Reviewing the Community Assignments  
+```{r community_assignments}    
+# Creating Community Membership Table
+  community_memberships <- as.data.frame(sort(membership(community_leiden)))
+  community_memberships <- cbind(as.numeric(rownames(community_memberships)),  community_memberships)
+  colnames(community_memberships) <- c("id", 'community')  
+  community_memberships$label <- nodes$attr[(nodes$id %in% community_memberships$id)]
+  community_memberships <- community_memberships[c(1,3,2)]
+  head(community_memberships)
+```
+
+## Determine the Number & Sizes of Our Communities
+```{r community_sizes, fig.width=3, fig.height=2.25}   
+# Aggregating to Get a Sense of the Communities Sizes
+  community_counts <- aggregate(x = list(Count =  community_memberships$id), 
+                                by = list(Community =  community_memberships$community), 
+                                FUN = length)
+  nrow(community_counts)
+  mean(community_counts$Count)
+  sd(community_counts$Count)
+  median(community_counts$Count)
+```
+  
+## Plotting the Community Size Distribution
+```{r plotting_community_sizes} 
+# Looking at the Communities Size Distribution
+  plot(community_counts$Count, xlab='Observation Number', ylab= 'Community Size', 
+       las=1, type = "c",bty="n",   col='blue', main='', cex.axis=0.80)
+  grid(lwd = 2)
+  
+```
+
+## Network Reduction: Community x Community Graphs
+```{r shrinking_the_network}
+# Shrinking the Network to Create a Community x Community Graph, 
+# Edges in this Community are the Sum of Co-Occurrences
+  community_graph <- shrink_network(marvel_lc, community_leiden$membership)
+
+# Calculating the Degree of Each Community
+  vertex_degrees <- as.numeric(sqrt(degree(community_graph))) 
+```
+
+## Plotting the Community Graph, Hiding Self-Loops
+```{r plotting_community_graph, fig.align='center', fig.width=3.75, fig.height=2.8125}
+  par(mar=c(0,0,0,0))
+  plot(simplify(community_graph), vertex.size=vertex_degrees, vertex.label=NA, 
+       layout=layout_with_kk)
+```
+## Performing a Resolution Sweep Analysis
+As indicated in the community detection simulation results, we can significantly improve the Leiden results if we know what resolution parameter that optimizes modularity, a resolution of 1 is often a good but rarely the best choice. To identify the optimal resolution parameter, we use Wier et al,'s \href{https://champ.readthedocs.io/en/latest/index.html}{Convex Hull of Admissible Modularity Partitions (CHAMP)} framework. CHAMP is currently implemented in Python, but will be included in the ideanet tools in the near future. I have included the Jupyter notebook used for this analysis.
+
+\begin{figure}
+\centering
+  \includegraphics[width=0.65\textwidth]{Marvel_Thinned_Modularity_and_Heatmap.pdf}
+\caption*{}
+\end{figure}
+
+## Performing Community Detection: Take 2  
+In this case, 1 was very close to optimal, as indicated by break in the convex hull and the cross over point with the number of communities. We, however, can get a slightly better solution with value of 0.968.
+
+```{r community_detection_take_2}  
+
+# Performing Leiden Community Detection with a Resolution Parameter of 1
+# community_leiden <- cluster_leiden(marvel_lc, resolution = 0.968)
+  community_leiden <- readLines("communities_marvel_lc_res_0_98.clu")
+  community_leiden <- as.numeric(community_leiden[(2:length(community_leiden))])
+
+# Isolating the Partition Memberships
+  community_memberships <- data.frame(id = as.integer(V(marvel_lc)) - 1, community = community_leiden)
+  community_memberships$label <- get.vertex.attribute(marvel_lc, "attr")
+  community_memberships <- community_memberships[c(1,3,2)]
+```  
+
+## Recalculating the Community Memberships
+```{r recalculating_community_memberships}
+# Assign Community Membership as an Attribute
+  V(marvel_lc)$community <- community_memberships$community
+  
+# Aggregating to Get a Sense of the Communities Sizes
+  community_counts <- aggregate(x = list(count =  community_memberships$id), 
+                                by = list(Community =  community_memberships$community), 
+                                FUN = length)
+
+``` 
+
+## Identifying the Most Central Character in Each Community
+```{r identifying_group_leaders}
+# Create the subgraph excluding between-group edges
+  marvel_ingroup <-  ingroup_graph(marvel_lc, community_memberships, FALSE)
+ 
+# Calculating Each Nodes In-Group Degree
+  ingroup_degree <- data.frame(id = as.numeric(V(marvel_ingroup) - 1), 
+                               total_ingroup_degree = as.numeric(degree(marvel_ingroup)))
+  global_degree <- data.frame(id = as.numeric(V(marvel_lc) - 1), 
+                              total_degree = as.numeric(degree(marvel_lc)))
+  community_memberships <- dplyr::left_join(community_memberships, ingroup_degree, by="id")
+  community_memberships <- dplyr::left_join(community_memberships, global_degree, by="id")
+  
+# Identifying the Most Central Nodes in each Community
+  community_memberships_table <- as.data.table(community_memberships)
+  community_leaders <- community_memberships_table[, .SD[which.max(total_ingroup_degree)], 
+                                                   by = community]
+
+``` 
+
+## Looking at the Largest Groups' Most Central Actors
+```{r identifying_large_group_leaders}
+# Calculating Groups Sizes
+  community_counts <- aggregate(x = list(count =  community_memberships$id), 
+                                by = list(community =  community_memberships$community), 
+                                FUN = length)
+
+# Joining Table to Get Identify Group Leaders of the Largest Groups
+  community_counts <- dplyr::left_join(community_counts, community_leaders, by=c('community'))
+  community_counts <- community_counts[order(-community_counts$count), ]
+  head(community_counts)
+
+``` 
+
+## Extracting the Largest Communities
+```{r isolating_largest_communities}
+# Identifying the Four Largest Communities
+  large_communities <- community_counts$community[community_counts$count >= 600]
+
+# Extracting Communities
+  community_subgraphs <- vector('list', length(large_communities))
+  names(community_subgraphs) <- paste0("Community ",large_communities)
+  for (i in seq_along(large_communities)) {
+    # Extract vertices belonging to the current community
+      comm_vertices <- V(marvel_lc)[community == large_communities[[i]]]
+    
+    # Create a subgraph for the current community
+      if (length(comm_vertices) > 0) {  # Ensure there are vertices to create a subgraph
+        community_subgraphs[[i]] <- induced_subgraph(marvel_lc, vids = comm_vertices)
+      }else {
+        warning(paste("No vertices found for community", comm_id))
+      }
+  }
+  
+```
+  
+## Plotting the Four Communities - Code
+```{r examining_largest_communities, results='hide', echo=TRUE, fig.show='hide'}
+# Creating Color Pallett
+community_colors <- setNames(c("#AA3377", "#66CCEE", "#CCBB44", "#BBBBBB"), large_communities)
+  
+# Plot each subgraph
+par(mfrow = c(2, 2), mar = c(2, 2, 2, 2))
+for (i in seq_along(community_subgraphs)) {
+  comm_id <- names(community_subgraphs)[i]
+  g <- community_subgraphs[[i]]
+    
+  plot(g, main = names(community_subgraphs)[[i]],
+        main.cex = 1.5, vertex.color = community_colors[[i]],
+        vertex.size = 5, vertex.label = NA)
+}
+```
+
+## Plotting the Four Communities - Plot
+\begin{figure}
+\centering
+  \includegraphics[width=0.45\textwidth]{community_plots.pdf}
+\caption*{}
+\end{figure}
