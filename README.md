@@ -6,4 +6,4 @@ Welcome to the **Caffeine Citation** project! This repository is brewed to perfe
 
 ## About the Project
 
-☕ This project consists of a set of social network analyses in R and Pajek that examine changes Caffeine Citation literature over time. The soure of the data were articles collected from the Web of Science (WOS). 
+☕ This project consists of a set of social network analyses in R and Pajek that examine changes in the Caffeine Citation literature over time. The source of the data were articles collected from the Web of Science (WOS). 
