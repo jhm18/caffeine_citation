@@ -25,6 +25,9 @@ options(scipen = 999)
 # Set Working Directory
 setwd("/workspace/caffeine_citation")
 
+# Push changes
+# docker exec -it caffeine /bin/bash
+
 ######################
 ####   Functions  ####
 ######################
