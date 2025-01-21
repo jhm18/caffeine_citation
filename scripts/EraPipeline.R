@@ -1,6 +1,7 @@
 # Era Pipeline 
 # Sarah Delmar and Jon Morgan
-# Oct 8 2024
+# 21 Jan 2025
+
 
 ### Next Steps
 # We are currently using articles, but we want to use their citations
@@ -30,8 +31,8 @@ setwd("/workspace/caffeine_citation")
 #Source Pajek
 source("scripts/RPajekFunctions_30April2023.r")
 
-vertices <- era22_vertices
-network_partition <- era22_communities 
+#vertices <- era22_vertices
+#network_partition <- era22_communities 
 # Map from current vertices list to article and file id
 id_map <- function(node_list, vertices, era, network_partition){
   # Reduce node list  to current era
@@ -46,12 +47,12 @@ id_map <- function(node_list, vertices, era, network_partition){
   return(id_index)
 }
 
-t1_id_index <- era22_id_index
-t2_id_index <- era23_id_index
+#t1_id_index <- era22_id_index
+#t2_id_index <- era23_id_index
 
 # Pull out citations from each article in each era
-id_index <- t1_id_index
-vertices <- era22_vertices
+#id_index <- t1_id_index
+#vertices <- era22_vertices
 citation_finder <- function(node_list,edges, era1, era2){
   # Returns cited articles found in the current eras
   # Join era with edge list
@@ -126,6 +127,36 @@ community_membership <- function(t1_id_index, t2_id_index, cited_index){
   return(result2)
 }
 
+# Create node and edge list of communities that span eras for Pajek
+community_era_net <- function(eras_edges){
+  # Create node list of communities
+  nodes <- sort(unique(c(eras_edges$first_elements, eras_edges$second_elements)))
+  community_nodes <- data.frame(id = seq(1,length(nodes), 1), label = nodes)
+  
+  community_edges <- eras_edges
+  community_edges$obs_id <- seq(1,nrow(eras_edges),1) 
+  
+  # Create sender and target lists
+  sender_edges <- community_edges[c(6,3)]
+  colnames(sender_edges)[2] <- c("label")
+  sender_edges <- dplyr::left_join(sender_edges, community_nodes, by = "label")
+  sender_edges <- sender_edges[c(1,3,2)]
+  colnames(sender_edges)[c(2,3)] <- c("sender_id", "sender_label")
+  
+  target_edges <- community_edges[c(6,4,2,5)]
+  colnames(target_edges)[2] <- c("label")
+  target_edges <- dplyr::left_join(target_edges, community_nodes, by = "label")
+  target_edges <- target_edges[c(1,5,2,3,4)]
+  colnames(target_edges)[c(2,3)] <- c("target_id", "target_label")
+  
+  #Join lists by obs id to create edge list for communities
+  cluster_edges <- dplyr::left_join(sender_edges, target_edges, by="obs_id")
+  
+  community_list <- list(community_nodes = community_nodes, community_edges = cluster_edges)
+  
+  return(community_list)
+}
+
 
 ##############
 ## Tests   ###
@@ -186,4 +217,9 @@ eras_second_elements <- paste0("era2_", eras_edges$second_elements)
 eras_nodes <- unique(c(eras_first_elements, eras_second_elements))
 
 # Write a function that creates a pajek node list and edge list with ID
-# We need to create sequential IDs that we map to the edgelist.
+# We need to create sequential IDs that we map to the community edgelist (era_edges), 
+# since we are creating a network from Era23 to Era22.
+# Creating function, move to function section later
+era_community_list <- community_era_net(eras_edges)
+
+
