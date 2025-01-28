@@ -225,4 +225,9 @@ eras_nodes <- unique(c(eras_first_elements, eras_second_elements))
 # Creating function, move to function section later
 era_community_list <- community_era_net(eras_edges)
 
+write_net('Arcs', era_community_list$community_nodes$label, '', '', '', 'blue', 'white', 
+          era_community_list$community_edges$sender_id, era_community_list$community_edges$target_id,
+          era_community_list$community_edges$proportion, 'gray', 'Era_community_22_23', TRUE)
+
+
 
