@@ -41,6 +41,7 @@
 ####################
 #### Functions  ####
 ####################
+  
 # Source Pajek
   source("scripts/RPajekFunctions_30April2023.r")
 
@@ -185,6 +186,7 @@ load("data/article_combinedv2.Rda")
 load("data/citation_edge_list_21Mar2024.Rda")
 
 # Read in files from Pajek
+
 # Era 23
   setwd("/workspace/caffeine_citation/pajek_files/Era23")  
   read_clu(getwd(), "era23_testCommunity")
