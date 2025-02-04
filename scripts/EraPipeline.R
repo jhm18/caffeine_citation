@@ -173,6 +173,39 @@
       return(community_list)
   }
 
+# For a given era, pull out abstract, title, keywords for all articles
+  era_article_info <- function(article_combined, era, file_outputs){
+    # Subset by era
+      era_data <- article_combined[is.na(article_combined$era) == FALSE, ]
+      era_data <- era_data[era_data$era == era, ]
+      
+    # Subset by file id
+      file_ids <- unique(era_data$file_id)
+      era_files <- file_outputs[c(file_ids)]
+      
+    # Create output for each file that holds title, abstract, keywords
+      era_info <- vector("list", length = length(era_files))
+      for(i in seq_along(file_ids)){
+        # Subset era_data by file and era_files by file
+          article_files <- unique(era_data[era_data$file_id == file_ids[[i]], 3])
+          era_file <- era_files[[i]]
+          
+          # Create output list to hold info for each article
+            article_info <- vector("list", length(article_files))
+          # Loop through each article to pull info from era_files
+            for(j in seq_along(article_files)){
+              era_article <- era_file[[j]]
+              
+              # Manipulate title
+                article_title <- unlist(era_article$TI)
+                article_title <- article_title[-c(1)]
+                article_title <- paste(article_title, collapse = " ")
+            }
+      }
+      
+    
+  }
+  
 ##################
 #### Packages ####
 ##################
