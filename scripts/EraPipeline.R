@@ -191,16 +191,41 @@
           era_file <- era_files[[i]]
           
           # Create output list to hold info for each article
-            article_info <- vector("list", length(article_files))
+            title_list <- vector("character", length(article_files))
+            abstract_list <- vector("character", length(article_files))
+            keyword_list <- vector("character", length(article_files))
+            
           # Loop through each article to pull info from era_files
             for(j in seq_along(article_files)){
+              
+              # In article = 1, j = 116 and 117 are wrong - the j indexing is wrong!!
               era_article <- era_file[[j]]
               
               # Manipulate title
                 article_title <- unlist(era_article$TI)
                 article_title <- article_title[-c(1)]
                 article_title <- paste(article_title, collapse = " ")
+                title_list[[j]] <- article_title
+                
+              # Manipulate keywords
+                article_keywords <- unlist(era_article$ID)
+                article_keywords <- article_keywords[-c(1)]
+                article_keywords <- paste(article_keywords, collapse = " ")
+                article_keywords <- strsplit(article_keywords, ";")[[1]]
+                article_keywords <- trim(article_keywords)
+                article_keywords <- paste(article_keywords, collapse = ",")
+                keyword_list[[j]] <- article_keywords
+                
+              # Manipulate abstract
+                article_abstract <- unlist(era_article$AB)
+                article_abstract <- article_abstract[-c(1)]
+                article_abstract <- paste(article_abstract, collapse = " ")
+                abstract_list[[j]] <- article_abstract
             }
+            
+            era_info[[i]] <- 
+              test <- data.frame(file_id = file_ids[[i]], article_id = article_files, title = title_list,
+                       abstract_list = abstract_list, keywords = keyword_list)
       }
       
     
