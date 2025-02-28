@@ -194,12 +194,18 @@
             title_list <- vector("character", length(article_files))
             abstract_list <- vector("character", length(article_files))
             keyword_list <- vector("character", length(article_files))
+            doi_list <- vector("character", length(article_files))
             
           # Loop through each article to pull info from era_files
             for(j in seq_along(article_files)){
               
-              # In article = 1, j = 116 and 117 are wrong - the j indexing is wrong!!
-              era_article <- era_file[[j]]
+              # In article = 1, j = 16 and 17 are wrong - the j indexing is wrong!!
+              era_article <- era_file[[article_files[[j]]]]
+              
+              # Pull doi
+                article_doi <- unlist(era_article$DI)
+                article_doi <- article_doi[-c(1)]
+                doi_list[[j]] <- article_doi
               
               # Manipulate title
                 article_title <- unlist(era_article$TI)
@@ -223,13 +229,16 @@
                 abstract_list[[j]] <- article_abstract
             }
             
-            era_info[[i]] <- 
-              test <- data.frame(file_id = file_ids[[i]], article_id = article_files, title = title_list,
-                       abstract_list = abstract_list, keywords = keyword_list)
+            era_info[[i]] <- data.frame(file_id = file_ids[[i]], article_id = article_files, doi = doi_list, title = title_list,
+                                        abstract_list = abstract_list, keywords = keyword_list)
       }
       
+    # Stack all output lists
+      era_info <- do.call("rbind", era_info)
     
+      return(era_info)
   }
+  ## Fix how we pull out DOI, take it from article_combined not file_outputs
   
 ##################
 #### Packages ####
@@ -292,9 +301,9 @@ load("data/citation_edge_list_21Mar2024.Rda")
             era_community_list$community_edges$sender_id, era_community_list$community_edges$target_id,
             era_community_list$community_edges$proportion, 'gray', 'Era_community_22_23', TRUE)
   
-# Create 
-
-
+# Create a list of abstract/title/keywords for all articles in a given era
+  era22_data <- era_article_info(article_combined, 22, file_outputs)
+  era23_data <- era_article_info(article_combined, 23, file_outputs)
 ############
 ## Tests ###
 ############
