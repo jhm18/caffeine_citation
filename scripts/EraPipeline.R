@@ -173,7 +173,7 @@
       return(community_list)
   }
 
-# For a given era, pull out abstract, title, keywords for all articles
+# For a given era, pull out doi, abstract, title, keywords for all articles
   era_article_info <- function(article_combined, era, file_outputs){
     # Subset by era
       era_data <- article_combined[is.na(article_combined$era) == FALSE, ]
@@ -203,10 +203,10 @@
               era_article <- era_file[[article_files[[j]]]]
               
               # Pull doi
-                article_doi <- unlist(era_article$DI)
-                article_doi <- article_doi[-c(1)]
+                article_doi <- unique(era_data[era_data$file_id == file_ids[[i]] & 
+                                                  era_data$article_id == article_files[[j]],"source_combined"])
                 doi_list[[j]] <- article_doi
-              
+                
               # Manipulate title
                 article_title <- unlist(era_article$TI)
                 article_title <- article_title[-c(1)]
@@ -238,7 +238,33 @@
     
       return(era_info)
   }
-  ## Fix how we pull out DOI, take it from article_combined not file_outputs
+
+# For a given era, merge era#_data with node list to get node_id
+  node_identifier <- function(era_df, era, node_list){
+    # Subset node list to current era
+      curr_node_list <- node_list[node_list$era == era, ]
+      
+    # Rename columns to match df
+      colnames(curr_node_list)[[2]] <- c("doi")
+      
+    # Merge df with node list
+      era_df <- dplyr::left_join(era_df,curr_node_list[c(1,2)], by="doi")
+      era_df <- era_df[c(1,2,7,3:6)]
+      
+      return(era_df)
+  }
+
+# For a given era, add in community ids
+  community_identifier <- function(era_df, id_index){
+    # Merge era_df with community id
+      era_df <- dplyr::left_join(era_df, id_index[c(2,4)], by="node_id")
+      era_df <- era_df[c(1:3,8,4:7)]
+      
+    # Sort by community
+      era_df <- era_df[order(era_df$community),]
+    
+      return(era_df)
+  }
   
 ##################
 #### Packages ####
@@ -304,6 +330,21 @@ load("data/citation_edge_list_21Mar2024.Rda")
 # Create a list of abstract/title/keywords for all articles in a given era
   era22_data <- era_article_info(article_combined, 22, file_outputs)
   era23_data <- era_article_info(article_combined, 23, file_outputs)
+
+# Add in node_id  
+  era22_data <- node_identifier(era22_data, 22, node_list)
+  era23_data <- node_identifier(era23_data, 23, node_list)
+  
+# Add in community_id and sort by community
+  era22_data <- community_identifier(era22_data, era22_id_index)
+  era23_data <- community_identifier(era23_data, era23_id_index)
+
+# Saving data
+  setwd("/workspace/caffeine_citation/data")
+  save(era22_data, file="era22_prompt.Rda")
+  save(era23_data, file="era23_prompt.Rda")
+  
+  setwd("/workspace/caffeine_citation/pajek_files/Era22")
 ############
 ## Tests ###
 ############
