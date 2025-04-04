@@ -54,79 +54,93 @@ library(parallel)
     
     return(chunks)
   }
+  
+# Request Function
+  make_request <- function(data) {
+    # Write the prompt to the file
+      prompt_header <- "You are a helpful assistant that generates concise, meaningful names for clusters based on their associated community ID and text themes.
+For each community, provide a short, descriptive name (2-10 words) that captures the main theme of the text.
+The first element in each row of the data is the community ID. Each element is separated by a tab or \t.
+The theme is defined by  the next three elements. These elements refer to the title, a set of keywords, and an abstract for that data row. 
+
+Return only the result as a CSV with two columns:
+   - `community_id`: The ID of the community.
+   - `theme`: The concise name for the cluster.
+Do not include any extra text, explanations, or markdown formatting. The CSV should have no headers, footers, or commentary.
+Here is the data to analyze:"
+      
+    # Creating a Spacer
+      spacer <- c("")
+ 
+    # Create Character Vector of Data Elements
+      data_list <- vector('character', nrow(data))
+      for (i in seq_along(data_list)){
+        data_list[[i]] <- paste(data[i,1], data[i,2], data[i,4], data[i,3], sep = "\t ")
+      }
+      
+    # Create Output List
+      prompt_list <- append(prompt_header, spacer)
+      prompt_list <- append(prompt_list, data_list)
+      
+    # Creating Prompt
+      temp_file <- tempfile(fileext = ".txt")
+      writeLines(prompt_list, temp_file)
+
+      prompt <- paste(readLines(temp_file), collapse = "\n")
+      unlink(temp_file)  # Clean up temporary file immediately
+    
+    # Construct API request
+      url <- "https://api.openai.com/v1/chat/completions"
+      response <- POST(
+        url,
+        add_headers(
+          "Authorization" = paste("Bearer", Sys.getenv("OPENAI_API_KEY")),
+          "Content-Type" = "application/json"
+        ),
+        body = list(
+          model = model,
+          messages = list(
+            list(role = "system", content = "You are a helpful assistant that generates concise, meaningful names for clusters based on their constituent elements and concepts."),
+            list(role = "user", content = prompt)
+          )
+        ),
+        encode = "json"
+      )
+    
+    # Handle API response
+      if (status_code(response) != 200) {
+        stop("API call failed with status: ", status_code(response), "\n", content(response, "text"))
+      }
+      
+      content(response, "text", encoding = "UTF-8") %>% fromJSON(flatten = TRUE)
+  }
 
 # Community Labeling with ChatGPT
   generate_cluster_name <- function(data, model = "gpt-4", retries = 3) {
-    # Function to make a single API request
-      make_request <- function(data) {
-        # Create a temporary file for the prompt
-          temp_file <- tempfile(fileext = ".txt")
-        
-        # Write the prompt to the file
-          prompt_header <- "You are a helpful assistant that generates concise, meaningful names for clusters based on their associated community ID and text themes.
-                            For each community, provide a short, descriptive name (2-10 words) that captures the main theme of the text themes for that community.
-                            The theme is defined by  the following 3 columns: `title`, `abstract_list`, and `keywords`.
-                            Return only the result as a CSV with two columns:
-                                                  - `community_id`: The ID of the community.
-                                                  - `theme`: The concise name for the cluster.
-                            Do not include any extra text, explanations, or markdown formatting. The CSV should have no headers, footers, or commentary.
-                            Here is the data to analyze: community_id, title, abstract_list, keywords"
-        
-          writeLines(prompt_header, temp_file)
-          write.table(data, temp_file, append = TRUE, sep = "\t", col.names = FALSE, row.names = FALSE, quote = FALSE)
-          prompt <- paste(readLines(temp_file), collapse = "\n")
-          unlink(temp_file)  # Clean up temporary file immediately
-            
-        # Construct API request
-        url <- "https://api.openai.com/v1/chat/completions"
-        response <- POST(
-          url,
-          add_headers(
-            "Authorization" = paste("Bearer", Sys.getenv("OPENAI_API_KEY")),
-            "Content-Type" = "application/json"
-          ),
-          body = list(
-            model = model,
-            messages = list(
-              list(role = "system", content = "You are a helpful assistant that generates concise, meaningful names for clusters based on their constituent elements and concepts."),
-              list(role = "user", content = prompt)
-            )
-          ),
-          encode = "json"
-        )
-        
-        # Handle API response
-        if (status_code(response) != 200) {
-          stop("API call failed with status: ", status_code(response), "\n", content(response, "text"))
-        }
-        
-        content(response, "text", encoding = "UTF-8") %>% fromJSON(flatten = TRUE)
-      }
-      
     # Retry logic
-    for (i in seq_len(retries)) {
-      result <- tryCatch(
-        make_request(data),
-        error = function(e) {
-          if (i == retries) stop("API call failed after ", retries, " retries.")
-          Sys.sleep(2^i)  # Exponential backoff
-          return(NULL)
-        }
-      )
-      if (!is.null(result)) break
-    }
+      for (i in seq_len(retries)) {
+        result <- tryCatch(
+          make_request(data),
+          error = function(e) {
+            if (i == retries) stop("API call failed after ", retries, " retries.")
+            Sys.sleep(2^i)  # Exponential backoff
+            return(NULL)
+          }
+        )
+        if (!is.null(result)) break
+      }
     
     # Extract and parse the response
-    response_content <- result$choices$message.content
-    response_lines <- unlist(strsplit(response_content, "\n"))
-    split_lines <- lapply(response_lines, function(line) strsplit(line, ",")[[1]])
-    output_data <- do.call(rbind, split_lines)
-    colnames(output_data) <- c("community_id", "theme")
-    output_data <- as.data.frame(output_data, stringsAsFactors = FALSE)
-    output_data$community_id <- as.integer(output_data$community_id)
+      response_content <- result$choices$message.content
+      response_lines <- unlist(strsplit(response_content, "\n"))
+      split_lines <- lapply(response_lines, function(line) strsplit(line, ",")[[1]])
+      output_data <- do.call(rbind, split_lines)
+      colnames(output_data) <- c("community_id", "theme")
+      output_data <- as.data.frame(output_data, stringsAsFactors = FALSE)
+      output_data$community_id <- as.integer(output_data$community_id)
     
     # Return Output
-    return(output_data)
+      return(output_data)
   }
 
 # NOTES: We need to adjust this function to provide ChatGPT more structure when review the prompt. 
@@ -143,21 +157,25 @@ library(parallel)
   era22_prompt <- era22_data[c(4,6:8)]
   colnames(era22_prompt)[[1]] <- c("community_id")
   
-  #########################
-  #   LABELING CLUSTERS   #
-  #########################
+#########################
+#   LABELING CLUSTERS   #
+#########################
   
-  # Chunking Data
+# NOTES
+# 1) Adjust Chunking to perform a request per community. Multiple communities are too much information.
+# 2) Adjust Prompt to generate one theme for the entire dataset. This is okay because each dataset is specific to each community.
+  
+# Chunking Data
     chunks <- chunk_data_by_community(era22_prompt, chunk_size = 100)
   
-  # Running in Parallel
+# Running in Parallel
     results <- mclapply(
       chunks[c(1:4)],
       function(chunk) generate_cluster_name(chunk, model = "gpt-4"),
       mc.cores = 4
     )
   
-  # Combine results into a single data frame
+# Combine results into a single data frame
     final_results <- do.call(rbind, results)
   
 
