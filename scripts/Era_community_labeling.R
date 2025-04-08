@@ -54,22 +54,27 @@ library(parallel)
     
     return(chunks)
   }
+ 
+## Notes
+  # Adjust function to take a csv input with a prompt where each column and row are defined. 
+  # Alternatively, we don't give the community with the prompt. We save it out, and just give the article info.
+  
   
 # Request Function
   make_request <- function(data) {
     # Write the prompt to the file
-      prompt_header <- "You are a helpful assistant that generates a concise, meaningful name for the cluster by summarizing the content of multiple articles.
-Each row in the input data corresponds to an article. The input data corresponds to a group of articles with a shared community ID.
-For the given community, provide a short, descriptive name (2-10 words) that captures the main theme of all the articles (i.e. all data rows). 
-The first element in each row of the data is the community ID. Each element is separated by a tab or \t.
-The theme is defined by  the next three elements. These elements refer to the title, a set of keywords, and an abstract for each article in that cluster.
+      prompt_header <- "You are a helpful assistant that generates a concise, meaningful name for a cluster of articles that share a community ID.
 
-Return only the result as a CSV with two columns and one row:
-   - `community_id`: The ID of the community.
-   - `theme`: A single concise name for the entire cluster. 
-   
-Do not include any extra text, explanations, or markdown formatting. The CSV should have no headers, footers, or commentary.
-Do not provide a name for each row of data. Rather, provide a single name for the entire dataset.
+Each row in the input data corresponds to an article. The first element in each row is the community ID, followed by the article's title, keywords, and abstract, separated by tabs (\\t).
+
+All rows in this input data belong to the same community. Your task is to analyze the **entire set of rows** as a whole and generate a single short theme name (2–10 words) that summarizes the main topic of this cluster.
+
+Return a CSV with **exactly one row and two columns**:
+- community_id: the shared community ID
+- theme: a single concise name for the entire cluster
+
+Do not include any headers, explanations, or commentary. Output only the CSV row. Do not name each article. Summarize all articles together.
+
 Here is the data to analyze:"
       
     # Creating a Spacer
@@ -80,6 +85,7 @@ Here is the data to analyze:"
       for (i in seq_along(data_list)){
         data_list[[i]] <- paste(data[i,1], data[i,2], data[i,4], data[i,3], sep = "\t ")
       }
+      data_list <- paste(data_list, collapse = "\n")
       
     # Create Output List
       prompt_list <- append(prompt_header, spacer)
