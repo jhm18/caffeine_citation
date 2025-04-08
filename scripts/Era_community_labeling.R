@@ -58,15 +58,18 @@ library(parallel)
 # Request Function
   make_request <- function(data) {
     # Write the prompt to the file
-      prompt_header <- "You are a helpful assistant that generates concise, meaningful names for clusters based on their associated community ID and text themes.
-For each community, provide a short, descriptive name (2-10 words) that captures the main theme of the text.
+      prompt_header <- "You are a helpful assistant that generates a concise, meaningful name for the cluster by summarizing the content of multiple articles.
+Each row in the input data corresponds to an article. The input data corresponds to a group of articles with a shared community ID.
+For the given community, provide a short, descriptive name (2-10 words) that captures the main theme of all the articles (i.e. all data rows). 
 The first element in each row of the data is the community ID. Each element is separated by a tab or \t.
-The theme is defined by  the next three elements. These elements refer to the title, a set of keywords, and an abstract for that data row. 
+The theme is defined by  the next three elements. These elements refer to the title, a set of keywords, and an abstract for each article in that cluster.
 
-Return only the result as a CSV with two columns:
+Return only the result as a CSV with two columns and one row:
    - `community_id`: The ID of the community.
-   - `theme`: The concise name for the cluster.
+   - `theme`: A single concise name for the entire cluster. 
+   
 Do not include any extra text, explanations, or markdown formatting. The CSV should have no headers, footers, or commentary.
+Do not provide a name for each row of data. Rather, provide a single name for the entire dataset.
 Here is the data to analyze:"
       
     # Creating a Spacer
