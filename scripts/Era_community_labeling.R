@@ -61,42 +61,38 @@ library(parallel)
   
   
 # Request Function
+  data <- era22_prompt
   make_request <- function(data) {
-    # Write the prompt to the file
-      prompt_header <- "You are a helpful assistant that generates a concise, meaningful name for a cluster of articles that share a community ID.
+    #   Create a temporary file for the prompt
+        temp_file <- tempfile(fileext = ".txt")
 
-Each row in the input data corresponds to an article. The first element in each row is the community ID, followed by the article's title, keywords, and abstract, separated by tabs (\\t).
+    #   Write the prompt to the file
+        prompt_header <- "
+You are a helpful assistant that generates concise, meaningful names for clusters based on their associated community ID and text themes.
 
-All rows in this input data belong to the same community. Your task is to analyze the **entire set of rows** as a whole and generate a single short theme name (2–10 words) that summarizes the main topic of this cluster.
+For each community, provide a short, descriptive name (2-5 words) that captures the main theme of the text themes for that community.
 
-Return a CSV with **exactly one row and two columns**:
-- community_id: the shared community ID
-- theme: a single concise name for the entire cluster
+Return only the result as a CSV with two columns:
+- `community_id`: The ID of the community.
+- `theme`: The concise name for the cluster.
 
-Do not include any headers, explanations, or commentary. Output only the CSV row. Do not name each article. Summarize all articles together.
+Do not include any extra text, explanations, or markdown formatting. The CSV should have no headers, footers, or commentary. 
 
-Here is the data to analyze:"
-      
-    # Creating a Spacer
-      spacer <- c("")
- 
-    # Create Character Vector of Data Elements
-      data_list <- vector('character', nrow(data))
-      for (i in seq_along(data_list)){
-        data_list[[i]] <- paste(data[i,1], data[i,2], data[i,4], data[i,3], sep = "\t ")
-      }
-      data_list <- paste(data_list, collapse = "\n")
-      
-    # Create Output List
-      prompt_list <- append(prompt_header, spacer)
-      prompt_list <- append(prompt_list, data_list)
-      
-    # Creating Prompt
-      temp_file <- tempfile(fileext = ".txt")
-      writeLines(prompt_list, temp_file)
+Here is the data to analyze:
 
-      prompt <- paste(readLines(temp_file), collapse = "\n")
-      unlink(temp_file)  # Clean up temporary file immediately
+community_id\ttext_theme
+"
+  # Create Character Vector of Data Elements
+    clusters <- data$community_id
+    data_body <- paste( data[[2]], data[[4]], data[[3]], sep = " ")
+    data_df <- data.frame(community_id = clusters, text_theme = data_body)
+    test_data <- data_df[data_df$community_id == 1,]
+
+  # Construct Query 
+    writeLines(prompt_header, temp_file)
+    write.table(test_data, temp_file, append = TRUE, sep = "\t", col.names = FALSE, row.names = FALSE, quote = FALSE)
+    prompt <- paste(readLines(temp_file), collapse = "\n")
+    unlink(temp_file)  # Clean up temporary file immediately
     
     # Construct API request
       url <- "https://api.openai.com/v1/chat/completions"
@@ -121,7 +117,10 @@ Here is the data to analyze:"
         stop("API call failed with status: ", status_code(response), "\n", content(response, "text"))
       }
       
-      content(response, "text", encoding = "UTF-8") %>% fromJSON(flatten = TRUE)
+      result <- content(response, "text", encoding = "UTF-8") %>% fromJSON(flatten = TRUE)
+      result$choices$message.content
+
+      
   }
 
 # Community Labeling with ChatGPT
@@ -129,7 +128,7 @@ Here is the data to analyze:"
     # Retry logic
       for (i in seq_len(retries)) {
         result <- tryCatch(
-          make_request(data),
+          make_request(test_data),
           error = function(e) {
             if (i == retries) stop("API call failed after ", retries, " retries.")
             Sys.sleep(2^i)  # Exponential backoff
@@ -186,5 +185,23 @@ Here is the data to analyze:"
   
 # Combine results into a single data frame
     final_results <- do.call(rbind, results)
-  
 
+
+#############
+#   TESTS   #
+#############
+
+# Write the prompt to the file
+#  prompt_header <- "You are a helpful assistant that generates a concise, meaningful name for a cluster of articles that share a community ID.
+
+#Each row in the input data corresponds to an article. The first element in each row is the community ID, followed by the article's title, keywords, and abstract, separated by tabs (\\t).
+
+#All rows in this input data belong to the same community. Your task is to analyze the **entire set of rows** as a whole and generate a single short theme name (2–10 words) that summarizes the main topic of this cluster.
+
+#Return a CSV with **exactly one row and two columns**:
+#- community_id: the shared community ID
+#- theme: a single concise name for the entire cluster
+
+#Do not include any headers, explanations, or commentary. Output only the CSV row. Do not name each article. Summarize all articles together.
+
+#Here is the data to analyze:"
