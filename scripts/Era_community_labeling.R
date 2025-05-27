@@ -61,7 +61,8 @@ library(parallel)
   
   
 # Request Function
-  data <- era22_prompt
+  data <- data.frame(community_id = era22_prompt$community_id, text_theme = as.character(era22_prompt$abstract_list))
+
   make_request <- function(data) {
     #   Create a temporary file for the prompt
         temp_file <- tempfile(fileext = ".txt")
@@ -84,9 +85,11 @@ community_id\ttext_theme
 "
   # Create Character Vector of Data Elements
     clusters <- data$community_id
-    data_body <- paste( data[[2]], data[[4]], data[[3]], sep = " ")
+  # data_body <- paste( data[[2]], data[[4]], data[[3]], sep = " ")
+    data_body <- data$text_theme
     data_df <- data.frame(community_id = clusters, text_theme = data_body)
-    test_data <- data_df[data_df$community_id == 1,]
+    test_data <- data_df[data_df$community_id <= 2,]
+    test_data <- test_data[c(1,2,3,4,5,27,28,29,30,31,32), ]
 
   # Construct Query 
     writeLines(prompt_header, temp_file)
@@ -120,7 +123,6 @@ community_id\ttext_theme
       result <- content(response, "text", encoding = "UTF-8") %>% fromJSON(flatten = TRUE)
       result$choices$message.content
 
-      
   }
 
 # Community Labeling with ChatGPT
@@ -151,8 +153,11 @@ community_id\ttext_theme
       return(output_data)
   }
 
-# NOTES: We need to adjust this function to provide ChatGPT more structure when review the prompt. 
-#        We may also need to provide smaller subsets to avoid overwhelming the API.
+# NOTES:  We limit the data in the prompt to the abstract. At the article-level, this gave clearer themes.
+#         Nevertheless, we are not gettting a single theme per community. We are getting a theme per entry.
+#         JHM needs to review the data limits on the OpenAI account. The query does not seem large. We, however, hit processing limits at something like 
+#         12 observations.
+#         WE HAVE CONFIRMED THAT THE PROMPT WORK; BUT, IT REQUIRES MULTIPLE COMMUNITIES IN THE PROMPT.
 
 #################
 #  DATA IMPORT  #
