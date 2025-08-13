@@ -153,8 +153,39 @@ library("ollamar")
             return(community_themes)
     }
 
+#   Helper Function: Text Truncation 
+    truncate_text <- function(text, max_chars = 8000) {
+        #   Check if the prompt exceeds a Max Text Limit
+            if (nchar(text) <= max_chars) return(text)
+    
+        #   Truncate to max_chars
+            truncated <- substr(text, 1, max_chars)
+        
+        #   Try to end at a complete sentence
+            last_period <- max(gregexpr("\\.", truncated)[[1]])
+            if (last_period > max_chars * 0.8) {
+                truncated <- substr(truncated, 1, last_period)
+            }
+        
+        #   Report truncation
+            cat("    Truncated text from", nchar(text), "to", nchar(truncated), "characters\n")
+        
+        #   Return Formatted Text
+            return(truncated)
+    }
+
+#   Helper Function to Determine Stopping Points to Avoid Time Out Errors
+    calculate_timeout <- function(abstract_count, char_count, max_timeout = 1200) {
+        base_timeout <- 300  # 5 minutes base
+        char_factor <- char_count / 1000 * 10  # 10 seconds per 1000 chars
+        abstract_factor <- abstract_count * 15  # 15 seconds per abstract
+    
+        timeout <- base_timeout + char_factor + abstract_factor
+        return(min(timeout, max_timeout))  # Cap at max_timeout
+    }
+
 #   Function to Generate Community Themes
-    generate_community_themes <- function(raw_data) {
+    generate_community_themes <- function(raw_data, max_chars = 8000, max_timeout = 1200) {
         #   Ensure Ollama is running
             if (!ensure_ollama_running()) {
                 stop("Could not start Ollama service")
@@ -169,52 +200,96 @@ library("ollamar")
             library("jsonlite")
     
         #   Initialize results
-            results <- data.frame(community_id = integer(), theme = character())
-        
+            results <- data.frame(community_id = integer(), theme = character(), processing_time = numeric(), status = character())
+    
         #   Process each community
             for(i in 1:nrow(community_data)) {
-                #   Creating Function Terminal Prompt
+                #   Setting Initial Start Time
+                    start_time <- Sys.time()
                     cat("Processing community", community_data$community_id[i], 
                         "with", community_data$abstract_count[i], "abstracts...\n")
             
-                #   Create prompt with all abstracts for this community
-                    prompt <- paste("You must respond with ONLY a 5-10 word theme name. No explanations, no extra text.\n\n",
-                                    "Research cluster content (", community_data$abstract_count[i], "related abstracts):\n",
-                                    community_data$combined_abstracts[i], "\n\n",  # This IS the content
-                                    "Theme:")
+                #   Prepare text (with truncation if needed)
+                    processed_text <- truncate_text(community_data$combined_abstracts[i], max_chars)
+                
+                #   Calculate appropriate timeout
+                    timeout_seconds <- calculate_timeout(
+                        community_data$abstract_count[i], 
+                        nchar(processed_text),
+                        max_timeout
+                    )
+                    cat("    Using timeout:", timeout_seconds, "seconds\n")
             
-                #   Make API call
-                    response <- POST(
-                        "http://127.0.0.1:11434/api/generate",
-                        body = list(
-                            model = "llama3.1:8b",
-                            prompt = prompt,
-                            stream = FALSE
-                        ),
-                        encode = "json"
+                #   Create prompt
+                    prompt <- paste(
+                        "You must respond with ONLY a 5-10 word theme name. No explanations, no extra text.\n\n",
+                        "Research cluster content (", community_data$abstract_count[i], "related abstracts):\n",
+                        processed_text, "\n\n",
+                        "Theme:"
                     )
             
-                #   Extract and clean response
-                    theme <- content(response)$response
-                    theme <- trimws(theme)
-                    theme <- gsub("^(Here is|Here's|The theme is|Theme:|A theme could be):?\\s*", "", theme, ignore.case = TRUE)
-                    theme <- gsub("^[\"']|[\"']$", "", theme)
-                    theme <- gsub("\n.*", "", theme)
-                    theme <- gsub("\\.$", "", theme)
-                    theme <- strsplit(theme, "\\.|\\n")[[1]][1]
-                    theme <- trimws(theme)
-            
-                #   Store result
-                    results <- rbind(results, data.frame(
-                        community_id = community_data$community_id[i],
-                        theme = theme
-                    ))
-            
-                #   Show progress
-                    cat("Community", community_data$community_id[i], ":", theme, "\n\n")
+                #   Make API call with error handling
+                    tryCatch({
+                        #   Creating Response
+                            response <- POST("http://127.0.0.1:11434/api/generate",
+                                        body = list(model = "llama3.1:8b", prompt = prompt, stream = FALSE),
+                                        encode = "json",
+                                        timeout(timeout_seconds))
+                    
+                        #   Check if request was successful
+                            if (status_code(response) != 200) {
+                                stop("API returned status code: ", status_code(response))
+                            }
+                    
+                        #   Extract and clean response
+                            theme <- content(response)$response
+                            theme <- trimws(theme)
+                            theme <- gsub("^(Here is|Here's|The theme is|Theme:|A theme could be):?\\s*", "", theme, ignore.case = TRUE)
+                            theme <- gsub("^[\"']|[\"']$", "", theme)
+                            theme <- gsub("\n.*", "", theme)
+                            theme <- gsub("\\.$", "", theme)
+                            theme <- strsplit(theme, "\\.|\\n")[[1]][1]
+                            theme <- trimws(theme)
+                    
+                        #   Calculate processing time
+                            processing_time <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
+                    
+                        #   Store successful result
+                            results <- rbind(results, data.frame(
+                                community_id = community_data$community_id[i],
+                                theme = theme,
+                                processing_time = round(processing_time, 1),
+                                status = "success"
+                            ))
+                            cat("Community", community_data$community_id[i], ":", theme, 
+                                "(", round(processing_time, 1), "seconds )\n\n")
+                    
+                    }, error = function(e) {
+                        #   Handle errors (timeout, connection issues, etc.)
+                            processing_time <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
+                            error_msg <- e$message
+                            cat("ERROR for community", community_data$community_id[i], ":", error_msg, "\n")
+                        
+                        #   Store failed result with error info
+                            results <<- rbind(results, data.frame(
+                                community_id = community_data$community_id[i],
+                                theme = paste("ERROR:", substr(error_msg, 1, 50)),
+                                processing_time = round(processing_time, 1),
+                                status = "failed"
+                            ))
+                        cat("Continuing to next community...\n\n")
+                    })
             }
-        
-        #   Return Community Themes
+    
+        #   Summary
+            successful <- sum(results$status == "success")
+            failed <- sum(results$status == "failed")
+            cat("=== SUMMARY ===\n")
+            cat("Successful:", successful, "communities\n")
+            cat("Failed:", failed, "communities\n")
+            cat("Total processing time:", round(sum(results$processing_time), 1), "seconds\n")
+    
+        #   Return Results
             return(results)
     }
 
