@@ -315,7 +315,9 @@ library("ollamar")
 #   IMPORTING CLUSTER DATA   #
 ##############################
 
-#   Loading Era 22 for Testing Purposes
+#   ERA 22
+
+#   Loading Era 22 Prompt Data
     load("/workspace/caffeine_citation/data/era22_prompt.Rda")
 
 #   Formatting data (May Back Keywords and Title Later)
@@ -323,27 +325,39 @@ library("ollamar")
     colnames(era22_prompt)[[1]] <- c("community_id")
     community_data <- data.frame(community_id = era22_prompt$community_id, text_theme = as.character(era22_prompt$abstract_list))
 
+#   ERA 23
+
+#   Loading Era 23 Prompt Data
+    load("/workspace/caffeine_citation/data/era23_prompt.Rda")
+
+#   Formatting data (May Back Keywords and Title Later)
+    era23_prompt <- era23_data[c(4,6:8)]
+    colnames(era23_prompt)[[1]] <- c("community_id")
+    era_23_community_data <- data.frame(community_id = era23_prompt$community_id, text_theme = as.character(era23_prompt$abstract_list))
+
 ##########################
 #   COMPARING CLUSTERS   #
 ##########################
 
 #   ERA 22
 
-#   Collapsing Abstracting by Cluster
+#   Collapsing Abstracts by Cluster
     community_abstracts <- prepare_community_data(community_data)
     print(community_abstracts[(1:5),])
 
-#   Examining & Exporting Era 22 Results
+#   Generating Community Labels & Exporting Era 22 Results
     generate_community_themes(community_abstracts, max_chars = 8000, max_timeout = 1200)
     readr::write_csv(era22_results, file=c("/workspace/caffeine_citation/data/era22_results.csv"))
 
-#   ERA 21
+#   ERA 23
 
+#   Collapsing Abstracts by Cluster
+    era_23_community_abstracts <- prepare_community_data(era_23_community_data)
+    print(era_23_community_abstracts[(1:5),])
 
-
-
-
-
+#   Generating Community Labels & Exporting Era 23 Results
+    generate_community_themes( era_23_community_abstracts, max_chars = 8000, max_timeout = 1200)
+    readr::write_csv(era22_results, file=c("/workspace/caffeine_citation/data/era23_results.csv"))
 
 #######################
 #   FUNCTION CHECKS   #
