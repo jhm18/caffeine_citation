@@ -1,0 +1,795 @@
+community_id,theme,processing_time,status
+1,Impact of Obesity and Inflammation on Drug Metabolism,217.5,success
+2,Crystalline Materials for Enhanced Pharmaceutical Properties,205.1,success
+3,"Sleep, Brain Chemistry, and Electrochemical Sensors",206.4,success
+4,Pharmaceutical Formulations and Natural Products Research,166.4,success
+5,Removal of Pharmaceuticals from Water Sources,210.2,success
+6,Caffeine's Effects on Exercise and Cognitive Function,124.7,success
+7,Surface Defects in Metal Halide Perovskite Solar Cells,52.4,success
+8,Regulation of Ryanodine Receptor Function in Muscles,152.2,success
+9,Psychostimulant Impact on Brain Development in Pregnancy Studies,54.1,success
+10,Caffeine's Effects on Humans and Cancer Cells Studied,195.4,success
+11,Metal-Organic Frameworks for Drug Delivery and Adsorption,88.7,success
+12,Green Catalysts in Organic Synthesis Reactions,64.3,success
+13,Delivery Methods for Sublingual Drug Administration Systems Research,32.9,success
+14,Caffeine Research and Applications in Neuroscience,91.6,success
+15,Pharmaceutical Residues in Drinking Water and Wastewater Treatment,197.5,success
+16,Partitioning of Caffeine in Aqueous Two-Phase Systems,28.2,success
+17,Photocatalytic Degradation of Organic Pollutants on Hybrid Fabrics,29.5,success
+18,Chemical Compositions of Tea Products and Their Bioactivity Properties,212.7,success
+19,Molecular Interactions in Pharmaceutical Solvation and Aggregation,180.6,success
+20,Understanding Adenosine Receptors with Computational Techniques and Simulations,41.4,success
+21,Association Between Green Tea Consumption and Mortality Risks,230,success
+22,Translation Modification Implications in Saccharomyces cerevisiae Strains,43.1,success
+23,Health Outcomes and Socioeconomic Factors in Pregnancy,41.7,success
+24,Nanoparticles for Lung Cancer Diagnosis and Treatment Development,24.6,success
+25,Calcium Binding and Polymerization Dynamics in Sarcoplasmic Reticulum,31.4,success
+26,Tea Plant Genetic and Biochemical Research Advances,201.6,success
+27,Metabolomics and Bioactivity of Plant-Derived Compounds,203.6,success
+28,Pharmacokinetic Interactions and Metabolic Variability Studies,228.1,success
+29,Mitochondrial ROS Generation in Pulmonary Artery Smooth Muscle Cells,144.7,success
+30,Caffeine and Migraine Pathways Explored Further Research,98.5,success
+31,Biotechnology and Biosensing Innovations in Detection Systems,80.8,success
+32,Nanoencapsulation for Controlled Release and Sustained Delivery Systems,26.3,success
+33,Phenolic Compound Extraction and Caffeine Content Analysis,171.7,success
+34,Health Benefits of Tea and Polyphenolic Contents Variance,22.1,success
+35,Pregnancy Complications and Incontinence Treatment Options Review,37,success
+36,Bioactive Compounds in Food Wastewater Encapsulation Efficiency,116.1,success
+37,Caffeine's Effects on Blood Pressure and Heart Disease Risk,185.5,success
+38,Pharmaceutical Contaminants in Aquatic Ecosystems Everywhere,190.7,success
+39,Caffeine's Impact on Sleep-Disordered Breathing in Middle-Aged Men,46,success
+40,Neonatal Care and Physiological Maturation Outcomes Study,201.3,success
+41,Autistic Children's Diet and Physical Activity Patterns Compared,50.1,success
+42,Cannabinoids in Parkinson's Disease Treatment Research,194.2,success
+43,Unraveling the Mysteries of Consciousness and Anesthesia,174,success
+44,Magnesium and Nutrient Deficiency Research Studies,178.1,success
+45,Nanostructured Wound Dressings for Enhanced Healing Outcomes,26.2,success
+46,Validation of Liquid Chromatographic Methods for Pharmaceutical Analysis,43.6,success
+47,Genetic Variants Influence Caffeine Effects on Sleep,208.2,success
+48,Coffee Consumption and Metabolic Syndrome Associations,88.7,success
+49,Removal of Micropollutants from Wastewater and Agricultural Systems,207.9,success
+50,Cocrystal Synthesis and Properties Research Developments,127.6,success
+51,Particle Size and Shape Analysis in Pharmaceutical Tablets,32.9,success
+52,Antioxidants in Cosmetics and Plant Extracts Research,162,success
+53,Beverage Constituents and Their Biological Effects,181.1,success
+54,Inflammation and Therapeutic Applications,183.5,success
+55,Oral Drug Delivery Challenges Uncovered Through Research,126.8,success
+56,Caffeine Detection Methods and Techniques Compared,199.5,success
+57,Pharmaceutical Studies on Acetaminophen and Caffeine Granules,31,success
+58,Analytical Methods for Determination of Various Compounds,115.8,success
+59,Synthesis and Evaluation of Antibacterial Aryloxycaffeine Compounds,32.1,success
+60,Electrochemical Sensors for Biochemical Detection and Analysis Research,23.1,success
+61,Overcoming the Mucus Barrier in Drug Discovery,62.5,success
+62,Ocular Therapeutic Delivery Systems Improvement Strategies,67.7,success
+63,Emerging Trends in Artificial Intelligence and Machine Learning,3.8,success
+64,Pharmaceutical Contamination of Water Sources Worldwide,175.5,success
+65,Beverages' Effects on Human Cognitive Functioning,189.7,success
+66,Artificial Intelligence and Machine Learning Applications in Healthcare Sector,4.1,success
+67,Caffeine Boosts Cancer Fighting Immune Response,80.1,success
+68,Respiratory Emergencies in the Delivery Room,208.5,success
+69,Adverse Effects of Caffeinated Beverages on Human Health,182.3,success
+70,Coffee's Protective Effects on Metabolic Diseases and Cancers,190.4,success
+71,Caffeine's Effect on Brain-Computer Interface Signal Processing,37.5,success
+72,The Impact of Technology on Modern Society Behaviors,180.1,success
+73,Expectation Affects Patient Treatment Outcomes Significantly Always,194.4,success
+74,Brain Activity Changes After Drinking Green Tea,33.1,success
+75,Exploring the Frontiers of Artificial Intelligence and Machine Learning,4,success
+76,Water Treatment Technologies Review,213.8,success
+77,Restless Legs Syndrome Research and Treatment Options Explored,28.5,success
+78,Calorimetric Techniques for Studying Polypeptide Metal Ion Interactions,30.8,success
+79,Ocular Biometrics After Caffeine Consumption Trial Results,53.2,success
+80,Metal-Caffeine Complexes and Their Biological Activities,180.5,success
+81,Quantifying Opioids with Emerging New Psychoactive Substances Detection Methods,43.8,success
+82,Caffeine Quantitation by UV Spectrophotometry Method Validation,26.7,success
+83,Caffeine's Effects on Brain Function and Epilepsy Symptoms,202.7,success
+84,The Alarming Effects of Energy Drinks on Alcohol Consumption,41.8,success
+85,Caffeine and Ethanol Combinations in Rewarding Effects,41.6,success
+86,Risks Associated with Nitrous Oxide Misuse Worldwide Increasingly,34.2,success
+87,Action Potentials in Horizontal Cells of the Retina,62.9,success
+88,Stress Effects on Fertility Research Outcomes Observed,95.3,success
+89,Effects of Lifestyle Habits on Reproductive Health,177.1,success
+90,Pharmaceutical Contamination in Urban Rivers Studied Further,47.6,success
+91,Protective Effects of Modafinil Against Ischemic Testicular Injury,45,success
+92,Bacterial Demethylation of Caffeine Molecules Discovered,125.1,success
+93,Adenosine Receptors Modulate Synaptic Plasticity and Mood Disorders,205.3,success
+94,Calcium Ions in Learning and Sensitization Processes Studied,40.7,success
+95,Cytochrome P450 Downregulation Mechanism of Drug-Drug Interaction,38.9,success
+96,Targeting Resistant Cancer Cells with Recombinant Enzymes,64.4,success
+97,Microbiome Modulation by Addictive Substances and Endophytes,136.3,success
+98,Molecular Mechanisms of Stress Response and Adaptation in Cells,163.8,success
+99,Metabolic Changes in Plants under External Stimuli Studied,71.1,success
+100,Pharmaceutical Contaminants in Water Sources,186.5,success
+101,Assessing Refluxogenic Potential of Foods and Beverages Effectively,181.5,success
+102,Extraction and Valorization of Coffee Byproducts,173.5,success
+103,Emerging Trends in Artificial Intelligence and Machine Learning Applications,4.5,success
+104,Caffeine's Medicinal Properties,216.9,success
+105,Exercise Science and Sports Nutrition Research,194.1,success
+106,Coffee's Protective Effects on Human DNA Integrity Studied,36.3,success
+107,Coffee and Tea Consumption in Cancer Prevention Studies,37.3,success
+108,The Impact of Social Stress on Type D Personality Traits,29.2,success
+109,Coffee's Impact on Human Health and Wellness Benefits,188.9,success
+110,Caffeine's Effect on Bone Mineral Density and Vitamin D Receptor Interaction,34.4,success
+111,Optimizing Green Tea Production through Temperature Control Strategies,25.4,success
+112,Childhood Acute Lymphoblastic Leukaemia Disease Mechanisms Uncovered,40.4,success
+113,Bioactive Compound Encapsulation Techniques Research Study,201.4,success
+114,Coffee Extraction Modeling and Simulation Techniques Revealed,51.2,success
+115,Chemical Contamination of Water Resources Worldwide,194.5,success
+116,Coffee Grounds as a Valuable Resource for Extraction and Reuse,200.6,success
+117,Effects of Caffeine on Metabolic Syndromes and Diseases,188.9,success
+118,The Effects of Caffeine and Amino Acid Supplementation on Athletes,59.7,success
+119,Anemia During Pregnancy: A Public Health Concern Worldwide,67.2,success
+120,Artificial Intelligence Applications in Healthcare Technology Systems Integration,2.8,success
+121,Caffeine's Multifaceted Therapeutic Applications Revealed,145.4,success
+122,Blood Sampling Innovations for Improved Analytical Accuracy,109.5,success
+123,Bone Muscle Crosstalk in Osteosarcopenia Pathophysiology Explained,91,success
+124,Water Treatment Technologies for Emerging Contaminants Removal,201.9,success
+125,Green Media in Extraction Field Research Advances,55.6,success
+126,Maternal Metabolome Changes During Pregnancy Studied,48.3,success
+127,Solvent Effects on Caffeine Extraction Process Mechanisms,30.1,success
+128,Coffee's Effects on Metabolism and Human Health,186.4,success
+129,Caffeine's Ergogenic Effects on Exercise Performance,209.8,success
+130,Caffeine Biosynthesis Pathways in Microorganisms and Fermentation Processes,32.8,success
+131,Cocrystals in Pharmaceutical Tablets Quantification Methodologies,84.8,success
+132,Advanced Photocatalysts for Enhanced Environmental Remediation Efficiency,43.8,success
+133,Neurological Rescue through Targeted Therapeutic Nanoparticles Delivery,44.5,success
+134,Quantitative Analysis of Caffeine in Various Beverages,39,success
+135,The Impact of Sleep Deprivation on Physical Performance,173.7,success
+136,Neuroprotective Effects of Caffeine and Plant Extracts,188,success
+137,Caffeine's Impact on Fetal Development and Childhood Behavior,108.3,success
+138,Biological Research Methods for Cancer Treatment Optimization,38.6,success
+139,Blood Pressure and Vascular Smooth Muscle Interaction Dynamics,40.8,success
+140,Coordination Chemistry and Applications of Caffeine Derivatives,120.5,success
+141,Caffeine's Impact on Ethanol Consumption in Mice Studies,45,success
+142,Fertility and Fertilization in Swine Research Studies,45.2,success
+143,Effects of Caffeine on Neurotransmitter Levels During Exercise,30.8,success
+144,Analytical Methods for Pharmaceuticals and Food Analysis,205.7,success
+145,Methotrexate Treatment for Panniculitis Following Mesotherapy,26.4,success
+146,Biocatalytic Synthesis of L-Theanine with Bacillus Enzymes,31.5,success
+147,Efficacy and Safety of Herbal Medicine for Weight Loss,45.2,success
+148,Chemiluminescence and Its Applications in Analytical Chemistry Research,27.2,success
+149,Accelerating Deep Learning with FPGA-Based Acceleration Techniques Developed,67.5,success
+150,Cutting Agents in Illicit Drugs Research and Analysis,188.5,success
+151,Sleep Disorders and Substances Use in Young Adults,191.6,success
+152,Caffeine's Dark Effects on Developing Brains,191.9,success
+153,Caffeine Poisoning Induced Bidirectional Ventricular Tachycardia,43.4,success
+154,Pharmaceuticals and Their Applications in Medicine Today,160.2,success
+155,Caffeine's Impact on Neonatal Health Outcomes,176.8,success
+156,The Effects of Flavonoid-Caffeine Supplements on Energy Expenditure,63.8,success
+157,Effects of Caffeine and Ethanol on MicroRNA Expression,94,success
+158,Contaminant Presence in Water Sources and Soil,183.6,success
+159,Kratom Related Fatalities Involving Other Substances and Toxicities,26,success
+160,Optimizing Organosolv Pretreatment for Reducing Sugar Production,39.2,success
+161,Economic Assessment of Caffeine Production from Black Tea Waste,40.2,success
+162,Pharmacokinetics in Animal Models of Drug Metabolism,42.4,success
+163,Autonomic Nervous System and Antisocial Behavior Connections,81.5,success
+164,Urotherapy Interventions in Children with Bladder Bowel Dysfunction,37.9,success
+165,Exercise and Supplement Effects on Endurance Performance,207.7,success
+166,Coffee's Effects on Cancer Risks and Other Health Issues,192.6,success
+167,Effects of Caffeine on Fish Health and Bioenergetics,186.8,success
+168,Microbial Diversity and Metabolic Adaptations to Novel Environments,14.4,success
+169,Managing Gastroesophageal Reflux Disease in Pediatric Cerebral Palsy Patients,23.6,success
+170,Effects of Caffeine on Ice Hockey Performance Skills,39.8,success
+171,Caffeine Effects on Fetal Development and Adult Diseases,199,success
+172,Pharmaceutical and Food Additives Quality Control Methods,194.8,success
+173,Pharmacokinetic Effects of Dietary Compounds in Human Health,111.6,success
+174,Pretreatment Methods and Their Impact on Inhibitor Formation,43.9,success
+175,Electrophysiological Method EEG in Food Research Analysis,30.2,success
+176,Exploring New Solvents and Explosive Detection Methods,101.9,success
+177,Effects of Exercise on Athletic Performance and Recovery,174.5,success
+178,Effects of Decaffeination on Antioxidant Activity in Green Tea Samples,34.4,success
+179,Caffeine's Impact on Stress and Anxiety Symptoms,80.2,success
+180,Sleep Disorders and Psychoactive Substances Research,191.7,success
+181,Advanced Electrochemical Treatment Methods for Industrial Wastewater,46.1,success
+182,Sleep Inertia and its Effects on Cognitive Performance,99.1,success
+183,Caffeine Affects Vigilance Decrement in Jumping Spiders Behaviors,31.5,success
+184,Caffeine's Impact on Health Outcomes and Behavior,177.8,success
+185,The Burden of Irritable Bowel Syndrome on Daily Life,44.7,success
+186,DEET's Impact on Aquatic Microbial Communities,49.7,success
+187,Nocturia and its Impact on Quality of Life,40.4,success
+188,Caffeine's Effect on Alcohol Consumption and Aggression Behaviors,87.9,success
+189,Thermochemolysis of Nucleobases in Tetramethylammonium Hydroxide Solutions,48.4,success
+190,Phytochemicals and Antioxidants in Tea Beverages,202.8,success
+191,Exploring Natural Therapies for Neurodegenerative Diseases,163.8,success
+192,Sperm Cryopreservation Damage and Protective Effects,75.4,success
+193,Rosin-Based Polymers in High-Performance Liquid Chromatography Applications,53.3,success
+194,Antioxidant Properties of Caffeine and Copper/Zinc Superoxide Dismutase,48.1,success
+195,Coffee's Effect on Alzheimer's Disease Pathologies Studied,33.3,success
+196,Mitochondrial Calcium Overload in Cellular Stress Response,41.6,success
+197,Ergogenic Effects on Athletic Performance and Muscle Function,193.5,success
+198,Pharmacology of Neonates in European Healthcare Settings,43.3,success
+199,Automated Detection Methods for Pharmaceuticals in Wastewater Samples,115.8,success
+200,Work Schedule Impacts on Lifestyle Factors Study Results,40.9,success
+201,Pesticide Residues in Tea Infusions,204,success
+202,Membranes in Water Purification Processes Efficiency Evaluation,139.1,success
+203,Emerging Trends in Artificial Intelligence and Machine Learning Technology,4,success
+204,Coffee Oil as Natural Surfactant Substitute Investigated,27.2,success
+205,Hydrogel Research with Chitosan from Bees' Origin and Caffeine Modification,20.8,success
+206,Environmental Chemicals in Water and Biological Effects Evaluated,189.5,success
+207,Supplement Use in Athletes and College Students,179.4,success
+208,Plant Defense Inducing Chemicals for Disease Management Strategies,27.3,success
+209,Effects of Canopy Cover on Medicinal Plant Development and Production,32.4,success
+210,Sweetener Synergy and Energy Drink Consequences,76.9,success
+211,Copeptin Levels Significantly Increased in Renal Failure Patients,28.2,success
+212,Pregnancy Complications and Fertility Treatment Outcomes,176.6,success
+213,Bioactive Compounds and Their Effects on Human Health,176,success
+214,Antioxidants and Coronary Artery Disease Risk Factors Studied,18.7,success
+215,Pharmaceutical Residues in Freshwater Lakes Research,41.4,success
+216,Coffee's Effects on Health and Cardiovascular Diseases,195.3,success
+217,Sustainable Nanomaterials Derived from Coffee Husk Extract,23.4,success
+218,Factors Affecting Variability of Resting Metabolic Rate Measurements,43.9,success
+219,Chemical Composition of Coffee Beans Revealed,198.9,success
+220,Caffeine Exposure During Pregnancy Risks Neurological Development Disorders,23.7,success
+221,New Psychoactive Substance Toxicology and Case Reports,111.6,success
+222,Impact of Climate Change on Biodiversity and Ecosystem Services Worldwide,4.1,success
+223,Teachers' Risk Factors for Voice Disorders Identified through Meta-Analysis,39.2,success
+224,Plant Metabolomics and Hormonal Regulation Analysis,62.6,success
+225,Chromatographic Peak Shape Response Function Modeling,28.4,success
+226,Polymer-based Monolithic Columns for Alkaloid Separation Research,32,success
+227,Removal of Pharmaceuticals through Electrochemical Oxidation Processes,68.2,success
+228,Caffeine Abuse Among University Students in South Korea Studied,25.8,success
+229,Plant-based Compounds for Human Health Benefits,189.3,success
+230,The Health Benefits of Polyphenols in Tea and Coffee,181.3,success
+231,Effects of Caffeine on Fetal Biophysical Profile Tests,26.8,success
+232,Transdermal Absorption of Cosmetics and Active Ingredients,37.4,success
+233,Tetrabenazine's Unexpected Facilitation of Exocytosis Mechanism,62.5,success
+234,The Impact of Climate Change on Global Food Security Systems,3.6,success
+235,Exploring the Intersection of Technology and Human Behavior Studies,2.8,success
+236,Role of Oxidative Stress in Viral-Induced Apoptosis Research,35.1,success
+237,E-cigarette Use Among Never-Smoking Youth Risks Rising,54,success
+238,Caffeine Metabolism and Herbal Extract Interactions,74.6,success
+239,Effects of Medications on Infant Behavior and Developmental Outcomes,12.5,success
+240,Risk Factors for Osteoporosis in the United Arab Emirates Population,36.9,success
+241,Caffeine Reinforcement and Volitional Self Administration Studies,39,success
+242,Stability Indicating High Performance Liquid Chromatography Method Development,27,success
+243,Environmental Impact on Human Diseases,161.3,success
+244,Emerging Trends in Artificial Intelligence and Machine Learning Applications,3.6,success
+245,Drug Release Kinetics and Liposome Osmotropy Interactions,33.8,success
+246,Bioactive Molecules from Sustainable Synthesis Reactions,23.7,success
+247,Neonatal Care for Premature Infants with Respiratory Distress,195,success
+248,Molecularly Imprinted Polymers for Enhanced Selectivity Extraction,112.9,success
+249,Pharmacokinetic Interactions of Methylxanthines with Cytochrome P450 Enzymes,30.7,success
+250,The Effect of Placebo on Exercise Performance Outcomes,47.4,success
+251,Biomarkers for Habitual Coffee Intake Identified Through Metabolomics Approach,38.7,success
+252,Effects of Depot Medroxyprogesterone Acetate on Bone Density,41.9,success
+253,Microbial Dynamics in Anaerobic Co-Digestion Systems,35.7,success
+254,Green Tea Catechins and Obesity Reduction Effects Studied,22.8,success
+255,Artificial Intelligence in Medical Imaging Analysis Applications,2.5,success
+256,Caffeine's Effects on Adolescent Developmental Neurobiological Processes Studied,30.4,success
+257,Electrochemical Detection of Biomolecules in Nanocomposite Materials,45.5,success
+258,Molecular Mechanisms and Therapeutic Applications in Muscle Diseases,53.2,success
+259,Cognitive Enhancement through Modafinil and Flecainide Combinations,92.6,success
+260,Coffee Bean Composition and Sensory Quality Correlations,182.2,success
+261,Mitochondrial dysfunction links to malignant hyperthermia susceptibility in mice,42.2,success
+262,Alpha 2 Receptors and Vascular Smooth Muscle Interactions,60.1,success
+263,The Sleep Regulating Mechanisms Across Species Review,114.6,success
+264,Psychedelic Substances in Medicine and Recreational Use,114.2,success
+265,Rapid Delivery of Therapeutic Agents via Thin Film Technology,40.3,success
+266,Caffeine's Effect on Weight Loss Outcomes,49.8,success
+267,Tea Consumption and Depressive Symptoms in Elderly Population,31.7,success
+268,Coffee Consumption and Overactive Bladder Symptoms in Elderly Women,18.6,success
+269,Coffee Consumption and Breast Cancer Risk Inconsistencies Found,37,success
+270,Harmful Effects of Xenobiotics on Placental Development Processes,15.8,success
+271,Voltammetry Sensors for Pharmaceutical Compounds Detection in Water Samples,35.9,success
+272,Caffeine Therapy in Perinatal Asphyxia in Neonates,73.5,success
+273,Pharmaceutical Analysis Using Spectrophotometry Techniques Successfully,36.7,success
+274,Validating FTIR Method for Simultaneous Content Determination of Drugs,30.3,success
+275,Coffee's Genetic Impact on Chronic Disease Prevention Strategies,27.6,success
+276,Evaluating Chinese Herbal Therapies for Weight Loss Research,82.5,success
+277,Utilizing Tea Stalk for Carboxymethyl Cellulose Production Optimization,35.7,success
+278,Doping Prevention through Interactive Education Games,44.3,success
+279,Caffeine's Impact on Natural Dye Sensitization in Solar Cells,31.2,success
+280,Pharmacokinetics and Tissue Distribution of Alnustone in Rats,54.7,success
+281,Antimicrobial Properties of Fermented Cyperus rotundus Extracts Revealed,33.4,success
+282,Applications of Second Harmonic Generation in Biophysical Research,29.9,success
+283,Caffeine's Neuroprotective Effects on Beta-Amyloid Exposed Cells,27.3,success
+284,Coffee's Antiviral Properties in Hepatitis B Treatment Outcomes,35.4,success
+285,Health Risks Associated with Cannabis Use Worldwide,33.8,success
+286,Caffeine's Effect on Working Memory and Brain Functions Studied,18.7,success
+287,Synthesis and Application of Spherical Hollow Cobalt Ferrite Particles,30.5,success
+288,Carbon Nanotube Sensors for Tetrahydrocannabinol Detection Development,29.3,success
+289,Biomedical Discovery through Integrated Genomics and Bioinformatics Analysis,205.7,success
+290,Overactive Bladder Treatment Options and Outcomes Research,74.5,success
+291,Vascular Density in Aging Eyes Studied Across Sex Lines,25.9,success
+292,Scientific Collaboration and Knowledge Sharing in Interdisciplinary Fields,3.8,success
+293,Population Genomics in Asexual Yeast Species Variation Research,32.5,success
+294,Tinnitus Treatment Outcomes with Alternative Therapy Combination,43.6,success
+295,Exploring the Impact of Climate Change on Global Economies,3.5,success
+296,Coffee's Chemical Composition Undergoes Significant Changes During Roasting Process,44.4,success
+297,Emerging Pollutants in South African Urban Waters,145.8,success
+298,Molecularly Imprinted Polymer Sensors and Analytical Applications,34.1,success
+299,Mass Spectrometry in Thin-Layer Chromatography Applications,79.9,success
+300,Exploring Emerging Trends in Artificial Intelligence and Machine Learning,6.5,success
+301,Caffeine's Anti-Degranulation Activity on Allergic Reactions Studied In Vitro,30.1,success
+302,Cardiorespiratory Stability in Preterm Infants,108.1,success
+303,The Evolution of Artificial Intelligence in Cyber Security Systems,3.8,success
+304,Tungsten Trioxide Nanoparticles Electrochemical Sensor Development Research,25.4,success
+305,Caffeine's Impact on Antioxidant and Genotoxic Effects,71.3,success
+306,The Effect of Grinding on Coffee Beverage Properties,54.5,success
+307,Detection Methods for Explosive Materials and Chemical Compounds,50.9,success
+308,Portable Forensic Toxicology Analysis Platforms for Public Health Security,36.1,success
+309,Nanomaterials for Controlled Drug Release Systems Developed,45.5,success
+310,Drying Methods Affect Arabica Coffee Quality and Flavor Profile,26.6,success
+311,Exploring the Intersection of Technology and Human Experience,4.8,success
+312,Cocoa Bean Genotypes Vary in Bioactive Compound Composition,28.4,success
+313,Exploring the Frontiers of Artificial Intelligence and Machine Learning,4.8,success
+314,Emerging Trends in AI-Powered Cybersecurity Solutions and Threat Detection,4.3,success
+315,Coffee Extracts Show Promise in Treating Traumatic Brain Injury,23,success
+316,The Neuromuscular Dynamics of Octopus Arms Revealed,43.4,success
+317,Sugar Content in Non-Carbonated Sugar-Sweetened Beverages,52,success
+318,Caffeine's Multiple Actions on Vascular Smooth Muscle Cells,107.2,success
+319,Metabolic Pathways and Biomarkers for Urolithiasis,43.1,success
+320,Advanced Materials for Environmental Remediation Technologies,213.3,success
+321,Coffee Consumption Affects Parkinson's Disease Motor Symptoms Significantly Always,31.8,success
+322,Genetic Mutations and Catecholaminergic Polymorphic Ventricular Tachycardia (CPVT),137,success
+323,Stress Induction Through Socially Evaluated Cold-pressor Group Test,43,success
+324,Characterization of Volatile Compounds in Ancient Tea Mistletoe,46.9,success
+325,Synthesizing Environmentally Friendly Ionic Liquids for Catalysis Applications,45.2,success
+326,Adenosine Receptor Ligands and Modulators,248.1,success
+327,Chromatographic Analysis of Complex Over the Counter Formulations,52.3,success
+328,Nanotechnology Enhances Electrochemical Detection of Biological Compounds,37.2,success
+329,Antinociceptive Activity of Clinacanthus nutans Leaves Extract,69.9,success
+330,Skin Permeation and Absorption Kinetics Research,115.7,success
+331,Cytochrome P450 Enzyme Induction Study Results Announced,40.5,success
+332,Toxic Effects of Pesticides on Human Health and Environment,97.4,success
+333,Caffeine's Impact on Migraines and Myocardial Infarction Risks,96.1,success
+334,Metabolomics in Disease Diagnosis and Personalized Medicine Research,67.9,success
+335,Biological Mechanisms of Calcium Signaling Disorders,59.2,success
+336,Caffeine's Effects on Neurotransmitter Levels and Fatigue Response,36.4,success
+337,Advanced Membrane Technology for Water Treatment and Desalination,50.8,success
+338,The Impact of Caffeine Content Regulations on Energy Drinks Demand,25.5,success
+339,Work Capacity and Sleep Disorder Patterns Observed,44.2,success
+340,Chemical Sensors for Sudden Infant Death Syndrome Prevention,35.8,success
+341,Quantifying Caffeine with LC-MS/MS Methods and Calibration Curves,27.5,success
+342,"Hair Loss, Hair Growth, Skin Damage Prevention",82,success
+343,Effects of Caffeine on Planarian Behavior Experiments,19.3,success
+344,Caffeine Effects on Dribbling Speed in Elite Basketball Players,43.7,success
+345,Caffeine Analysis Method for Beverages,26.5,success
+346,Emergence of Artificial Intelligence in Modern Cybersecurity Systems,3.6,success
+347,Antioxidant Effects on Stress and Anxiety Reduction,68.8,success
+348,Aqueous Biphasic Systems Based on Zwitterions Research,45,success
+349,Xanthine Derivatives in Bone Regeneration Research,49.7,success
+350,Stress and Immune System Dysregulation in Mice Research,113,success
+351,Pharmacokinetic Comparison of Ibuprofen Formulations and Caffeine Combination,64.5,success
+352,Taste Receptors in Insects and Plant Defense Mechanisms,90.5,success
+353,pH sensitivity in drug delivery systems research,47.7,success
+354,Ergogenic Aids and Performance Enhancement Strategies,196.5,success
+355,Ambient Ionization Methods for Analyzing Complex Mixtures,60.8,success
+356,Exploring the Impact of Social Media on Mental Health,4.7,success
+357,The Effects of Medications on Vocal Function Daily Life,55.8,success
+358,Metabolism and Regioselectivity in CYP1A2 Enzyme Reactions,44,success
+359,Caffeine Citrate in Premature Infant Health Outcomes Research,42.2,success
+360,Caffeine Content in Coffee Beans Under Various Shading Systems,32.7,success
+361,Cognitive Performance in Night Shift Workers Suffered Dramatic Decline,44.5,success
+362,Topical Fat Loss and Mitochondrial Function Enhancements,95.5,success
+363,The Nocebo Effect in Drug Withdrawal Symptoms,207.4,success
+364,Performance-Enhancing Substances in Equine Sports Regulations,33.8,success
+365,Cytochrome P450 Enzyme Substrate Recognition Mechanisms,45.6,success
+366,Coffee's Role in Mortality Reduction Explained,109.7,success
+367,Dietary Inflammatory Index and Mental Health Disorders Relationship,61.7,success
+368,Genetics of Blood Pressure and Coffee Consumption Interaction,72.6,success
+369,Matcha's Anxiolytic Effects on Brain Function in Mice Study,35.3,success
+370,Emerging Pollutants Removal from Water Treatment Systems,93.7,success
+371,Effects of Green Tea Catechins on Human Health,49.2,success
+372,Chrysin's Protective Effects on Parkinson's Disease Models,41.3,success
+373,Electrochemical Detection of Vanillin and its Derivatives,57.5,success
+374,Organic Solar Cells and Energy Harvesting Materials Research,30.8,success
+375,Muscle Biomechanics and Desmin Mutation Effects,54.2,success
+376,The Effects of Energy Drinks on Blood Pressure,61,success
+377,Nanoparticles in Catalysis and Thermoresponsive Materials Science,82.9,success
+378,Caffeine's Impact on Postprandial Glucose Response Varies by Genotype,41.9,success
+379,Sustainable Catalysts for One-Pot Multicomponent Organic Synthesis Reactions,24.9,success
+380,Green Catalytic Chemistry for Sustainable Organic Synthesis Techniques,23.7,success
+381,Caffeine Citrate Enhances Cisplatin's Anticancer Effectiveness Significantly Always,67.4,success
+382,Caffeine's Impact on Dementia Neuropsychiatric Symptoms,39.2,success
+383,Risks Associated with Adulterated Dietary Food Supplements Worldwide,42,success
+384,Fioricet Abuse Leading to Severe Health Complications Long Term,34.2,success
+385,Modulating Host Calcium Levels Kills Intracellular Mycobacteria,38.4,success
+386,Taste Perception Across the Lifespan and Saliva Composition Dynamics,96.4,success
+387,Blood Donation Risks and Adverse Events Research Review,33.4,success
+388,Matcha's Effects on Stress Responses in Human Subjects,18.7,success
+389,Effects of Energy Drinks on Physiological Parameters in Males,33.5,success
+390,Arbuscular Mycorrhizal Fungi and Tea Plant Nutrition Effects,56.3,success
+391,Palm Pollen's Anticancer Properties in Hepatocellular Carcinoma Models Studied,40.6,success
+392,Nutraceuticals and Dietary Supplements Research Findings,78.9,success
+393,Analyzing Equilibrium Constants in Biological Systems Chemistry,49.1,success
+394,Antioxidants in Sunscreen Formulations,43,success
+395,Oxytocin Concentrations and Specimen Variability in Meta-Analyses,30.5,success
+396,Caffeic Acid and Oxidative Stress in Endometriosis Research,50.9,success
+397,Caffeine Prophylaxis and Risk of Bronchopulmonary Dysplasia,60.9,success
+398,Cell Cycle Regulation in Response to DNA Damage Threats,28.7,success
+399,Silverskin Enhances Nutraceutical Value in Yogurt Products,36.3,success
+400,Polycystic Kidney Disease Research and Dietary Modulation Studies,137.8,success
+401,Allelochemicals in Vietnamese Tea Plant Extracts Studied,41.2,success
+402,Evaluating Sperm Motility in Cryopreserved Canine Semen Samples,38.2,success
+403,Theacrine's Potential as a Breast Cancer Metastasis Inhibitor,25.6,success
+404,Binding Modes and Binding Free Energies Calculations Revealed,94.6,success
+405,Impact of Covariates on Clozapine Pharmacokinetics Variability,64.8,success
+406,Dental Health Research Review Highlights Variability in Findings,52.6,success
+407,Quantification of Coffee Polyphenols with High-Performance Liquid Chromatography,61.3,success
+408,Restless Legs Syndrome in Children and Adolescents,70.2,success
+409,Headaches in Pupils and Teenagers Around the World,131.6,success
+410,Fermented Coffee Grounds in Dairy Cattle Nutrition,61,success
+411,Impact of Caffeine on Fetal Testicular Development and Function,55.7,success
+412,Bacteria and Pharmaceuticals in Drinking Water Systems,47.7,success
+413,Pu-erh Tea Volatile Profiles Analyzed Chemically,50.3,success
+414,Electrochemical Synthesis of Polypyrrole for SPE Applications,49.2,success
+415,Caffeine's Effects on Dictyostelium Developmental Processes,133.4,success
+416,Bacterial Demethylation of Caffeine Molecules,49,success
+417,Raman Spectroscopy and Imaging Techniques in Pharmaceutical Analysis,33.4,success
+418,Metal-Organic Compounds in Medicinal Chemistry Research,98.4,success
+419,Pharmacodynamics and Pharmacokinetics of Analgesic Combinations,171.4,success
+420,Headaches That Strike During Nocturnal Sleep Episodes Rarely,61.7,success
+421,Core-Shell Magnetic Microsphere Development and Applications Research,37.7,success
+422,Hypothyroidism's Effects on Cardiac Electrical Remodeling,80.6,success
+423,Adsorption Dynamics and Interactions at Polymer Interfaces Studied,31.2,success
+424,Nanoparticles Impact on Plant Growth and Development Research,44.3,success
+425,Selective Chlorination of Aromatic Compounds with Trichloroisocyanuric Acid,24.8,success
+426,Emerging Trends in Artificial Intelligence and Machine Learning Development,5.2,success
+427,Comparing Cardiac Effects of Methylxanthines in Preterm Neonates,45.3,success
+428,Evolutionary Diversification of Acylsugars in Plant Species Families,26.7,success
+429,Participating Bodies in Everyday Coping Strategies,39.7,success
+430,Caffeine's Impact on Offspring Adiposity Outcomes Studied,79.9,success
+431,Coffee Contamination with Ochratoxin A Risks Public Health Worldwide,18.8,success
+432,Advanced Materials and Supramolecular Chemistry Research,70.4,success
+433,Community Health Worker Capacity for Hypertension Management,52.1,success
+434,Understanding the Impact of Climate Change on Human Migration Patterns,11.7,success
+435,Nonsense Mediated RNA Decay Mechanisms Explained,70.4,success
+436,Comparing Vertebral Anesthesia Methods for Cesarean Delivery Outcomes,53.4,success
+437,Green Tea Amino Acids and Taste Quality Research,27.6,success
+438,Wafer Cream Substitutes with Carob Pods Powder Investigation,51.7,success
+439,Extraction of Bioactive Compounds with Supercritical CO2,129,success
+440,Chemical Stability of Tea Infusion Caffeine Complexes,45.2,success
+441,The Benefits of Midday Napping for Cognitive Performance,44.8,success
+442,Interactions Between Anesthetics and Psychostimulants in Rodent Studies,48.5,success
+443,Effects of Caffeine on Neurobiological Processes and Development,117.4,success
+444,Nutritional Habits During Pregnancy Among Israeli Women,43.3,success
+445,Polyphenolic-Rich Fractions in Hepatoprotection and Antioxidant Activity,67,success
+446,Enhancing Student Engagement with Virtual Laboratory Experiments Online,32,success
+447,Medication and Equipment Misappropriation in the Emergency Department setting,56.4,success
+448,Coffee and Tea Consumption Habits Studied Further,45.2,success
+449,Exploring the Frontiers of Artificial Intelligence and Machine Learning,4.7,success
+450,Managing Adolescent Anxiety through Holistic Therapeutic Approaches,18.6,success
+451,Effects of Coffee on Hemodialysis Patient Health Outcomes,47.4,success
+452,Energy Drinks and Youth Substance Abuse Trends,36.3,success
+453,Adenosine Receptors in Parkinson's Disease Treatment Research,39,success
+454,Cola's Protective Effect on Urinary Tract Infections (UTIs),33.4,success
+455,Forensic Analysis of Illicit Narcotics and Impurities,42,success
+456,Structural Diversity of Natural Products and their Applications,46.2,success
+457,Validated HPLC Method for Paracetamol and Caffeine Analysis,44.7,success
+458,Photo Catalytic Degradation of Caffeine using Ag-Doped ZnO,34.1,success
+459,Beneficial Effects of Guarana Xanthine-Catechin Matrix on Inflammation,48,success
+460,Nutritional Variation in African Pear Fruit Accessions Studied,74.5,success
+461,Exercise Intensity Self-Selected by College-Aged Men,45.4,success
+462,Radiation Induced Damage in Tumor Cells Suppressed Effectively,51,success
+463,Caffeine's Interaction with Double-Helix Molecular Structure Studied,23.8,success
+464,Liquid Chromatography-Tandem Mass Spectrometry Method Development,56.4,success
+465,Analyzing the Impact of Social Media on Business Marketing Strategies,3.3,success
+466,Energy Drinks Consumption Among Medical Students and Physicians,28.7,success
+467,Metabolic Markers for Diabetic Retinopathy and Exercise Management,93.4,success
+468,Phosphorylation Reactions with H-Phosphonates under Electrochemical Conditions Studied,14.2,success
+469,Bioactive Compounds and Metabolic Syndrome Prevention,43.2,success
+470,Impact of Genetic Mutations on Mitochondrial Function,39.2,success
+471,New Models for Dermal Bioavailability Research and Analysis,32.8,success
+472,Enzyme Catalyzed Glycogen Phosphorylation Reactions Studied by Isothermal Titration Calorimetry,60,success
+473,Behavioral Effects of Mafedine on Zebrafish Anxiety Models,37.4,success
+474,Impact of Agricultural Practices on Floral Traits Expression,29.3,success
+475,Alcohol Consumption Patterns Among College Freshmen Students Identified,32.3,success
+476,Chronic Fatigue Syndrome Diagnostic and Treatment Challenges,71.2,success
+477,HPLC Method for Determining Drug-Drug Interactions,55.1,success
+478,Removal of Antibiotics from Hospital Waste Systems,19.2,success
+479,Sleep Loss Affects Risk-Taking Behavior and Decision-Making Abilities,33.4,success
+480,Brain Structure Taste Perception Research Findings Revealed,52.2,success
+481,Effects of Caffeine on Athletic Performance Enhancement Strategies,45.2,success
+482,The Effects of Caffeine on Rugby League Performance,34.8,success
+483,Caffeine Effects on Macular Microvasculature Observed by OCTA,43.2,success
+484,Coffee Bean Roasting Kinetic Model Development,26.4,success
+485,The Effects of Caffeine on Embryonic Development,44.3,success
+486,Skin Layer Diffusion and Transport Dynamics,34.7,success
+487,Cognitive Functioning and Caffeine in Older Adults with Diabetes,45,success
+488,Adenosine Reactivation of Dormant Chronic Regional Pain Syndrome (CRPS),29.5,success
+489,Neuromelanin and Neurodegenerative Diseases Research Implications,92.2,success
+490,Tobacco Industry Manipulation of Nicotine Research Findings,38.2,success
+491,Conditioned Response to Non-Alcoholic Beer Stimuli Observed,40,success
+492,Caffeine's Impact on Immature Adrenal Glands in Rats Studied,44.2,success
+493,Methotrexate Treatment Response and Adenosine Receptor Polymorphisms,49.5,success
+494,Caffeine Exposure and Asthma Development Mechanisms Revealed,47.9,success
+495,Pollinator Manipulation Through Plant Derived Compounds Exist,40.7,success
+496,Prenatal Caffeine Consumption and Infant Birth Size Association,47.4,success
+497,Pharmacokinetic Modeling in Drug-Drug Interaction Prediction Research,30.8,success
+498,Biochemical Impact of Yellowing Time on Tea Composition,36.4,success
+499,Arecoline's Effects on the Central Nervous System Chemistry,27.2,success
+500,Liver Function Assessment in Hepatic Tumors,61.5,success
+501,Dietary Influence on Inflammatory Skin Disorders and Acne Treatment,36.9,success
+502,The Chemistry of Tea Processing and Flavonoid Derivatives Formation,41.7,success
+503,Coffee Consumption and Caffeine Content Variations Worldwide,45.5,success
+504,Methylxanthines in Beverages: Analysis and Determination Methods,55.8,success
+505,Salt Influence on Aqueous Biphasic Systems Partition Behavior,35.6,success
+506,Caffeine's Effect on Children's Auditory Go/No-Go Task Processing,52.7,success
+507,Plant-to-plant Metabolite Transfer and Exchange Mechanisms,45.4,success
+508,Machine Learning and Artificial Intelligence Applications in Healthcare Systems,6.6,success
+509,Exercise Metabolism and Weight Loss Research Findings,31.7,success
+510,The Impact of Climate Change on Global Food Security Systems,3.3,success
+511,The Rise of Virtual Reality in Education and Training,2.4,success
+512,The Effects of Atorvastatin on Gastric Smooth Muscle Tone,63,success
+513,Replantation Outcomes and Complications in Hand Surgery Cases,25.5,success
+514,Caffeine's Effect on Vascular Anastomosis Patency and Intimal Hyperplasia,63.9,success
+515,Impact of Climate Change on Global Food Security Systems,3.9,success
+516,ALS and Therapeutic Potential of Adenosine Receptors Modulation,40.3,success
+517,Neuroprotective Effects of Cinnamaldehyde in SHSY5Y Cells Studied,69.1,success
+518,Pre-conception Counselling for Reproductive Planning and Health Care Providers,146.5,success
+519,Circulating Thermoelectric System for Temperature Regulation in Sonophoresis,34.9,success
+520,Gold Complexation and Electrochemical Reduction Behavior Studied,33,success
+521,Utilizing Green Tea Waste for Antimicrobial Applications,35.1,success
+522,Molecular Dynamics Simulations and Adenosine Analogue Self-Assembly,36.7,success
+523,Migraine Management and Unmet Needs in Italian Population,56.6,success
+524,Methylxanthines in Cocoa Products and Medications Analysis Methodologies Compared,23.8,success
+525,Advances in C-H Functionalization of Fused-Heterocyclic Systems Research,44.5,success
+526,Loganin's Sedative and Hypnotic Effects on Brain Activity,48.1,success
+527,Diffusion Processes in Lipid-Based Drug Delivery Systems,37.7,success
+528,Sensor Devices for Chemical Detection Applications Research,40.2,success
+529,Encapsulation Methods for Food and Pharmaceutical Applications,54,success
+530,Food Chemistry Analysis using H-1 NMR Spectroscopy Techniques,20.4,success
+531,Caffeine's Effect on Rugby Player Performance Boosted,68.5,success
+532,Effects of Creatine Supplementation on High-Intensity Running Performance,62.5,success
+533,Adsorption of Micropollutants by Polymeric Resin Materials,54.1,success
+534,Cellular Stress Response Mechanisms in Eukaryotic Organisms Revealed,42.2,success
+535,Caffeine's Impact on Microvascular Function and Cardiovascular Response,55.8,success
+536,Emerging Trends in Artificial Intelligence and Machine Learning Research,4.4,success
+537,Impact of Climate Change on Global Food Security Systems,4.7,success
+538,Detection and Analysis of Psychoactive Substances,44.9,success
+539,Influence of High Hydrostatic Pressure on Green Tea Characteristics,27.8,success
+540,Effects of Metal Ions on Tea-Infusion Precipitation Chemistry,31.2,success
+541,Caffeine Adsorption on Montmorillonite Clay Minerals Studied,41,success
+542,Microbial Degradation of Caffeine in Agro-Industrial Wastes,29.6,success
+543,Determination of Caffeine Origin in Food Products,33.8,success
+544,Coffee's Impact on Cardiovascular Health Outcomes Synthesis Review,25.7,success
+545,Benchtop NMR for Undergraduate Chemistry Laboratories Training,37.3,success
+546,Synthesis and Characterization of Selenium Caffeine Complexes,36.5,success
+547,Watercress and its Potential Chemoprotective Effects,45.7,success
+548,Rhabdomyolysis: A Critical Condition Requiring Timely Medical Intervention and Prevention,23.5,success
+549,Pharmacokinetics and Bioavailability of Caffeine in Chewing Gum,14.9,success
+550,Adenosine's Role in Ischemia/Reperfusion Injury Mechanisms,46.2,success
+551,Pediatric Migraine Prognosis and Predictors of Clinical Worsening,54.1,success
+552,Respiratory Stimulant Mechanisms in Apnea of Prematurity Treatment,43.3,success
+553,Clozapine Serum Concentration and Electroencephalogram Abnormalities Relationship,42.3,success
+554,Boron Nitride Fullerenes Interacting with Caffeine Molecules,38.7,success
+555,Animal Fertility and Assisted Reproduction Technologies,101.9,success
+556,Fungal Decay Detection in Strawberries using Hyperspectral Imaging Techniques,31.5,success
+557,Child Obesity and Salivary Proteome Research Cluster,41.6,success
+558,Tea vs Coffee's Impact on Rheumatoid Arthritis Risk,41.4,success
+559,Effects of Fluorine on Tea Plant Physiology,81.8,success
+560,Impact of Prematurity on Fracture Development in Children,37.8,success
+561,Regulation of Transposable Elements through DNA Methylation Pathways,36.7,success
+562,Protecting Active Materials with Thermally Stable Coatings,27.8,success
+563,Continuous Pharmaceutical Manufacturing Technologies,63.9,success
+564,Varroa Mite Impact on Honey Bee Colonies,37.1,success
+565,Toxicity of Organotin Compounds on Cardiac Function,49.5,success
+566,Caffeine's Impact on Sprint Cycling Performance Optimized,44,success
+567,MRI Method for Water Permeability Mapping in the Brain,69.9,success
+568,Caffeine's Protective Effects on Acute Kidney Injury in Premature Infants,51.6,success
+569,Synchronous Front-Face Fluorescence Spectroscopy in Dark Chocolate Analysis,35.4,success
+570,Cerebral Perfusion and Vascular Information Extraction Methods,73.9,success
+571,Fecal Contamination and Urban Watershed Pollution Issues,45.6,success
+572,The Science Behind Black Tea Processing Techniques Evolved,33.7,success
+573,Fiber Optic Dissolution Method Development Challenges,34.2,success
+574,Cardiovascular Effects of Rolipram Inhibition Research,52,success
+575,Emotional Regulation Deficits and Substance Use Disorders,35,success
+576,Caffeine Effects on Pattern-Reversal Visual Evoked Potential,51.5,success
+577,Functional Properties of Axolotl TRPA1 Channels Studied,32,success
+578,Brain Activity Changes in Premature Newborns Studied,31.9,success
+579,Coffee Consumption Perceptions and Health Benefit Awareness,29.5,success
+580,Stable Isotope Analysis of Organic Carbon Compounds,72.1,success
+581,Cardiac Function Implications of Wolframin Invalidation Studied,57,success
+582,Regulating Schwann Cells with Optogenetic Stimulation Techniques,43,success
+583,Wood Preservation using Plant Derived Chemicals,125.8,success
+584,Caffeine's Impact on Medical Students' Sleep Habits Studied,39.8,success
+585,Caffeine Enhances Reinforcing Effectiveness of Synthetic Cathinones,56.1,success
+586,Caffeine's Impact on Chondrocyte Viability and Gene Expression,49.8,success
+587,Comparing Therapeutic Effects of Caffeine vs Aminophylline in Neonates,40.4,success
+588,Targeting Pathways for Skin Flap Necrosis Treatment,37.4,success
+589,Combination Therapy Against Multidrug Resistant Bacterial Infections,37.3,success
+590,Corrosion Inhibition Properties of Triazole-Theophylline Derivatives Studied,36.1,success
+591,Tinnitus and Diet Research Efficacy Limitations Revealed Slowly,21.3,success
+592,Eating Disorders and Comorbid Substance Use Disorders,41.6,success
+593,Chemical Modification Techniques for Enhanced Analytical Characteristics in SALDI,16.8,success
+594,Voltammetry Methods for Determination of Pharmaceuticals,29.3,success
+595,Energy Drink Consumption Among Turkish University Students Studied,30.1,success
+596,Gene Duplication and Evolutionary Development of Saccharomyces cerevisiae,50.6,success
+597,Impact of Caffeine on Health in Adolescents,57.2,success
+598,Advanced Photo-Catalytic Treatment Technologies for Water Contamination,97.4,success
+599,Caffeine's Dual Effect on Neurobehavioral Recovery Post-Trauma,36.6,success
+600,Effects of Caffeine on Maximum Strength and Muscle Contractions,35.8,success
+601,Maternal Obesity's Impact on Offspring Metabolic Health,43.2,success
+602,Activated Carbons for Trace Compound Analysis in Environmental Samples,41.2,success
+603,Caffeine Abuse Among Children in India Challenges Public Health Regulators,32.5,success
+604,Meta Analysis on Tea and Parkinson's Disease Risk,46.6,success
+605,Photocatalytic Properties of Ruthenium-Modified Titanate Nanowires Studied,47.8,success
+606,Emerging Trends in Artificial Intelligence and Machine Learning Research,4.2,success
+607,Caffeine's Effects on Cardiovascular and Cognitive Parameters Studied,44.9,success
+608,Effect of Fermentation on Cocoa Bioactive Compounds Properties,53.5,success
+609,Ionic Liquids in Aqueous Biphasic Systems Research,39.2,success
+610,MoF Materials as Encapsulation Platforms for Active Additives,55.8,success
+611,Prescription Medication Abuse in Eating Disorder Patients,23.6,success
+612,Caffeine's Impact on Pregnancy and Fetal Development Outcomes,45.1,success
+613,Caffeine's Impact on Resistance Exercise and Muscle Apoptosis Research,14.4,success
+614,Caffeine Overdose and Cardiovascular Complications in Emergency Medicine Settings,23.3,success
+615,Caffeine's Effect on Human Brain Synaptic Plasticity Studied,45.4,success
+616,Placenta-on-a-Chip Technology for Xenobiotic Transport Studies Revealed,48.6,success
+617,Caffeine's Impact on Rodent Cognitive and Behavioral Functions,48.3,success
+618,Caffeine's Impact on Maternal-Fetal Thyroid Function Dynamics,45.2,success
+619,Caffeine's Impact on Blood Clotting During Exercise,64.7,success
+620,Testosterone's Role in Anxiety Disorders Revealed Through Research Findings,43.5,success
+621,Caffeine's Impact on Infant Neurodevelopment Outcomes Revealed,50.8,success
+622,Coffee Consumption and Subarachnoid Hemorrhage Risk Meta-Analysis,63.5,success
+623,Engineering Cells for Improved Bioproduct Yield and Purity,58.9,success
+624,Quantum Dots Based Electrochemical Sensors for Analyte Detection,42.6,success
+625,Caffeine Free Herbal Teas in South Africa Exist,33.1,success
+626,Repurposing Medicines into Sustainable Energy Storage Solutions,37.1,success
+627,Molecularly Imprinted Polymers for Caffeine Detection Research,67.4,success
+628,Stimulant-Induced Psychosis in Young Adults with ADHD Diagnoses,51.8,success
+629,Glycocalyx Degradation in Pregnancy-Related Hypertension Disorders,62.9,success
+630,Quantifying Cerebral Oxygen Metabolism with Calibrated Functional Magnetic Resonance Imaging,30.3,success
+631,Uric Acid Binding to Bovine Serum Albumin Proteins,47.2,success
+632,Toxoplasma gondii Cellular Replication Mechanisms Studied,58.6,success
+633,Effects of Caffeine on Exercise Performance and Endurance,60.8,success
+634,Citrus Aurantium and Caffeine Metabolic Response Study,64.3,success
+635,Authenticating Green Tea Quality with Chemometric Analysis,44.5,success
+636,Understanding the Impact of Artificial Intelligence on Human Society,5.7,success
+637,Post Traumatic Stress Symptoms and Daily Variation Patterns,37.9,success
+638,Coffee Grounds as Low-Cost Sensing Material for Humidity,46.9,success
+639,Caffeine's Effect on Superior Mesenteric Artery Blood Flow Velocities,42.7,success
+640,Caffeine and Xanthines in Plant Infusions and Extracts Studied,31.4,success
+641,Effects of Caffeine and Taurine on Water Molecule Mobility,19.7,success
+642,Genetic Engineering of Enzymes for Biotechnological Applications,37.2,success
+643,Potential Health Benefits of Green Coffee Bean Extracts,27.3,success
+644,Biotin's Role in Human Reproductive Health Outcomes,49.1,success
+645,Emerging Trends in Artificial Intelligence and Machine Learning Applications,6.2,success
+646,Adenosine-Dopamine Receptor Heteromers in Spinal Motoneuron Function,36.2,success
+647,Role of Fuss in Bitter Taste Perception Mechanisms,95.3,success
+648,Analgesic Suppositories Cause Long-Standing Perianal Ulcers in Migraine Patients,22.6,success
+649,Wood Protection Using Natural Compounds for Fungal Resistance,33.9,success
+650,Carbon Nanotube Based Magnetic Separation Methods,47.6,success
+651,Sleep Patterns in Emerging Adults with Diabetes,91.3,success
+652,Electrochemical Determination of Caffeine Using Modified Glassy Carbon Electrode,44.6,success
+653,Bioactive Compounds from Spent Brewery Grains Extracted,50.8,success
+654,Cardiac Contractility and Calcium Signaling Dynamics Study,49.2,success
+655,Sugar-Sweetened Beverages Consumption Patterns in Korean Adolescents Studied,43.4,success
+656,Caffeine's Effects on Ram Sperm Preservation Efficiency,54.5,success
+657,Coffee's Effect on Liver Fibrosis in HBV Patients Studied,63,success
+658,Prebiotic Effects of Epigallocatechin Gallate in Gut Microbial Populations,43.4,success
+659,Tablets for Oral Suspension (TOS) Formulation Optimizations,36,success
+660,The Biochemistry of Tea Plant Amino Acid Biosynthesis,75.8,success
+661,Anthranilic Diamide Insecticides for Novel Pest Control Methods,42.4,success
+662,Doxorubicin Induced Cardiotoxicity and SFRP1 Interaction Effects,60.7,success
+663,Green Tea Effects on Textured Vegetable Protein Properties,33.6,success
+664,Water Quality Monitoring Technologies Compared and Evaluated,45.4,success
+665,Phosphatase Activity Assay and Regulation Mechanisms Dissected,60.2,success
+666,Addictive Properties of Sugar-Sweetened Beverages in Adolescents,60.1,success
+667,Treatment Outcomes and Safety Considerations for Aminophylline Use,76.3,success
+668,Caffeine's Effects on Visual Sensitivity and Spatial Frequency Relationship,51,success
+669,Metabolism of Chemicals in Human vs Pig Skin,58.1,success
+670,Coffee's Antioxidant Effects on Metabolic Syndrome-Induced Cataract,65.2,success
+671,Coffee and Prostate Cancer Management Strategies Revealed,64.8,success
+672,Carob Chocolate Acceptance and Preference Studies Conducted,62.4,success
+673,Cocoa's Impact on Orthodontic Tooth Movement and Osteoblastic Activity,56.8,success
+674,Phenolic Acids and Methylxanthines in Tea Samples Analysis,31.6,success
+675,Effect of Kinesio Tape on Muscle Activation and Strength,40.1,success
+676,Microbial Endocrinology and Host-Microbe Neuroendocrine Interaction Dynamics,88.4,success
+677,Electrochemical Detection of Caffeine in Food and Drinks Samples,44.4,success
+678,Quantifying Individual Catechins in Green Tea Infusion Directly,37.2,success
+679,Mechanisms of Amino Acid Induced Pancreatic Injury Vary Significantly,57.4,success
+680,Effect of Non-Conventional Extraction Methods on Cold Brewed Coffee,35.5,success
+681,Effects of Energy Drinks on Cognitive Performance in Humans,45.8,success
+682,Polymer Monoliths in Capillary Electrochromatography Applications,37.4,success
+683,Impact of Caffeine on Adolescent Sleep Patterns Revealed,29.7,success
+684,Optimizing Enzyme Production from Xanthine Substrate Sources,60.6,success
+685,The Effect of Roasting on Coffee Quality Characteristics,56.8,success
+686,Cardiovascular Disease Prevention through Caffeine and Nutrition Analysis,38.2,success
+687,Digital Transformation in Modern Business and Industry Paradigms Shifts Slowly,11.9,success
+688,Impact of Social Media on Mental Health Trends Today,3.1,success
+689,Analyzing Trends in Artificial Intelligence and Machine Learning Applications,2.4,success
+690,Artificial Intelligence Applications in Healthcare System Improvement Initiatives,2.5,success
+691,Emerging Trends in Artificial Intelligence and Machine Learning Applications,3,success
+692,Exploring the Impact of Climate Change on Global Communities,2.5,success
+693,Efficacy of Methylxanthines Against Building Mold Growth,39.4,success
+694,Emerging Trends in AI and Machine Learning Applications,3.6,success
+695,Live Streaming Platforms and the Regulation of Female Bodies Online,46,success
+696,Preserving Quality in Green Tea Powder and Brews,54.1,success
+697,Microfluidic Chips with Modular Interchangeable Electrodes Design,32.7,success
+698,Coffee Poisoning in Horses in Espirito Santo Brazil,96.6,success
+699,DNA-Immobilized Silica Gel for Pharmaceutical Metabolite Detection,29.8,success
+700,Pulmonary Fibrosis Triggered by Polyhexamethylene Guanidine Phosphate,48.8,success
+701,Understanding the Complexities of Fatigue Research Findings,68.5,success
+702,Amateur Doping Phenomenon Among Young Athletes in Sicily Italy,49.8,success
+703,The Dark Side of Energy Drinks on Children's Health,22.2,success
+704,Energy Drink Abuse Among Young Adults Research Findings,44.9,success
+705,Parkinson's Disease Prevention Through Lifestyle Modification Strategies,27.8,success
+706,Caffeine Overdose Leading to Fatal Cardiac Arrest Cases,26.9,success
+707,Caffeine and Sprint Interval Training Effects on Body Adiposity,35.3,success
+708,Improving Efficiency of Equine Cloning through Epigenetic Reprogramming Strategies,41.7,success
+709,Natural Active Emulsions Based on Collagen and Essential Oils,32.2,success
+710,Coffee Volatile Compounds and Altitude Variation Study,36.5,success
+711,Hyperoxic Brain Damage and Transforming Growth Factor-Beta Expression,33.4,success
+712,Ionic Liquids in Aqueous Biphasic Systems Research,42.2,success
+713,Measuring Diet-Induced Thermogenesis in Mice Experimentally,33.3,success
+714,Design and Synthesis of Caffeine Derivatives for Medicinal Purposes,33.6,success
+715,Green Liquid Chromatographic Analysis Methods for Pharmaceutical Combinations,39,success
+716,Coffee Quality Variability Among Conilon Coffee Accessions,33.4,success
+717,Clinoptilolite as Adsorbent for Contaminant Removal Efficiency,33.9,success
+718,Breeding Tea Plants with Caffeine Less Genes Found,29.6,success
+719,Effects of Caffeine on Lactate Metabolism in Diabetic Rats,51.7,success
+720,Caffeine's Impact on Human Cognitive Abilities Revealed,39.8,success
+721,Pharmaceuticals as Emerging Micropollutants in Water Systems Worldwide,54.8,success
+722,Shift Work Impacts on Diet and Sleep Patterns,69,success
+723,Physiological Effects of Caffeine on Marathon Runners,40,success
+724,Quantifying Multiple Active Ingredients in Pharmaceutical Products Efficiently,30.5,success
+725,Supercritical Fluid Extraction and its Industrial Applications,31.1,success
+726,Emergence of AI in Scientific Research and Discovery,3.1,success
+727,Access to Over-the-Counter Medicines in South Africa Variance,45.3,success
+728,Portable Sleep Studies for Hospitalized Children With SDB,42.4,success
+729,The Impact of Artificial Intelligence on Modern Education Systems,2.8,success
+730,Herbal Slimming Products Quality Control Analysis,30.3,success
+731,"Shift Work, Diet, and Mental Health Dynamics",65.2,success
+732,High Performance Liquid Chromatography Analysis Techniques Improvement Methods,37.9,success
+733,Hidden Dangers in Caffeine-Laden Sport Supplements,40.3,success
+734,Blueberries' Impact on Dopamine Levels and Fatigue Relief Research,37.8,success
+735,Urbanization Impact on Water Quality in Urban Centers,32.3,success
+736,Caffeine and Air Temperature Affect Cognitive Performance,33.4,success
+737,Phytocomponents of Shammah Leaf Tobacco Products Identified,38.6,success
+738,Cortisol's Role in Systemic Arterial Hypertension Research Findings,30.7,success
+739,Effects of Caffeine on Professional Soccer Players Performance Metrics,35.6,success
+740,Black Tea's Antidiabetic and Phytochemical Properties Investigated,31.7,success
+741,Permeation Enhancers and Skin Penetration Rates Studied,36,success
+742,Use of Marmosets in Pharmacokinetic Research Studies,42.6,success
+743,Bayesian Inference for Informative Sampling Designs with Caffeine Data,26.7,success
+744,Coffee Bean Size and Shape Effects on Cupping Quality Attributes,38.3,success
+745,Caffeine vs Theophylline in Apnea Treatment Outcomes,57.8,success
+746,Iron Chelators as Potential Cancer Therapeutic Agents Emerging,41.4,success
+747,Liquid Chromatography Tandem Mass Spectrometry Method Validation,50.7,success
+748,UV Irradiation's Epigenetic Impact on Skin Cancer Development,36.9,success
+749,Computing Phase Equilibria in Supercritical Fluids Challenges,13.6,success
+750,Coffee Consumption and Cancer Risk Meta-Analyses,43,success
+751,Acute Pain Effects on Cognitive Function and Mobility,56.6,success
+752,Caffeine's Effect on Local Anesthesia Efficacy Studied,48.8,success
+753,Bilirubin Toxicity and Neuroprotection in Preterm Neonates,53.6,success
+754,Caffeine's Effects on Learning and Memory in Rats Studied,48.3,success
+755,Mechanisms of Deoxyschisandrin's Sedative-Hypnotic Effects on Mice Behavior,28.6,success
+756,Advanced Materials and Nanotechnology in Energy Applications Today,4.9,success
+757,Parkinson's Disease Progression and Lifestyle Factors Research,61.9,success
+758,Materials Science for Sustainable and Durable Coating Systems Development,27,success
+759,College Students' Perceptions and Habits Regarding Caffeine Consumption,40,success
+760,Rodent Anxiety Testing and Ketone Supplements Research Study,38.2,success
+761,Iron-Embedded Zeolites as Heterogeneous Fenton Catalysts,32.7,success
+762,Structure-Taste Relationship in Di- and Tripeptide Sequences,29.7,success
+763,Caffeine's Impact on Central Taste Processing and Perception,36.9,success
+764,Developmental Toxicity Test Methods Validation,36.5,success
+765,Impact of Fermentation on Coffee Bean Composition Profiles,38.6,success
+766,Prevalence of Premenstrual Syndrome Among Female Medical Students,46.7,success
+767,Phytochemicals and Their Impact on Honey Bee Health,37.3,success
+768,Ultraviolet Light Induced DNA Damage Response Pathways,34.8,success
+769,Daytime Sleepiness in Women is a Major Concern Factor,46.7,success
+770,Microfluidic Capillaries for Advanced Chromatography Applications Development,54.3,success
+771,Nicotine's Effect on Multiple Drug Stimulus Properties Interaction,42.9,success
+772,Sleep Habits and Academic Performance in Medical Students,62.8,success
+773,Caffeine and Cocaine Addiction Vulnerability in Adolescent Rats,33.3,success
+774,Taste Receptors Influence Grooming Behavior in Drosophila Flies,36.7,success
+775,Molecular Interactions Regulating Calcium Release Pathways,37.3,success
+776,Solubility Measurements in Compressed Carbon Dioxide Environments Studied,22.1,success
+777,Coffee Intake and Adiposity Relationship Studies,55.2,success
+778,Exploring the Impact of Climate Change on Global Ecosystems,3.4,success
+779,Benzodiazepine Effects on Vital Organs in Rats Studied,54.5,success
+780,Pharmaceutical Applications of Cyclooxygenase Enzymes and Variants,33.9,success
+781,Quantifying Actinodaphnine with Proton NMR Methods Developed,33.5,success
+782,Adenosine Receptors in the Hippocampal Formation Process,53,success
+783,Genetic Risk Scores and Lifestyle Modulate Insulin Resistance,50.5,success
+784,Effect of Maternal Diet on Fetal Activity During MRI,37.4,success
+785,Chemicals Contaminating Tea Infusions and Health Risks,31.6,success
+786,Dissolution Behavior of Solid Lipid Micro-particles in Gastrointestinal Fluids,40.7,success
+787,Cancer Immunotherapy and Natural Killer Cell Functions,56.4,success
+788,Caffeine's Potential Benefits for Diabetes-Related Bladder Dysfunction Symptoms,35.8,success
+789,Evolving Trends in Advanced Materials Science and Engineering,5.3,success
+790,Advances in Terahertz Spectroscopy for Food Quality Inspection Systems,22,success
+791,Unlikely Attractants in Aphid-Ant Mutualisms Disrupted,37.1,success
+792,Vasorelaxation Properties of Tiliacorinine Derivatives Studied,69,success
+793,The Impact of Artificial Intelligence on Modern Society,3.3,success
+794,Sensors and Probes for Detection and Quantification of Caffeine Molecules,27.3,success

@@ -327,9 +327,19 @@ library("ollamar")
 #   COMPARING CLUSTERS   #
 ##########################
 
+#   ERA 22
+
 #   Collapsing Abstracting by Cluster
     community_abstracts <- prepare_community_data(community_data)
     print(community_abstracts[(1:5),])
+
+#   Examining & Exporting Era 22 Results
+    generate_community_themes(community_abstracts, max_chars = 8000, max_timeout = 1200)
+    readr::write_csv(era22_results, file=c("/workspace/caffeine_citation/data/era22_results.csv"))
+
+#   ERA 21
+
+
 
 
 
