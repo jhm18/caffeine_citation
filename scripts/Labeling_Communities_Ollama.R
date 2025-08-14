@@ -346,7 +346,7 @@ library("ollamar")
     print(community_abstracts[(1:5),])
 
 #   Generating Community Labels & Exporting Era 22 Results
-    generate_community_themes(community_abstracts, max_chars = 8000, max_timeout = 1200)
+    era22_results <- generate_community_themes(community_abstracts, max_chars = 8000, max_timeout = 1200)
     readr::write_csv(era22_results, file=c("/workspace/caffeine_citation/data/era22_results.csv"))
 
 #   ERA 23
@@ -356,8 +356,8 @@ library("ollamar")
     print(era_23_community_abstracts[(1:5),])
 
 #   Generating Community Labels & Exporting Era 23 Results
-    generate_community_themes( era_23_community_abstracts, max_chars = 8000, max_timeout = 1200)
-    readr::write_csv(era22_results, file=c("/workspace/caffeine_citation/data/era23_results.csv"))
+    era23_results <- generate_community_themes( era_23_community_abstracts, max_chars = 8000, max_timeout = 1200)
+    readr::write_csv(era23_results, file=c("/workspace/caffeine_citation/data/era23_results.csv"))
 
 #######################
 #   FUNCTION CHECKS   #
