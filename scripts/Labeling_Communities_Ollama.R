@@ -293,6 +293,21 @@ library("ollamar")
             return(results)
     }
 
+#   Function to Examine Community-Level Lists
+    community_abstracts_finder <- function(data, community_id, themes_data){
+        #   Formatting Data
+            colnames(data)[[4]] <- c("community_id")
+
+        #   Isolating Community Data
+            community_data <- data[(data$community_id == community_id), c(4,6,7)]
+
+        #   Adding Theme
+            community_data <- dplyr::left_join(community_data, themes_data[,c(1,2)], by=c("community_id"))
+
+        #   Return Community with Theme
+            return(community_data)
+    }
+
 ##################
 #   BASIC TEST   #
 ##################
@@ -325,6 +340,9 @@ library("ollamar")
     colnames(era22_prompt)[[1]] <- c("community_id")
     community_data <- data.frame(community_id = era22_prompt$community_id, text_theme = as.character(era22_prompt$abstract_list))
 
+#   Pulling-Results
+    era_22_results <- readr::read_csv("/workspace/caffeine_citation/data/era22_results.csv")
+
 #   ERA 23
 
 #   Loading Era 23 Prompt Data
@@ -334,6 +352,9 @@ library("ollamar")
     era23_prompt <- era23_data[c(4,6:8)]
     colnames(era23_prompt)[[1]] <- c("community_id")
     era_23_community_data <- data.frame(community_id = era23_prompt$community_id, text_theme = as.character(era23_prompt$abstract_list))
+
+#   Pulling-Results
+    era_23_results <- readr::read_csv("/workspace/caffeine_citation/data/era23_results.csv")
 
 ##########################
 #   COMPARING CLUSTERS   #
@@ -358,6 +379,13 @@ library("ollamar")
 #   Generating Community Labels & Exporting Era 23 Results
     era23_results <- generate_community_themes( era_23_community_abstracts, max_chars = 8000, max_timeout = 1200)
     readr::write_csv(era23_results, file=c("/workspace/caffeine_citation/data/era23_results.csv"))
+
+###################
+#   EVALUATIONS   #
+###################
+
+#   Pulling-In Community & Theme Data
+    community_themes <- community_abstracts_finder(era23_data, 9, era_23_results)
 
 #######################
 #   FUNCTION CHECKS   #
