@@ -1,0 +1,25 @@
+NETBEGIN 1
+CLUBEGIN 1
+PERBEGIN 1
+CLSBEGIN 1
+HIEBEGIN 1
+VECBEGIN 1
+
+% Reading Network   ---    C:\Users\metal\OneDrive\Desktop\era22.net
+N 1 RDN "C:\Users\metal\OneDrive\Desktop\era22.net" (43670)
+% Reading Partition   ---    C:\Users\metal\OneDrive\Desktop\era22_testCommunity.clu
+C 1 RDC "C:\Users\metal\OneDrive\Desktop\era22_testCommunity.clu" (43670)
+% Extracting Subnetworks induced by each selected Cluster
+N 795 EXTNETALL 1 1 [1-*] (60)
+% All degree centrality of 2. Subnetwork of N1 induced by C1 [1] (304)
+V 1 DEGV 2 [2] (304)
+% Saving vector to file   ---    C:\Users\metal\OneDrive\Desktop\total_degree_community_1.vec
+V 1 WV "C:\Users\metal\OneDrive\Desktop\total_degree_community_1.vec" 0 (304)
+% All degree centrality of 3. Subnetwork of N1 induced by C1 [2] (451)
+V 2 DEGV 3 [2] (451)
+% Saving vector to file   ---    C:\Users\metal\OneDrive\Desktop\total_degree_community_2.vec
+V 2 WV "C:\Users\metal\OneDrive\Desktop\total_degree_community_2.vec" 0 (451)
+% All degree centrality of 4. Subnetwork of N1 induced by C1 [3] (278)
+V 3 DEGV 4 [2] (278)
+% Saving vector to file   ---    C:\Users\metal\OneDrive\Desktop\total_degree_community_3.vec
+V 3 WV "C:\Users\metal\OneDrive\Desktop\total_degree_community_3.vec" 0 (278)
