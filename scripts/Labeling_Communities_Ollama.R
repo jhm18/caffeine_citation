@@ -21,6 +21,9 @@ library("ollamar")
 #   FUNCTIONS   #
 #################
 
+#   Source Pajek
+    source("/workspace/caffeine_citation/scripts/RPajekFunctions_30April2023.r")
+  
 #   Check Ollama
     check_ollama <- function() {
         tryCatch({
@@ -483,6 +486,50 @@ write_pajek_mcr <- function(network_path, partition_path, output_dir, mcr_file_p
 		cat("Complete MCR file written to:", mcr_file_path, "\n")
 		cat("Generated commands for", k, "communities\n")
 }
+
+# Function to map degree rankings
+network_loc <- "/workspace/caffeine_citation/pajek_files/Era22/era22.net"
+community_loc <- "/workspace/caffeine_citation/pajek_files/Era22/era22_testCommunity.clu"
+era_prompt <- "/workspace/caffeine_citation/data/era22_prompt.Rda"
+community_degree_mapper <- function(network_loc, community_loc, era_prompt){
+  # Pull in network
+    read_net(network_loc)
+  
+  # Pull in community file
+    communities <- readLines(community_loc)
+    communities <- as.integer(communities[-c(1)])
+
+  # Create a community index
+    community_idx <- cbind(vertices,communities)
+    community_idx <- community_idx[order(community_idx$communities, community_idx$ID),]
+    colnames(community_idx)[[2]] <- c("node_id")
+    
+  # Load prompt data
+    load(era_prompt)
+    
+    ###########
+    ## Start here, rename prompt data
+  
+  # Loop through communities
+    community_ids <- unique(communities)
+    for (i in seq_along(community_ids)){
+      # Subset community index by current community
+        curr_community <- community_idx[community_idx$communities == i, ]
+    
+      # Pull in degree file for community
+  
+      # Subset using prompt data to isolate nodes in both eras
+      
+      # Populate output list
+      
+    }
+    
+  # Create community degree index
+
+  # Return community degree index
+
+}
+
 
 ##################
 #   BASIC TEST   #
