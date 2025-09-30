@@ -20,6 +20,8 @@ library("ollamar")
 #################
 #   FUNCTIONS   #
 #################
+#   Create not in function
+  `%notin%` <- Negate(`%in%`)
 
 #   Source Pajek
     source("/workspace/caffeine_citation/scripts/RPajekFunctions_30April2023.r")
@@ -491,7 +493,8 @@ write_pajek_mcr <- function(network_path, partition_path, output_dir, mcr_file_p
 network_loc <- "/workspace/caffeine_citation/pajek_files/Era22/era22.net"
 community_loc <- "/workspace/caffeine_citation/pajek_files/Era22/era22_testCommunity.clu"
 era_prompt <- "/workspace/caffeine_citation/data/era22_prompt.Rda"
-community_degree_mapper <- function(network_loc, community_loc, era_prompt){
+degree_file_loc <- "/workspace/caffeine_citation/pajek_files/Era22/Community_Degree_Files"
+community_degree_mapper <- function(network_loc, community_loc, era_prompt, degree_file_loc){
   # Pull in network
     read_net(network_loc)
   
@@ -503,25 +506,39 @@ community_degree_mapper <- function(network_loc, community_loc, era_prompt){
     community_idx <- cbind(vertices,communities)
     community_idx <- community_idx[order(community_idx$communities, community_idx$ID),]
     colnames(community_idx)[[2]] <- c("node_id")
+    community_idx <- community_idx[c(1,2,6)]
     
   # Load prompt data
+    environment_elements <- ls()
     load(era_prompt)
+    workspace_elements <- ls()
+    workspace_elements <- workspace_elements[workspace_elements %notin% environment_elements]
+    era_name <- workspace_elements[workspace_elements != "environment_elements"]
+    iteration_prompt <- get(era_name)
     
-    ###########
-    ## Start here, rename prompt data
-  
   # Loop through communities
-    community_ids <- unique(communities)
+    community_ids <- unique(community_idx$communities)
+    degree_files <- list.files(path=degree_file_loc, pattern="*.vec", full.names= TRUE)
+    output_list <- vector("list", length(community_ids))
+    
+    # Check for i=2,  degree file naming is sorted by character name (1,10)
+    # Take dgree file name, break it up to isolate number from name and sort by number
     for (i in seq_along(community_ids)){
       # Subset community index by current community
-        curr_community <- community_idx[community_idx$communities == i, ]
+        curr_community <- community_idx[community_idx$communities == community_ids[[i]], ]
     
       # Pull in degree file for community
-  
+        degree <- readLines(degree_files[[i]])
+        degree <- as.integer(degree[-c(1)])
+        curr_community$total_degree <- degree
+        
       # Subset using prompt data to isolate nodes in both eras
-      
+        curr_prompt <- iteration_prompt[iteration_prompt$community == community_ids[[i]], ]
+        curr_prompt <- dplyr::left_join(curr_prompt, curr_community[c(2,4)], by = "node_id")
+        curr_prompt <- curr_prompt[order(curr_prompt$total_degree, decreasing = TRUE),]
+        
       # Populate output list
-      
+        output_list[[i]] <- curr_prompt
     }
     
   # Create community degree index
