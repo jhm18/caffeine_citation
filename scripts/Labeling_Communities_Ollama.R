@@ -126,36 +126,66 @@ library("ollamar")
 #   Function to Prepare the Data by Community
     prepare_community_data <- function(data) {
         #   Get unique communities
-            unique_communities <- unique(data$community_id)
+            unique_communities <- unique(data$community)
+            
+        #   Sort data by community and total degree
+            data <- data[order(data$community, data$total_degree, decreasing = c(FALSE,TRUE)),]
         
         #   Initialize results
-            community_themes <- data.frame(
+            core_community_themes <- data.frame(
                 community_id = integer(),
                 combined_abstracts = character(),
                 abstract_count = integer(),
                 stringsAsFactors = FALSE
             )
+            
+            minor_community_themes <- data.frame(
+              community_id = integer(),
+              combined_abstracts = character(),
+              abstract_count = integer(),
+              stringsAsFactors = FALSE
+            )
     
-        #   Process each community
+        #   Process each community core
             for(comm_id in unique_communities) {
                 #   Get all abstracts for this community
-                    comm_data <- data[data$community_id == comm_id, ]
+                    comm_data <- data[data$community == comm_id, ]
+                    comm_data <- comm_data[c(1:5),]
                     
                 #   Combine abstracts
-                    combined_text <- paste(comm_data$text_theme, collapse = " ")
+                    combined_text <- paste(comm_data$abstract_list, collapse = " ")
                     abstract_count <- nrow(comm_data)
                     
                 #   Add to results
-                    community_themes <- rbind(community_themes, data.frame(
+                    core_community_themes <- rbind(core_community_themes, data.frame(
                         community_id = comm_id,
                         combined_abstracts = combined_text,
                         abstract_count = abstract_count,
                         stringsAsFactors = FALSE
                     ))
             }
+            
+        #   Process minor communities
+            for(comm_id in unique_communities) {
+              #   Get all abstracts for this community
+              comm_data <- data[data$community == comm_id, ]
+              comm_data <- comm_data[c(6:nrow(comm_data)),]
+              
+              #   Combine abstracts
+              combined_text <- paste(comm_data$abstract_list, collapse = " ")
+              abstract_count <- nrow(comm_data)
+              
+              #   Add to results
+              minor_community_themes <- rbind(minor_community_themes, data.frame(
+                community_id = comm_id,
+                combined_abstracts = combined_text,
+                abstract_count = abstract_count,
+                stringsAsFactors = FALSE
+              ))
+            }
         
         #   Return Consolidated Abstracts by Community
-            return(community_themes)
+            return(list(core_themes = core_community_themes, minor_themes = minor_community_themes))
     }
 
 #   Helper Function: Text Truncation 
@@ -490,11 +520,7 @@ write_pajek_mcr <- function(network_path, partition_path, output_dir, mcr_file_p
 }
 
 # Function to map degree rankings
-network_loc <- "/workspace/caffeine_citation/pajek_files/Era22/era22.net"
-community_loc <- "/workspace/caffeine_citation/pajek_files/Era22/era22_testCommunity.clu"
-era_prompt <- "/workspace/caffeine_citation/data/era22_prompt.Rda"
-degree_file_loc <- "/workspace/caffeine_citation/pajek_files/Era22/Community_Degree_Files"
-community_degree_mapper <- function(network_loc, community_loc, era_prompt, degree_file_loc){
+  community_degree_mapper <- function(network_loc, community_loc, era_prompt, degree_file_loc){
   # Pull in network
     read_net(network_loc)
   
@@ -522,29 +548,44 @@ community_degree_mapper <- function(network_loc, community_loc, era_prompt, degr
     output_list <- vector("list", length(community_ids))
     
     # Check for i=2,  degree file naming is sorted by character name (1,10)
-    # Take dgree file name, break it up to isolate number from name and sort by number
-    for (i in seq_along(community_ids)){
-      # Subset community index by current community
-        curr_community <- community_idx[community_idx$communities == community_ids[[i]], ]
+    # Make degree index
+      file_idx <- data.frame(location = degree_files)
+      string_elements <- strsplit(file_idx$location, "/")
+      net_numbers <- vector("numeric", length(string_elements))
+      for (i in seq_along(string_elements)){
+        net_name <- string_elements[[i]][length(string_elements[[i]])]
+        net_elements <- strsplit(net_name, "_")[[1]]
+        net_elements <- net_elements[length(net_elements)]
+        net_number <- as.integer(strsplit(net_elements, "\\.")[[1]][[1]])
+        net_numbers[[i]] <- net_number
+      }
+      file_idx$net_id <- net_numbers
+      file_idx <- file_idx[order(file_idx$net_id),]
     
-      # Pull in degree file for community
-        degree <- readLines(degree_files[[i]])
-        degree <- as.integer(degree[-c(1)])
-        curr_community$total_degree <- degree
-        
-      # Subset using prompt data to isolate nodes in both eras
-        curr_prompt <- iteration_prompt[iteration_prompt$community == community_ids[[i]], ]
-        curr_prompt <- dplyr::left_join(curr_prompt, curr_community[c(2,4)], by = "node_id")
-        curr_prompt <- curr_prompt[order(curr_prompt$total_degree, decreasing = TRUE),]
-        
-      # Populate output list
-        output_list[[i]] <- curr_prompt
-    }
+    # Take degree file name, break it up to isolate number from name and sort by number
+      for (i in seq_along(community_ids)){
+        # Subset community index by current community
+          curr_community <- community_idx[community_idx$communities == community_ids[[i]], ]
+          
+        # Pull in degree file for community
+          degree <- readLines(file_idx$location[[i]])
+          degree <- as.integer(degree[-c(1)])
+          curr_community$total_degree <- degree
+          
+        # Subset using prompt data to isolate nodes in both eras
+          curr_prompt <- iteration_prompt[iteration_prompt$community == community_ids[[i]], ]
+          curr_prompt <- dplyr::left_join(curr_prompt, curr_community[c(2,4)], by = "node_id")
+          curr_prompt <- curr_prompt[order(curr_prompt$total_degree, decreasing = TRUE),]
+          
+        # Populate output list
+          output_list[[i]] <- curr_prompt
+      }
     
-  # Create community degree index
-
-  # Return community degree index
-
+    # Create community degree index
+      degree_idx <- do.call("rbind", output_list)
+      unique(degree_idx$total_degree)
+    # Return community degree index
+      return(degree_idx)
 }
 
 
@@ -582,6 +623,7 @@ community_degree_mapper <- function(network_loc, community_loc, era_prompt, degr
 
 #   Pulling-Results
     era_22_results <- readr::read_csv("/workspace/caffeine_citation/data/era22_results.csv")
+    
 
 #   ERA 23
 
@@ -609,10 +651,20 @@ community_degree_mapper <- function(network_loc, community_loc, era_prompt, degr
     mcr_file_path <- c('/workspace/caffeine_citation/pajek_files/Era22/test_2.MCR')
     write_pajek_mcr(network_path,  partition_path,  output_dir,  mcr_file_path)
     
+#   Mapping Community Degrees to Prompt Data    
+    era_prompt <- "/workspace/caffeine_citation/data/era22_prompt.Rda"
+    degree_file_loc <- "/workspace/caffeine_citation/pajek_files/Era22/Community_Degree_Files"
+    era22_prompt <- community_degree_mapper(network_path,partition_path,era_prompt, degree_file_loc)
+    
 #   Collapsing Abstracts by Cluster
-    community_abstracts <- prepare_community_data(community_data)
-    print(community_abstracts[(1:5),])
+    community_abstracts <- prepare_community_data(era22_prompt)
+    print(community_abstracts$core_themes[(1:5),])
+    print(community_abstracts$minor_themes[(1:5),])
 
+    ##### NOTES. #####
+    # We need to fix the truncate function to take into account core and minor themes
+    
+    
 #   Generating Community Labels & Exporting Era 22 Results
     era22_results <- generate_community_themes(community_abstracts, max_chars = 8000, max_timeout = 1200)
     readr::write_csv(era22_results, file=c("/workspace/caffeine_citation/data/era22_results.csv"))
