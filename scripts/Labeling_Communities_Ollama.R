@@ -188,24 +188,129 @@ library("ollamar")
             return(list(core_themes = core_community_themes, minor_themes = minor_community_themes))
     }
 
+#   Function to map degree rankings
+    community_degree_mapper <- function(network_loc, community_loc, era_prompt, degree_file_loc){
+        #   Pull in network
+            read_net(network_loc)
+        
+        #   Pull in community file
+            communities <- readLines(community_loc)
+            communities <- as.integer(communities[-c(1)])
+
+        #   Create a community index
+            community_idx <- cbind(vertices,communities)
+            community_idx <- community_idx[order(community_idx$communities, community_idx$ID),]
+            colnames(community_idx)[[2]] <- c("node_id")
+            community_idx <- community_idx[c(1,2,6)]
+            
+        #   Load prompt data
+            environment_elements <- ls()
+            load(era_prompt)
+            workspace_elements <- ls()
+            workspace_elements <- workspace_elements[workspace_elements %notin% environment_elements]
+            era_name <- workspace_elements[workspace_elements != "environment_elements"]
+            iteration_prompt <- get(era_name)
+            
+        #   Loop through communities
+            community_ids <- unique(community_idx$communities)
+            degree_files <- list.files(path=degree_file_loc, pattern="*.vec", full.names= TRUE)
+            output_list <- vector("list", length(community_ids))
+            
+            #   Check for i=2,  degree file naming is sorted by character name (1,10)
+            #   Make degree index
+                file_idx <- data.frame(location = degree_files)
+                string_elements <- strsplit(file_idx$location, "/")
+                net_numbers <- vector("numeric", length(string_elements))
+                for (i in seq_along(string_elements)){
+                    net_name <- string_elements[[i]][length(string_elements[[i]])]
+                    net_elements <- strsplit(net_name, "_")[[1]]
+                    net_elements <- net_elements[length(net_elements)]
+                    net_number <- as.integer(strsplit(net_elements, "\\.")[[1]][[1]])
+                    net_numbers[[i]] <- net_number
+                }
+                file_idx$net_id <- net_numbers
+                file_idx <- file_idx[order(file_idx$net_id),]
+                
+            #   Take degree file name, break it up to isolate number from name and sort by number
+                for (i in seq_along(community_ids)){
+                    # Subset community index by current community
+                    curr_community <- community_idx[community_idx$communities == community_ids[[i]], ]
+                    
+                    # Pull in degree file for community
+                    degree <- readLines(file_idx$location[[i]])
+                    degree <- as.integer(degree[-c(1)])
+                    curr_community$total_degree <- degree
+                    
+                    # Subset using prompt data to isolate nodes in both eras
+                    curr_prompt <- iteration_prompt[iteration_prompt$community == community_ids[[i]], ]
+                    curr_prompt <- dplyr::left_join(curr_prompt, curr_community[c(2,4)], by = "node_id")
+                    curr_prompt <- curr_prompt[order(curr_prompt$total_degree, decreasing = TRUE),]
+                    
+                    # Populate output list
+                    output_list[[i]] <- curr_prompt
+                }
+            
+            #   Create community degree index
+                degree_idx <- do.call("rbind", output_list)
+                unique(degree_idx$total_degree)
+
+            #   Return community degree index
+                return(degree_idx)
+    }
+
 #   Helper Function: Text Truncation 
-    truncate_text <- function(text, max_chars = 8000) {
-        #   Check if the prompt exceeds a Max Text Limit
-            if (nchar(text) <= max_chars) return(text)
+    text_list <- community_abstracts
+    truncate_text <- function(text_list, core_threshold = 8000) {
+        #   Core Theme Character Length
+            core_theme_lengths <- nchar(text_list$core_themes$combined_abstracts)
+            core_theme_index <- data.frame(community_id = text_list$core_themes$community_id, core_theme_n =  core_theme_lengths)
+
+        #   Identify Max Count
+            max_chars = round(max(core_theme_index$core_theme_n), digits=10)
+
+        #   Identifying Communities that Require Minor Themes
+            minor_communities <- core_theme_index$community_id[(core_theme_index$core_theme_n < core_threshold)]
+            core_n <- core_theme_index$core_theme_n[(core_theme_index$core_theme_n < core_threshold)]
+            community_deltas <- max_chars - core_theme_index$core_theme_n[(core_theme_index$core_theme_n < core_threshold)]
+            minor_index <- data.frame(community =  minor_communities, core_theme_nchar =  core_n, char_delta = community_deltas)
+
+        #   Extract Minor Themes
+            minor_themes <- text_list$minor_themes[(text_list$minor_themes$community_id %in% minor_communities), ]
+
+        #   Iterate Through Communities Supplemented by a Minor Theme
+            minor_community_themes <- vector('list', nrow(minor_index))
+            names(minor_community_themes ) <- minor_index$community
+            for (i in seq_along( minor_community_themes )){
+                #   Isolate Minor Theme
+                    minor_theme <- minor_themes[(minor_themes$community_id == minor_communities[[i]]), 2]  
+
+                #   Isolating Community Delta
+                    comm_delta <- minor_index$char_delta[[i]]
+
+                #   Check if the prompt exceeds delta to Avoid Truncating Unnecessarily
+                    if (nchar(minor_theme) <=  comm_delta) return(t)
+
+                #   COME BACK HERE!!!
     
-        #   Truncate to max_chars
-            truncated <- substr(text, 1, max_chars)
-        
-        #   Try to end at a complete sentence
-            last_period <- max(gregexpr("\\.", truncated)[[1]])
-            if (last_period > max_chars * 0.8) {
-                truncated <- substr(truncated, 1, last_period)
+                #   Truncate to max_chars
+                    truncated <- substr(text, 1, max_chars)
+                
+                #   Try to end at a complete sentence
+                    last_period <- max(gregexpr("\\.", truncated)[[1]])
+                    if (last_period > max_chars * 0.8) {
+                        truncated <- substr(truncated, 1, last_period)
+                    }
+
+                #   Report truncation
+                    cat("    Truncated text from", nchar(text), "to", nchar(truncated), "characters\n")
+
+                #   Populate minor_community_themes
+
             }
+
+        #   Combine Major and Minor Themes
         
-        #   Report truncation
-            cat("    Truncated text from", nchar(text), "to", nchar(truncated), "characters\n")
-        
-        #   Return Formatted Text
+        #   Return Combined Theme
             return(truncated)
     }
 
@@ -519,76 +624,6 @@ write_pajek_mcr <- function(network_path, partition_path, output_dir, mcr_file_p
 		cat("Generated commands for", k, "communities\n")
 }
 
-# Function to map degree rankings
-  community_degree_mapper <- function(network_loc, community_loc, era_prompt, degree_file_loc){
-  # Pull in network
-    read_net(network_loc)
-  
-  # Pull in community file
-    communities <- readLines(community_loc)
-    communities <- as.integer(communities[-c(1)])
-
-  # Create a community index
-    community_idx <- cbind(vertices,communities)
-    community_idx <- community_idx[order(community_idx$communities, community_idx$ID),]
-    colnames(community_idx)[[2]] <- c("node_id")
-    community_idx <- community_idx[c(1,2,6)]
-    
-  # Load prompt data
-    environment_elements <- ls()
-    load(era_prompt)
-    workspace_elements <- ls()
-    workspace_elements <- workspace_elements[workspace_elements %notin% environment_elements]
-    era_name <- workspace_elements[workspace_elements != "environment_elements"]
-    iteration_prompt <- get(era_name)
-    
-  # Loop through communities
-    community_ids <- unique(community_idx$communities)
-    degree_files <- list.files(path=degree_file_loc, pattern="*.vec", full.names= TRUE)
-    output_list <- vector("list", length(community_ids))
-    
-    # Check for i=2,  degree file naming is sorted by character name (1,10)
-    # Make degree index
-      file_idx <- data.frame(location = degree_files)
-      string_elements <- strsplit(file_idx$location, "/")
-      net_numbers <- vector("numeric", length(string_elements))
-      for (i in seq_along(string_elements)){
-        net_name <- string_elements[[i]][length(string_elements[[i]])]
-        net_elements <- strsplit(net_name, "_")[[1]]
-        net_elements <- net_elements[length(net_elements)]
-        net_number <- as.integer(strsplit(net_elements, "\\.")[[1]][[1]])
-        net_numbers[[i]] <- net_number
-      }
-      file_idx$net_id <- net_numbers
-      file_idx <- file_idx[order(file_idx$net_id),]
-    
-    # Take degree file name, break it up to isolate number from name and sort by number
-      for (i in seq_along(community_ids)){
-        # Subset community index by current community
-          curr_community <- community_idx[community_idx$communities == community_ids[[i]], ]
-          
-        # Pull in degree file for community
-          degree <- readLines(file_idx$location[[i]])
-          degree <- as.integer(degree[-c(1)])
-          curr_community$total_degree <- degree
-          
-        # Subset using prompt data to isolate nodes in both eras
-          curr_prompt <- iteration_prompt[iteration_prompt$community == community_ids[[i]], ]
-          curr_prompt <- dplyr::left_join(curr_prompt, curr_community[c(2,4)], by = "node_id")
-          curr_prompt <- curr_prompt[order(curr_prompt$total_degree, decreasing = TRUE),]
-          
-        # Populate output list
-          output_list[[i]] <- curr_prompt
-      }
-    
-    # Create community degree index
-      degree_idx <- do.call("rbind", output_list)
-      unique(degree_idx$total_degree)
-    # Return community degree index
-      return(degree_idx)
-}
-
-
 ##################
 #   BASIC TEST   #
 ##################
@@ -663,7 +698,6 @@ write_pajek_mcr <- function(network_path, partition_path, output_dir, mcr_file_p
 
     ##### NOTES. #####
     # We need to fix the truncate function to take into account core and minor themes
-    
     
 #   Generating Community Labels & Exporting Era 22 Results
     era22_results <- generate_community_themes(community_abstracts, max_chars = 8000, max_timeout = 1200)
