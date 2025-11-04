@@ -279,7 +279,7 @@ library("ollamar")
 
         #   Iterate Through Communities Supplemented by a Minor Theme
             minor_community_themes <- vector('list', nrow(minor_index))
-            names(minor_community_themes ) <- minor_index$community
+            names(minor_community_themes) <- minor_index$community
             for (i in seq_along( minor_community_themes )){
                 #   Isolate Minor Theme
                     minor_theme <- minor_themes[(minor_themes$community_id == minor_communities[[i]]), 2]  
@@ -288,30 +288,65 @@ library("ollamar")
                     comm_delta <- minor_index$char_delta[[i]]
 
                 #   Check if the prompt exceeds delta to Avoid Truncating Unnecessarily
-                    if (nchar(minor_theme) <=  comm_delta) return(t)
-
-                #   COME BACK HERE!!!
-    
-                #   Truncate to max_chars
-                    truncated <- substr(text, 1, max_chars)
+                    if (nchar(minor_theme) <=  comm_delta){
+                        #   Populating if Minor Themes is Below the Community Delta
+                            minor_community_themes[[i]] <-  minor_theme
+                    }else{
+                        #   Truncate to max_chars
+                            truncated <- substr(minor_theme, 1, comm_delta)
                 
-                #   Try to end at a complete sentence
-                    last_period <- max(gregexpr("\\.", truncated)[[1]])
-                    if (last_period > max_chars * 0.8) {
-                        truncated <- substr(truncated, 1, last_period)
-                    }
+                        #   Try to end at a complete sentence
+                            last_period <- max(gregexpr("\\.", truncated)[[1]])
+                            if (last_period > comm_delta * 0.8) {
+                                truncated <- substr(truncated, 1, last_period)
+                            }
 
-                #   Report truncation
-                    cat("    Truncated text from", nchar(text), "to", nchar(truncated), "characters\n")
+                        #   Report truncation
+                            cat("    Truncated minor theme text from", nchar(minor_theme), "to", nchar(truncated), "characters\n")
 
-                #   Populate minor_community_themes
-
+                        #   Populate minor_community_themes
+                            minor_community_themes[[i]] <- truncated
+                    } 
             }
 
         #   Combine Major and Minor Themes
+            core_theme_index$is_minor <- ifelse(core_theme_index$core_theme_n < 8000, 1, 0) 
+            combined_themes <- vector("list", nrow(core_theme_index))
+            names(combined_themes) <- core_theme_index$community_id
+            iteration <- 0
+            for(i in seq_along(combined_themes)){
+                #   Update Check Variable
+                    iteration <- i
+
+                #   Has Minor Theme
+                    is_minor <- core_theme_index$is_minor[[i]]
+                    community_id <- core_theme_index$community_id[[i]]
+
+                #   Handling Combined Major & Minor vs. Major Theme Only
+                    if(is_minor == 1){
+                        #   Isolate Major Theme
+                            major_theme <- text_list$core_themes$combined_abstracts[[i]]
+
+                        #   Isolate Truncated Minor Theme
+                            minor_theme <- minor_community_themes[names(minor_community_themes) == community_id]
+
+                        #   Combine Themes
+                            combined_theme <- c(major_theme, minor_theme)
+                            combined_theme <- paste( combined_theme, collapse = " ")
+
+                        #   Populating Combined Themes
+                            combined_themes[[i]] <- combined_theme
+                    }else{
+                        #   Populating Combined Themes
+                            combined_themes[[i]] <- text_list$core_themes$combined_abstracts[[i]]
+                    }
+            }
+
+        #   Stack the List into a DataFrame
+            combined_themes_df <- do.call("rbind",   combined_themes)
         
         #   Return Combined Theme
-            return(truncated)
+            return(combined_themes_df)
     }
 
 #   Helper Function to Determine Stopping Points to Avoid Time Out Errors
