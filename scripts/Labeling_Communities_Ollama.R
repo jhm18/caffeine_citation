@@ -259,7 +259,6 @@ library("ollamar")
     }
 
 #   Helper Function: Text Truncation 
-    text_list <- community_abstracts
     truncate_text <- function(text_list, core_threshold = 8000) {
         #   Core Theme Character Length
             core_theme_lengths <- nchar(text_list$core_themes$combined_abstracts)
@@ -343,8 +342,9 @@ library("ollamar")
             }
 
         #   Stack the List into a DataFrame
-            combined_themes_df <- do.call("rbind",   combined_themes)
-        
+            combined_themes_vector <- do.call("rbind",   combined_themes)
+            combined_themes_df <- data.frame(community = as.integer(names(combined_themes)), theme= combined_themes_vector)
+
         #   Return Combined Theme
             return(combined_themes_df)
     }
@@ -360,7 +360,7 @@ library("ollamar")
     }
 
 #   Function to Generate Community Themes
-    generate_community_themes <- function(raw_data, max_chars = 8000, max_timeout = 1200) {
+    generate_community_themes <- function(raw_data, core_threshold = 8000, max_timeout = 1200) {
         #   Ensure Ollama is running
             if (!ensure_ollama_running()) {
                 stop("Could not start Ollama service")
@@ -368,38 +368,41 @@ library("ollamar")
     
         #   Prepare data by community
             community_data <- prepare_community_data(raw_data)
-            cat("Found", nrow(community_data), "unique communities\n")
+            cat("Found", nrow(community_data$core_themes), "unique communities\n")
     
         #   Load required libraries
             library("httr")
             library("jsonlite")
     
         #   Initialize results
-            results <- data.frame(community_id = integer(), theme = character(), processing_time = numeric(), status = character())
+            results <- data.frame(community_id = integer(), theme = character(), processing_time = numeric(), 
+                                  status = character())
     
+        #   Prepare text (with truncation if needed)
+            processed_text <- truncate_text(community_data, core_threshold)
+
         #   Process each community
-            for(i in 1:nrow(community_data)) {
+            for(i in 1:nrow(processed_text)) {
                 #   Setting Initial Start Time
                     start_time <- Sys.time()
-                    cat("Processing community", community_data$community_id[i], 
+                    cat("Processing community", processed_text$community[i], 
                         "with", community_data$abstract_count[i], "abstracts...\n")
             
-                #   Prepare text (with truncation if needed)
-                    processed_text <- truncate_text(community_data$combined_abstracts[i], max_chars)
-                
                 #   Calculate appropriate timeout
                     timeout_seconds <- calculate_timeout(
-                        community_data$abstract_count[i], 
+                        processed_text$community[i], 
                         nchar(processed_text),
                         max_timeout
                     )
                     cat("    Using timeout:", timeout_seconds, "seconds\n")
             
                 #   Create prompt
+                    community_text <- processed_text$theme[i]
+
                     prompt <- paste(
                         "You must respond with ONLY a 5-10 word theme name. No explanations, no extra text.\n\n",
-                        "Research cluster content (", community_data$abstract_count[i], "related abstracts):\n",
-                        processed_text, "\n\n",
+                        "Research cluster content for community", processed_text$community[i],":\n",
+                        community_text, "\n\n",
                         "Theme:"
                     )
             
@@ -431,12 +434,12 @@ library("ollamar")
                     
                         #   Store successful result
                             results <- rbind(results, data.frame(
-                                community_id = community_data$community_id[i],
+                                community_id = processed_text$community[i],
                                 theme = theme,
                                 processing_time = round(processing_time, 1),
                                 status = "success"
                             ))
-                            cat("Community", community_data$community_id[i], ":", theme, 
+                            cat("Community", processed_text$community[i], ":", theme, 
                                 "(", round(processing_time, 1), "seconds )\n\n")
                     
                     }, error = function(e) {
@@ -731,12 +734,11 @@ write_pajek_mcr <- function(network_path, partition_path, output_dir, mcr_file_p
     print(community_abstracts$core_themes[(1:5),])
     print(community_abstracts$minor_themes[(1:5),])
 
-    ##### NOTES. #####
-    # We need to fix the truncate function to take into account core and minor themes
-    
 #   Generating Community Labels & Exporting Era 22 Results
-    era22_results <- generate_community_themes(community_abstracts, max_chars = 8000, max_timeout = 1200)
+    era22_results <- generate_community_themes(era22_prompt, core_threshold = 8000, max_timeout = 1200)
     readr::write_csv(era22_results, file=c("/workspace/caffeine_citation/data/era22_results.csv"))
+
+#   START BACK HERE: LOOK AT RESULTS!!!!
 
 #   ERA 23
 
