@@ -350,115 +350,177 @@ library("ollamar")
     }
 
 #   Helper Function to Determine Stopping Points to Avoid Time Out Errors
-    calculate_timeout <- function(abstract_count, char_count, max_timeout = 1200) {
-        base_timeout <- 300  # 5 minutes base
-        char_factor <- char_count / 1000 * 10  # 10 seconds per 1000 chars
-        abstract_factor <- abstract_count * 15  # 15 seconds per abstract
-    
-        timeout <- base_timeout + char_factor + abstract_factor
-        return(min(timeout, max_timeout))  # Cap at max_timeout
+    calculate_timeout <- function(char_count, max_timeout = 1200) {
+        base_timeout <- 180
+        seconds_per_1k <- 18
+        timeout <- base_timeout + (char_count / 1000) * seconds_per_1k
+        min(round(timeout), max_timeout)
     }
 
 #   Function to Generate Community Themes
-    generate_community_themes <- function(raw_data, core_threshold = 8000, max_timeout = 1200) {
+#   raw_data <- era22_prompt
+    generate_community_themes <- function(raw_data, core_threshold = 8000, max_timeout = 1200,
+                                          model = "llama3.1:8b", fallback_timeout = 900,     # 15 minutes
+                                          cooldown_seconds = 30) {
+
         #   Ensure Ollama is running
             if (!ensure_ollama_running()) {
                 stop("Could not start Ollama service")
             }
-    
+
         #   Prepare data by community
             community_data <- prepare_community_data(raw_data)
             cat("Found", nrow(community_data$core_themes), "unique communities\n")
-    
+
         #   Load required libraries
             library("httr")
             library("jsonlite")
-    
+
         #   Initialize results
-            results <- data.frame(community_id = integer(), theme = character(), processing_time = numeric(), 
-                                  status = character())
-    
+            results <- data.frame(
+                community_id = integer(),
+                theme = character(),
+                processing_time = numeric(),
+                status = character(),
+                stringsAsFactors = FALSE
+            )
+
         #   Prepare text (with truncation if needed)
             processed_text <- truncate_text(community_data, core_threshold)
 
-        #   Process each community
-            for(i in 1:nrow(processed_text)) {
-                #   Setting Initial Start Time
-                    start_time <- Sys.time()
-                    cat("Processing community", processed_text$community[i], 
-                        "with", community_data$abstract_count[i], "abstracts...\n")
-            
-                #   Calculate appropriate timeout
-                    timeout_seconds <- calculate_timeout(
-                        processed_text$community[i], 
-                        nchar(processed_text),
-                        max_timeout
-                    )
-                    cat("    Using timeout:", timeout_seconds, "seconds\n")
-            
-                #   Create prompt
-                    community_text <- processed_text$theme[i]
-
-                    prompt <- paste(
-                        "You must respond with ONLY a 5-10 word theme name. No explanations, no extra text.\n\n",
-                        "Research cluster content for community", processed_text$community[i],":\n",
-                        community_text, "\n\n",
-                        "Theme:"
-                    )
-            
-                #   Make API call with error handling
-                    tryCatch({
-                        #   Creating Response
-                            response <- POST("http://127.0.0.1:11434/api/generate",
-                                        body = list(model = "llama3.1:8b", prompt = prompt, stream = FALSE),
-                                        encode = "json",
-                                        timeout(timeout_seconds))
-                    
-                        #   Check if request was successful
-                            if (status_code(response) != 200) {
-                                stop("API returned status code: ", status_code(response))
-                            }
-                    
-                        #   Extract and clean response
-                            theme <- content(response)$response
-                            theme <- trimws(theme)
-                            theme <- gsub("^(Here is|Here's|The theme is|Theme:|A theme could be):?\\s*", "", theme, ignore.case = TRUE)
-                            theme <- gsub("^[\"']|[\"']$", "", theme)
-                            theme <- gsub("\n.*", "", theme)
-                            theme <- gsub("\\.$", "", theme)
-                            theme <- strsplit(theme, "\\.|\\n")[[1]][1]
-                            theme <- trimws(theme)
-                    
-                        #   Calculate processing time
-                            processing_time <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
-                    
-                        #   Store successful result
-                            results <- rbind(results, data.frame(
-                                community_id = processed_text$community[i],
-                                theme = theme,
-                                processing_time = round(processing_time, 1),
-                                status = "success"
-                            ))
-                            cat("Community", processed_text$community[i], ":", theme, 
-                                "(", round(processing_time, 1), "seconds )\n\n")
-                    
-                    }, error = function(e) {
-                        #   Handle errors (timeout, connection issues, etc.)
-                            processing_time <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
-                            error_msg <- e$message
-                            cat("ERROR for community", community_data$community_id[i], ":", error_msg, "\n")
-                        
-                        #   Store failed result with error info
-                            results <<- rbind(results, data.frame(
-                                community_id = community_data$community_id[i],
-                                theme = paste("ERROR:", substr(error_msg, 1, 50)),
-                                processing_time = round(processing_time, 1),
-                                status = "failed"
-                            ))
-                        cat("Continuing to next community...\n\n")
-                    })
+        #   Helper: build prompt
+            build_prompt <- function(comm_id, community_text) {
+                paste(
+                    "You must respond with ONLY a 5-10 word theme name. No explanations, no extra text.\n\n",
+                    "Research cluster content for community", comm_id, ":\n",
+                    community_text, "\n\n",
+                    "Theme:"
+                )
             }
-    
+
+        #   Helper: one API call
+            make_request <- function(prompt_txt, timeout_seconds) {
+                POST(
+                    "http://127.0.0.1:11434/api/generate",
+                    add_headers(`Content-Type` = "application/json"),
+                    body = list(
+                        model = model,
+                        prompt = prompt_txt,
+                        stream = FALSE,
+                        options = list(
+                            num_predict = 40,
+                            temperature = 0.2
+                        )
+                    ),
+                    encode = "json",
+                    timeout(timeout_seconds)
+                )
+            }
+
+        #   Process each community
+            for (i in 1:nrow(processed_text)) {
+
+                #   Isolating Data & Declaring Attempt
+                    comm_id <- processed_text$community[i]
+                    start_time <- Sys.time()
+
+                    cat("Processing community", comm_id, "...\n")
+
+                    community_text <- processed_text$theme[i]
+                    char_count <- nchar(community_text)
+
+                #   Attempt 1 timeout (length-based)
+                    timeout_seconds <- calculate_timeout(char_count, max_timeout)
+                    cat("    Using timeout:", timeout_seconds, "seconds\n")
+
+                    prompt <- build_prompt(comm_id, community_text)
+
+                    attempt <- 1
+                    success <- FALSE
+                    last_error <- NA_character_
+
+                    while (attempt <= 2 && !success) {
+
+                        if (attempt == 2) {
+                            cat("    Retry with fallback timeout:", fallback_timeout, "seconds\n")
+                        } else {
+                            cat("    Attempt 1\n")
+                        }
+
+                        response <- NULL
+                        err_msg <- NULL
+
+                        tryCatch({
+                            response <- make_request(prompt, if (attempt == 1) timeout_seconds else fallback_timeout)
+                        }, error = function(e) {
+                            err_msg <<- e$message
+                        })
+
+                        # Timeout/transport error
+                        if (!is.null(err_msg)) {
+                            last_error <- err_msg
+
+                            is_timeout <- grepl("Timeout was reached|timed out", err_msg, ignore.case = TRUE)
+
+                            if (is_timeout && attempt == 1) {
+                                attempt <- 2
+                                next
+                            } else {
+                                break
+                            }
+                        }
+
+                        # Non-200 response
+                        if (status_code(response) != 200) {
+                            body_txt <- content(response, as = "text", encoding = "UTF-8")
+                            last_error <- paste0("API status ", status_code(response), ": ", body_txt)
+                            break
+                        }
+
+                        # Extract and clean response
+                        theme <- content(response)$response
+                        theme <- trimws(theme)
+                        theme <- gsub("^(Here is|Here's|The theme is|Theme:|A theme could be):?\\s*", "", theme, ignore.case = TRUE)
+                        theme <- gsub("^[\"']|[\"']$", "", theme)
+                        theme <- gsub("\n.*", "", theme)
+                        theme <- gsub("\\.$", "", theme)
+                        theme <- strsplit(theme, "\\.|\\n")[[1]][1]
+                        theme <- trimws(theme)
+
+                        processing_time <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
+
+                        results <- rbind(results, data.frame(
+                            community_id = comm_id,
+                            theme = theme,
+                            processing_time = round(processing_time, 1),
+                            status = "success",
+                            stringsAsFactors = FALSE
+                        ))
+
+                        cat("Community", comm_id, ":", theme,
+                            "(", round(processing_time, 1), "seconds )\n\n")
+
+                        success <- TRUE
+                    }
+
+                #   Record failure + cooldown
+                    if (!success) {
+                        processing_time <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
+                        cat("ERROR for community", comm_id, ":", last_error, "\n")
+
+                        results <- rbind(results, data.frame(
+                            community_id = comm_id,
+                            theme = paste("ERROR:", substr(last_error, 1, 120)),
+                            processing_time = round(processing_time, 1),
+                            status = "failed",
+                            stringsAsFactors = FALSE
+                        ))
+
+                        cat("Cooling down for", cooldown_seconds, "seconds, then continuing...\n\n")
+                        Sys.sleep(cooldown_seconds)
+                    }
+            }
+
         #   Summary
             successful <- sum(results$status == "success")
             failed <- sum(results$status == "failed")
@@ -466,7 +528,7 @@ library("ollamar")
             cat("Successful:", successful, "communities\n")
             cat("Failed:", failed, "communities\n")
             cat("Total processing time:", round(sum(results$processing_time), 1), "seconds\n")
-    
+
         #   Return Results
             return(results)
     }
@@ -722,20 +784,17 @@ write_pajek_mcr <- function(network_path, partition_path, output_dir, mcr_file_p
     partition_path <- c('/workspace/caffeine_citation/pajek_files/Era22/era22_testCommunity.clu')
     output_dir <- c('/workspace/caffeine_citation/pajek_files/Era22/Community_Degree_Files')
     mcr_file_path <- c('/workspace/caffeine_citation/pajek_files/Era22/test_2.MCR')
-    write_pajek_mcr(network_path,  partition_path,  output_dir,  mcr_file_path)
+#   write_pajek_mcr(network_path,  partition_path,  output_dir,  mcr_file_path)
     
 #   Mapping Community Degrees to Prompt Data    
     era_prompt <- "/workspace/caffeine_citation/data/era22_prompt.Rda"
     degree_file_loc <- "/workspace/caffeine_citation/pajek_files/Era22/Community_Degree_Files"
     era22_prompt <- community_degree_mapper(network_path,partition_path,era_prompt, degree_file_loc)
     
-#   Collapsing Abstracts by Cluster
-    community_abstracts <- prepare_community_data(era22_prompt)
-    print(community_abstracts$core_themes[(1:5),])
-    print(community_abstracts$minor_themes[(1:5),])
-
 #   Generating Community Labels & Exporting Era 22 Results
-    era22_results <- generate_community_themes(era22_prompt, core_threshold = 8000, max_timeout = 1200)
+    era22_results <- generate_community_themes(era22_prompt, core_threshold = 8000, max_timeout = 1200,
+                                          model = "llama3.1:8b", fallback_timeout = 900,     # 15 minutes
+                                          cooldown_seconds = 30)
     readr::write_csv(era22_results, file=c("/workspace/caffeine_citation/data/era22_results.csv"))
 
 #   START BACK HERE: LOOK AT RESULTS!!!!
@@ -756,6 +815,11 @@ write_pajek_mcr <- function(network_path, partition_path, output_dir, mcr_file_p
 
 #   Pulling-In Community & Theme Data
     community_themes <- community_abstracts_finder(era23_data, 9, era_23_results)
+
+#   Collapsing Abstracts by Cluster
+    community_abstracts <- prepare_community_data(era22_prompt)
+    print(community_abstracts$core_themes[(1:5),])
+    print(community_abstracts$minor_themes[(1:5),])
 
 #######################
 #   FUNCTION CHECKS   #
