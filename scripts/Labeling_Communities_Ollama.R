@@ -805,18 +805,18 @@ write_pajek_mcr <- function(network_path, partition_path, output_dir, mcr_file_p
     partition_path <- c('/workspace/caffeine_citation/pajek_files/Era23/era23_testCommunity.clu')
     output_dir <- c('/workspace/caffeine_citation/pajek_files/Era23/Community_Degree_Files')
     mcr_file_path <- c('/workspace/caffeine_citation/pajek_files/Era23/test_2.MCR')
-    write_pajek_mcr(network_path,  partition_path,  output_dir,  mcr_file_path)
+    #write_pajek_mcr(network_path,  partition_path,  output_dir,  mcr_file_path)
     
 #   Mapping Community Degrees to Prompt Data    
-    era_prompt <- "/workspace/caffeine_citation/data/era22_prompt.Rda"
-    degree_file_loc <- "/workspace/caffeine_citation/pajek_files/Era22/Community_Degree_Files"
-    era22_prompt <- community_degree_mapper(network_path,partition_path,era_prompt, degree_file_loc)
+    era_prompt <- "/workspace/caffeine_citation/data/era23_prompt.Rda"
+    degree_file_loc <- "/workspace/caffeine_citation/pajek_files/Era23/Community_Degree_Files"
+    era23_prompt <- community_degree_mapper(network_path,partition_path,era_prompt, degree_file_loc)
     
-#   Generating Community Labels & Exporting Era 22 Results
-    era22_results <- generate_community_themes(era22_prompt, core_threshold = 8000, max_timeout = 1200,
+#   Generating Community Labels & Exporting Era 23 Results
+    era23_results <- generate_community_themes(era23_prompt, core_threshold = 8000, max_timeout = 1200,
                                           model = "llama3.1:8b", fallback_timeout = 900,     # 15 minutes
                                           cooldown_seconds = 30)
-    readr::write_csv(era22_results, file=c("/workspace/caffeine_citation/data/era22_results.csv"))
+    readr::write_csv(era23_results, file=c("/workspace/caffeine_citation/data/era23_results.csv"))
 
 
 
