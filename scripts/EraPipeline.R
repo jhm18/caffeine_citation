@@ -322,11 +322,6 @@ load("data/citation_edge_list_21Mar2024.Rda")
 # Creating function, move to function section later
   era_community_list <- community_era_net(eras_edges)
   
-# Writ-Out to Pajek
-  write_net('Arcs', era_community_list$community_nodes$label, '', '', '', 'blue', 'white', 
-            era_community_list$community_edges$sender_id, era_community_list$community_edges$target_id,
-            era_community_list$community_edges$proportion, 'gray', 'Era_community_22_23', TRUE)
-  
 # Create a list of abstract/title/keywords for all articles in a given era
   era22_data <- era_article_info(article_combined, 22, file_outputs)
   era23_data <- era_article_info(article_combined, 23, file_outputs)
@@ -345,10 +340,36 @@ load("data/citation_edge_list_21Mar2024.Rda")
   save(era23_data, file="era23_prompt.Rda")
   
   setwd("/workspace/caffeine_citation/pajek_files/Era22")
-############
-## Tests ###
-############
+#######################
+## Labeling Networks ##
+#######################
+load(file="/workspace/caffeine_citation/data/era22_prompt.Rda")
+load(file="/workspace/caffeine_citation/data/era23_prompt.Rda")
+era22_themes <- readr::read_csv(file="/workspace/caffeine_citation/data/era22_results.csv")
+era23_themes <- readr::read_csv(file="/workspace/caffeine_citation/data/era23_results.csv")
+
+first_elements_df <- eras_edges[c(1,3)]
+first_themes <- era22_themes[c(1,2)]
+colnames(first_elements_df)[c(2)] <- c("community_id")
+
+first_elements_df <- dplyr::left_join(first_elements_df,first_themes, by="community_id")
+
+second_elements_df <- eras_edges[c(1,4)]
+second_themes <- era23_themes[c(1,2)]
+colnames(second_elements_df)[c(2)] <- c("community_id")
+
+second_elements_df <- dplyr::left_join(second_elements_df,second_themes, by="community_id")
+
+######NOTES#######
+# Investigate the community ids for the joined network vs era22 and era23 prompt data 
+# look in community_identifier function 
 
 
+############################
+## Create Pajek Networks  ##
+############################
 
-
+# Writ-Out to Pajek
+  write_net('Arcs', era_community_list$community_nodes$label, '', '', '', 'blue', 'white', 
+            era_community_list$community_edges$sender_id, era_community_list$community_edges$target_id,
+            era_community_list$community_edges$proportion, 'gray', 'Era_community_22_23', TRUE)
