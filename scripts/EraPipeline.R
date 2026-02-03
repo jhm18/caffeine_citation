@@ -144,6 +144,14 @@
   }
 
 # Create node and edge list of communities that span eras for Pajek
+######################################################################################################################
+### Come back to here, see if we can figure how to map back to our ids                                              ##
+## We need to make sure the community labels preserve the community ids from the orinigal era community solutions   ##
+## Right now, sender label and target label are higher than our community labels                                    ##
+## We are trying to go back to the network we made with our themes                                                  ##
+######################################################################################################################
+
+## Start back here ##
   community_era_net <- function(eras_edges){
     # Create node list of communities
       nodes <- sort(unique(c(eras_edges$first_elements, eras_edges$second_elements)))
@@ -362,8 +370,11 @@ second_elements_df <- dplyr::left_join(second_elements_df,second_themes, by="com
 
 ######NOTES#######
 # Investigate the community ids for the joined network vs era22 and era23 prompt data 
-# look in community_identifier function 
+# look in community_identifier function
 
+# Stack era_community_list
+community_nodes <- era_community_list$community_nodes
+community_edges <- era_community_list$community_edges
 
 ############################
 ## Create Pajek Networks  ##
