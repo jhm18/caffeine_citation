@@ -248,6 +248,9 @@
   }
 
 # For a given era, merge era#_data with node list to get node_id
+##############################################
+## See if this is where we lose data        ##
+##############################################
   node_identifier <- function(era_df, era, node_list){
     # Subset node list to current era
       curr_node_list <- node_list[node_list$era == era, ]
@@ -323,6 +326,15 @@ load("data/citation_edge_list_21Mar2024.Rda")
   eras_first_elements <- paste0("era1_",eras_edges$first_elements)
   eras_second_elements <- paste0("era2_", eras_edges$second_elements)
   eras_nodes <- unique(c(eras_first_elements, eras_second_elements))
+
+# Add era 1 themes
+  era1_node_labels <- data.frame(community_id = unique(community_edges$sender_id)) 
+  era1_node_labels <- dplyr::left_join(era1_node_labels, era22_themes[c(1,2)], by="community_id")
+
+
+# Add era 2 themes
+  era2_node_labels <- data.frame(community_id = sort(unique(community_edges$target_label)))
+  era2_node_labels <- dplyr::left_join(era2_node_labels, era23_themes[c(1,2)], by="community_id")
 
 # Write a function that creates a pajek node list and edge list with ID
 # We need to create sequential IDs that we map to the community edgelist (era_edges), 
