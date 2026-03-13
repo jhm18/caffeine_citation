@@ -94,10 +94,16 @@
 # Extract links between communities
   community_membership <- function(t1_id_index, t2_id_index, cited_index){
     # Make a shared index for citations that span eras
-      shared_index <- cited_index[c(1,3,4)]
+      shared_index <- cited_index[c(1:4)]
+
+    # Create string that combines sender and target
+      pair_id <- paste0(shared_index$sender_id, "_", shared_index$target_id)
+      shared_index$pair_id <- seq(1,length(pair_id),1)
       colnames(shared_index)[[1]] <- c("pajek_id")
     
-    # Make unique senders list
+#########################################################################################
+
+    # Make unique senders list CHANGE THIS - MAKE EDGES UNIQUE INSTEAD
     # shared_senders <- data.frame(pajek_id =unique(shared_index$pajek_id))
     # shared_senders <- dplyr::left_join(shared_senders, t1_id_index[c(1,4,5)], by="pajek_id")
     # Add community to cited index for each era
@@ -288,6 +294,7 @@
 load("data/citation_node_list_3Oct2024.Rda")
 load("data/article_combinedv2.Rda")
 load("data/citation_edge_list_21Mar2024.Rda")
+load("data/caffeine_articles_20April2021.Rda")
 
 # Read in files from Pajek
 
