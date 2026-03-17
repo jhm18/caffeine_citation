@@ -99,45 +99,44 @@
     # Create string that combines sender and target
       pair_id <- paste0(shared_index$sender_id, "_", shared_index$target_id)
       shared_index$pair_id <- seq(1,length(pair_id),1)
-      colnames(shared_index)[[1]] <- c("pajek_id")
-    
-#########################################################################################
 
-    # Make unique senders list CHANGE THIS - MAKE EDGES UNIQUE INSTEAD
-    # shared_senders <- data.frame(pajek_id =unique(shared_index$pajek_id))
-    # shared_senders <- dplyr::left_join(shared_senders, t1_id_index[c(1,4,5)], by="pajek_id")
-    # Add community to cited index for each era
-      shared_index <- dplyr::left_join(shared_index, t1_id_index[c(1,4,5)], by="pajek_id")
-      colnames(shared_index)[c(4,5)] <- c("community1", "era1")
-      shared_index <- dplyr::left_join(shared_index, t2_id_index[c(1,4,5)], by="pajek_id")
-      colnames(shared_index)[c(6,7)] <- c("community2", "era2")
-      
-    # Aggregate unique community pairs from cols community1 and community2
-      shared_index$pair <- apply(shared_index[, c("community1", "community2")], 1, function(x) paste(sort(x), collapse = "-"))      
-    
-    # Aggregate the sum by unique pairs 
-      shared_index$count <- 1 
-      
+    # Create sender and target label datasets to join with shared index
+      sender_labels <- shared_index[c('pair_id', 'sender_label')]
+      target_labels <- shared_index[c('pair_id', 'target_label')]
+
+    # Rename doi column
+      colnames(sender_labels)[[2]] <- c('node_label')
+      colnames(target_labels)[[2]] <- c('node_label')
+
+    # Join by doi; target list ends up with NA values because some articles are not within era  
+      sender_labels <- dplyr::left_join(sender_labels,t2_id_index[c('node_label','community')], by='node_label')
+      target_labels <- dplyr::left_join(target_labels, t1_id_index[c('node_label','community')], by='node_label')
+
+    # Rename community columns by 1 and 2
+      colnames(sender_labels)[c(2,3)] <- c('sender_doi','sender_community')
+      colnames(target_labels)[c(2,3)] <- c('target_doi','target_community')
+
+    # Join senders and targets by pair id
+      shared_edges <- dplyr::left_join(sender_labels, target_labels, by = 'pair_id')
+      shared_edges$keep <- shared_edges$sender_community*shared_edges$target_community
+      shared_edges <- shared_edges[(is.na(shared_edges$keep) == FALSE),]
+      shared_edges <- shared_edges[c(2:5)]
+
+    # Make a pair id based on community
+      shared_edges <- shared_edges[order(shared_edges$sender_community,shared_edges$target_community),]
+      shared_edges$pair_id <- paste0(shared_edges$sender_community, "_", shared_edges$target_community)
+
     # Aggregate the row counts for each unique pair 
-      result <- aggregate(count ~ pair, data = shared_index, sum)
-      result_pairs <- strsplit(result$pair, "-")
-      
-    # First element of each pair 
-      first_elements <- sapply(result_pairs, `[`, 1) 
-      
-    # Second element of each pair
-      second_elements <- sapply(result_pairs, `[`, 2)
-    
-      result <- cbind(result,first_elements,second_elements)
-      result$first_elements <- as.integer(result$first_elements)
-      result$second_elements <- as.integer(result$second_elements)
-      result <- result[order(result$first_elements,result$second_elements), ]
+      result <- aggregate(x = list(count = shared_edges$pair_id), by = list(pair_id = shared_edges$pair_id),FUN = length)
+      edges_index <- shared_edges[!duplicated(shared_edges$pair_id),]
+      result <- dplyr::left_join(result, edges_index, by='pair_id')
+      result <- result[c('pair_id','sender_community','target_community','count')]
     
     # Calculate proportion for each first element
-      first_elements_list <- unique(result$first_elements)
+      first_elements_list <- unique(result$sender_community)
       proportion <- vector("list", length = length(first_elements_list))
       for(i in seq_along(first_elements_list)){
-        curr_element <- result[result$first_elements == first_elements_list[[i]], ]
+        curr_element <- result[result$sender_community == first_elements_list[[i]], ]
         curr_sum <- sum(curr_element$count)
         curr_element$proportion <- curr_element$count/curr_sum
         curr_element <- curr_element[order(curr_element$proportion, decreasing = TRUE),]
@@ -148,6 +147,8 @@
     # Return Community Memberships
       return(result2)
   }
+
+## Need to check if our fix worked##
 
 # Create node and edge list of communities that span eras for Pajek
 ######################################################################################################################
@@ -294,7 +295,7 @@
 load("data/citation_node_list_3Oct2024.Rda")
 load("data/article_combinedv2.Rda")
 load("data/citation_edge_list_21Mar2024.Rda")
-load("data/caffeine_articles_20April2021.Rda")
+#load("data/caffeine_articles_20April2021.Rda")
 
 # Read in files from Pajek
 
