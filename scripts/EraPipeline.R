@@ -152,37 +152,62 @@
 
 # Create node and edge list of communities that span eras for Pajek
 ######################################################################################################################
-### Come back to here, see if we can figure how to map back to our ids                                              ##
+### Come back to here, Confirm that this works in Pajek!                                                         ##
 ## We need to make sure the community labels preserve the community ids from the orinigal era community solutions   ##
-## Right now, sender label and target label are higher than our community labels                                    ##
-## We are trying to go back to the network we made with our themes                                                  ##
 ######################################################################################################################
 
-## Start back here ##
-  community_era_net <- function(eras_edges){
+## Fixed this function ##
+  community_era_net <- function(eras_edges, sender_themes, target_themes){
+    # Sort eras edges by sender, target
+      eras_edges <- eras_edges[order(eras_edges$sender_community, eras_edges$target_community), ]
+
+    # Label communities with target or sender for node list
+      eras_edges$sender_id <- paste0("sender_", eras_edges$sender_community)
+      eras_edges$target_id <- paste0("target_", eras_edges$target_community)
+
     # Create node list of communities
-      nodes <- sort(unique(c(eras_edges$first_elements, eras_edges$second_elements)))
+      nodes <- sort(unique(c(eras_edges$sender_id, eras_edges$target_id)))
       community_nodes <- data.frame(id = seq(1,length(nodes), 1), label = nodes)
     
       community_edges <- eras_edges
       community_edges$obs_id <- seq(1,nrow(eras_edges),1) 
     
     # Create sender and target lists
-      sender_edges <- community_edges[c(6,3)]
-      colnames(sender_edges)[2] <- c("label")
+      sender_edges <- community_edges[c(8,2,6)]
+      colnames(sender_edges)[3] <- c("label")
       sender_edges <- dplyr::left_join(sender_edges, community_nodes, by = "label")
-      sender_edges <- sender_edges[c(1,3,2)]
-      colnames(sender_edges)[c(2,3)] <- c("sender_id", "sender_label")
+      sender_edges <- sender_edges[c(1,4,2,3)]
+      colnames(sender_edges)[c(2,4)] <- c("sender_id", "sender_label")
     
-      target_edges <- community_edges[c(6,4,2,5)]
-      colnames(target_edges)[2] <- c("label")
+      target_edges <- community_edges[c(8,3,7,4,5)]
+      colnames(target_edges)[3] <- c("label")
       target_edges <- dplyr::left_join(target_edges, community_nodes, by = "label")
-      target_edges <- target_edges[c(1,5,2,3,4)]
-      colnames(target_edges)[c(2,3)] <- c("target_id", "target_label")
+      target_edges <- target_edges[c(1,6,2,3,4,5)]
+      colnames(target_edges)[c(2,4)] <- c("target_id", "target_label")
+
+    # Relabel columns to add themes from Olama csv output
+      colnames(sender_themes)[c(1,2)] <- c("sender_community", "sender_name")
+      colnames(target_themes)[c(1,2)] <- c("target_community", "target_name")
+      sender_edges <- dplyr::left_join(sender_edges, sender_themes[c(1,2)], by="sender_community")
+      target_edges <- dplyr::left_join(target_edges, target_themes[c(1,2)], by="target_community")
+      target_edges <- target_edges[c(1:4,7,5,6)]
     
     # Join lists by obs id to create edge list for communities
       cluster_edges <- dplyr::left_join(sender_edges, target_edges, by="obs_id")
-      community_list <- list(community_nodes = community_nodes, community_edges = cluster_edges)
+
+    # Remake node list with themes
+      sender_nodes <- sender_edges[c(2,4,5)]
+      colnames(sender_nodes) <- c("node_id", "label", "name")
+      target_nodes <- target_edges[c(2,4,5)]
+      colnames(target_nodes) <- c("node_id", "label", "name")
+      node_list <- rbind(sender_nodes, target_nodes)
+      node_list <- node_list[!duplicated(node_list$node_id),]
+      node_list <- node_list[order(node_list$node_id),]
+
+    # Reduce edge list
+      community_edges <- cluster_edges[c(2,6,10,11),]
+
+      community_list <- list(community_nodes = node_list, community_edges = community_edges)
     
     # Return Sequential Network List Objects
       return(community_list)
