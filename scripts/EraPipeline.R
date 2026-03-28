@@ -2,6 +2,8 @@
 # Sarah Delmar and Jon Morgan
 # 29 Jan 2025
 
+# To run Pajek from Visual Studio Code's Terminal: DISPLAY=:100.0 pajek
+
 ################
 #### Notes  ####
 ################
