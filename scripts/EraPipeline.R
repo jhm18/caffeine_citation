@@ -150,29 +150,25 @@
       return(result2)
   }
 
-## Need to check if our fix worked##
-
 # Create node and edge list of communities that span eras for Pajek
-######################################################################################################################
-### Come back to here, Confirm that this works in Pajek!                                                         ##
-## We need to make sure the community labels preserve the community ids from the orinigal era community solutions   ##
-######################################################################################################################
-
-## Fixed this function ##
   community_era_net <- function(eras_edges, sender_themes, target_themes){
     # Sort eras edges by sender, target
-      eras_edges <- eras_edges[order(eras_edges$sender_community, eras_edges$target_community), ]
+      eras_ties <- eras_edges[order(eras_edges$sender_community, eras_edges$target_community), ]
 
     # Label communities with target or sender for node list
-      eras_edges$sender_id <- paste0("sender_", eras_edges$sender_community)
-      eras_edges$target_id <- paste0("target_", eras_edges$target_community)
+      eras_ties$sender_id <- paste0("sender_", eras_ties$sender_community)
+      eras_ties$target_id <- paste0("target_", eras_ties$target_community)
+      sender_nodes <- data.frame(sender_community = eras_ties$sender_community, sender_id = eras_ties$sender_id)
+      sender_nodes <- sender_nodes[order(sender_nodes$sender_community), ]
+      target_nodes <- data.frame(target_community = eras_ties$target_community, target_id = eras_ties$target_id)
+      target_nodes <- target_nodes[order(target_nodes$target_community), ]
 
     # Create node list of communities
-      nodes <- sort(unique(c(eras_edges$sender_id, eras_edges$target_id)))
+      nodes <- unique(c(sender_nodes$sender_id, target_nodes$target_id))
       community_nodes <- data.frame(id = seq(1,length(nodes), 1), label = nodes)
     
-      community_edges <- eras_edges
-      community_edges$obs_id <- seq(1,nrow(eras_edges),1) 
+      community_edges <- eras_ties
+      community_edges$obs_id <- seq(1,nrow(eras_ties),1) 
     
     # Create sender and target lists
       sender_edges <- community_edges[c(8,2,6)]
@@ -207,7 +203,7 @@
       node_list <- node_list[order(node_list$node_id),]
 
     # Reduce edge list
-      community_edges <- cluster_edges[c(2,6,10,11),]
+      community_edges <- cluster_edges[c(2,6,10,11)]
 
       community_list <- list(community_nodes = node_list, community_edges = community_edges)
     
@@ -282,9 +278,6 @@
   }
 
 # For a given era, merge era#_data with node list to get node_id
-##############################################
-## See if this is where we lose data        ##
-##############################################
   node_identifier <- function(era_df, era, node_list){
     # Subset node list to current era
       curr_node_list <- node_list[node_list$era == era, ]
@@ -356,26 +349,6 @@ load("data/citation_edge_list_21Mar2024.Rda")
 
 # Return longitudinal edge list with community from both eras sorted by proportion
   eras_edges <- community_membership(era22_id_index, era23_id_index, cited_index)
-
-# Label communities with their respective era (for t1 and t2)
-  eras_first_elements <- paste0("era1_",eras_edges$first_elements)
-  eras_second_elements <- paste0("era2_", eras_edges$second_elements)
-  eras_nodes <- unique(c(eras_first_elements, eras_second_elements))
-
-# Add era 1 themes
-  era1_node_labels <- data.frame(community_id = unique(community_edges$sender_id)) 
-  era1_node_labels <- dplyr::left_join(era1_node_labels, era22_themes[c(1,2)], by="community_id")
-
-
-# Add era 2 themes
-  era2_node_labels <- data.frame(community_id = sort(unique(community_edges$target_label)))
-  era2_node_labels <- dplyr::left_join(era2_node_labels, era23_themes[c(1,2)], by="community_id")
-
-# Write a function that creates a pajek node list and edge list with ID
-# We need to create sequential IDs that we map to the community edgelist (era_edges), 
-# since we are creating a network from Era23 to Era22.
-# Creating function, move to function section later
-  era_community_list <- community_era_net(eras_edges)
   
 # Create a list of abstract/title/keywords for all articles in a given era
   era22_data <- era_article_info(article_combined, 22, file_outputs)
@@ -393,41 +366,32 @@ load("data/citation_edge_list_21Mar2024.Rda")
   setwd("/workspace/caffeine_citation/data")
   save(era22_data, file="era22_prompt.Rda")
   save(era23_data, file="era23_prompt.Rda")
+
+##############################################################
+#####                                                     ####
+#####           Constructing Community Network            ####
+#####                                                     ####
+##############################################################
+
+# Write a function that creates a pajek node list and edge list with ID
+# We need to create sequential IDs that we map to the community edgelist (era_edges), 
+# since we are creating a network from Era23 to Era22.
+  era22_themes <- readr::read_csv(file="/workspace/caffeine_citation/data/era22_results.csv")
+  era23_themes <- readr::read_csv(file="/workspace/caffeine_citation/data/era23_results.csv")
+
+  era_community_list <- community_era_net(eras_edges, era23_themes, era22_themes)
   
-  setwd("/workspace/caffeine_citation/pajek_files/Era22")
-#######################
-## Labeling Networks ##
-#######################
-load(file="/workspace/caffeine_citation/data/era22_prompt.Rda")
-load(file="/workspace/caffeine_citation/data/era23_prompt.Rda")
-era22_themes <- readr::read_csv(file="/workspace/caffeine_citation/data/era22_results.csv")
-era23_themes <- readr::read_csv(file="/workspace/caffeine_citation/data/era23_results.csv")
-
-first_elements_df <- eras_edges[c(1,3)]
-first_themes <- era22_themes[c(1,2)]
-colnames(first_elements_df)[c(2)] <- c("community_id")
-
-first_elements_df <- dplyr::left_join(first_elements_df,first_themes, by="community_id")
-
-second_elements_df <- eras_edges[c(1,4)]
-second_themes <- era23_themes[c(1,2)]
-colnames(second_elements_df)[c(2)] <- c("community_id")
-
-second_elements_df <- dplyr::left_join(second_elements_df,second_themes, by="community_id")
-
-######NOTES#######
-# Investigate the community ids for the joined network vs era22 and era23 prompt data 
-# look in community_identifier function
-
 # Stack era_community_list
-community_nodes <- era_community_list$community_nodes
-community_edges <- era_community_list$community_edges
+  community_nodes <- era_community_list$community_nodes
+  community_edges <- era_community_list$community_edges
 
-############################
-## Create Pajek Networks  ##
-############################
+# Write .clu file to label sender vs target for our node list
+  role <- strsplit(community_nodes$label, "_")
+  role <- unlist(lapply(role, function(x) x[[1]]))
+  community_role <- ifelse(role == "sender", 1,2)
+  write_clu(community_role,"community_role")
 
 # Writ-Out to Pajek
-  write_net('Arcs', era_community_list$community_nodes$label, '', '', '', 'blue', 'white', 
+  write_net('Arcs', era_community_list$community_nodes$name, '', '', '', 'blue', 'white', 
             era_community_list$community_edges$sender_id, era_community_list$community_edges$target_id,
             era_community_list$community_edges$proportion, 'gray', 'Era_community_22_23', TRUE)
