@@ -548,7 +548,7 @@ library("ollamar")
             return(community_data)
     }
 
-#	  Generate MCR Commands Helper
+#   Generate MCR Commands Helper
 	  .generate_pajek_community_mcr <- function(network_path, partition_path, output_dir) {
   		#	"""
   		#	Args:
