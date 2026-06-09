@@ -24,7 +24,7 @@ library("ollamar")
   `%notin%` <- Negate(`%in%`)
 
 #   Source Pajek
-    source("/workspace/caffeine_citation/scripts/RPajekFunctions_30April2023.r")
+ #   source("/workspace/caffeine_citation/scripts/RPajekFunctions_30April2023.r")
   
 #   Check Ollama
     check_ollama <- function() {
@@ -742,113 +742,4 @@ write_pajek_mcr <- function(network_path, partition_path, output_dir, mcr_file_p
 #   Performing Basic Test
     test_result <- test_ai_generation()
 
-##############################
-#   IMPORTING CLUSTER DATA   #
-##############################
-
-#   ERA 22
-
-#   Loading Era 22 Prompt Data
-    load("/workspace/caffeine_citation/data/era22_prompt.Rda")
-
-#   Formatting data (May Back Keywords and Title Later)
-    era22_prompt <- era22_data[c(4,6:8)]
-    colnames(era22_prompt)[[1]] <- c("community_id")
-    community_data <- data.frame(community_id = era22_prompt$community_id, text_theme = as.character(era22_prompt$abstract_list))
-
-#   Pulling-Results
-    era_22_results <- readr::read_csv("/workspace/caffeine_citation/data/era22_results.csv")
-    
-
-#   ERA 23
-
-#   Loading Era 23 Prompt Data
-    load("/workspace/caffeine_citation/data/era23_prompt.Rda")
-
-#   Formatting data (May Back Keywords and Title Later)
-    era23_prompt <- era23_data[c(4,6:8)]
-    colnames(era23_prompt)[[1]] <- c("community_id")
-    era_23_community_data <- data.frame(community_id = era23_prompt$community_id, text_theme = as.character(era23_prompt$abstract_list))
-
-#   Pulling-Results
-    era_23_results <- readr::read_csv("/workspace/caffeine_citation/data/era23_results.csv")
-
-##########################
-#   COMPARING CLUSTERS   #
-##########################
-
-#   ERA 22
-
-#   Generating Cluster Degree Rankings for the Purpose of Prompt Weighting
-    network_path <- c('/workspace/caffeine_citation/pajek_files/Era22/era22.net')
-    partition_path <- c('/workspace/caffeine_citation/pajek_files/Era22/era22_testCommunity.clu')
-    output_dir <- c('/workspace/caffeine_citation/pajek_files/Era22/Community_Degree_Files')
-    mcr_file_path <- c('/workspace/caffeine_citation/pajek_files/Era22/test_2.MCR')
-#   write_pajek_mcr(network_path,  partition_path,  output_dir,  mcr_file_path)
-    
-#   Mapping Community Degrees to Prompt Data    
-    era_prompt <- "/workspace/caffeine_citation/data/era22_prompt.Rda"
-    degree_file_loc <- "/workspace/caffeine_citation/pajek_files/Era22/Community_Degree_Files"
-    era22_prompt <- community_degree_mapper(network_path,partition_path,era_prompt, degree_file_loc)
-    
-#   Generating Community Labels & Exporting Era 22 Results
-    era22_results <- generate_community_themes(era22_prompt, core_threshold = 8000, max_timeout = 1200,
-                                          model = "llama3.1:8b", fallback_timeout = 900,     # 15 minutes
-                                          cooldown_seconds = 30)
-    readr::write_csv(era22_results, file=c("/workspace/caffeine_citation/data/era22_results.csv"))
-
-#   ERA 23
-
-
-#   Generating Cluster Degree Rankings for the Purpose of Prompt Weighting
-    network_path <- c('/workspace/caffeine_citation/pajek_files/Era23/era23.net')
-    partition_path <- c('/workspace/caffeine_citation/pajek_files/Era23/era23_testCommunity.clu')
-    output_dir <- c('/workspace/caffeine_citation/pajek_files/Era23/Community_Degree_Files')
-    mcr_file_path <- c('/workspace/caffeine_citation/pajek_files/Era23/test_2.MCR')
-    #write_pajek_mcr(network_path,  partition_path,  output_dir,  mcr_file_path)
-    
-#   Mapping Community Degrees to Prompt Data    
-    era_prompt <- "/workspace/caffeine_citation/data/era23_prompt.Rda"
-    degree_file_loc <- "/workspace/caffeine_citation/pajek_files/Era23/Community_Degree_Files"
-    era23_prompt <- community_degree_mapper(network_path,partition_path,era_prompt, degree_file_loc)
-    
-#   Generating Community Labels & Exporting Era 23 Results
-    era23_results <- generate_community_themes(era23_prompt, core_threshold = 8000, max_timeout = 1200,
-                                          model = "llama3.1:8b", fallback_timeout = 900,     # 15 minutes
-                                          cooldown_seconds = 30)
-    readr::write_csv(era23_results, file=c("/workspace/caffeine_citation/data/era23_results.csv"))
-
-
-
-###################
-#   EVALUATIONS   #
-###################
-
-#   Pulling-In Community & Theme Data
-    community_themes <- community_abstracts_finder(era23_data, 9, era_23_results)
-
-#   Collapsing Abstracts by Cluster
-    community_abstracts <- prepare_community_data(era22_prompt)
-    print(community_abstracts$core_themes[(1:5),])
-    print(community_abstracts$minor_themes[(1:5),])
-
-#######################
-#   FUNCTION CHECKS   #
-#######################
-
-#   Testing that stop_ollama() works
-    stop_ollama()
-
-#   Testing if I can start ollama
-    ensure_ollama_running()
-
-#   Testing that if Ollama is Running that ensure_ollama_running() Returns the Correct Value
-    ensure_ollama_running()
-    
-#   Testing C Path Conversion function
-    test_path <- getwd()
-    c_path <- .make_c_paths(test_path)
-    print(c_path)
-    
-#   Testing MCR Generator
     
