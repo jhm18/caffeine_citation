@@ -97,6 +97,8 @@
         write_pajek_mcr(network_path,  partition_path,  output_dir,  mcr_file_path)
     
       # Mapping Community Degrees to Prompt Data  
+
+        # Need to change mcr function for Z drive
       ##################
       ## Add sending Pajek the file after writing mcr, start here next
       ###########  
