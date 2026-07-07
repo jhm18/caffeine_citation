@@ -188,7 +188,7 @@ run_pajek <- function(mcr_file, pajek_dir, pajek_exe = "pajek.exe", wine_cmd = N
 
 #	Test 1
 #	Locate the macro file
-			mcr <- "/workspace/caffeine_citation/pajek_files/Era22/test_2.MCR"
+			mcr <- "/workspace/caffeine_citation/pajek_files/Era22/net1.MCR"
 
 		#	Non-default Wine prefix? Set it before running:
 			Sys.setenv(WINEPREFIX = path.expand("~/.wine-pajek"))

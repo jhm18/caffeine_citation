@@ -549,7 +549,7 @@ library("ollamar")
     }
 
 #   Generate MCR Commands Helper
-	  .generate_pajek_community_mcr <- function(network_path, partition_path, output_dir) {
+	  .generate_pajek_community_mcr <- function(network_path, partition_path, output_dir, drive_letter = "C") {
   		#	"""
   		#	Args:
   		#		network_path: string, full path to the .net network file
@@ -583,15 +583,15 @@ library("ollamar")
   		
   		#	Add network reading section
   			net_section <- c(
-  				paste0("% Reading Network   ---    ", .make_c_paths(network_path)),
-  				paste0("N 1 RDN ", .make_c_paths(network_path))
+  				paste0("% Reading Network   ---    ", .make_drive_path(network_path, drive_letter)),
+  				paste0("N 1 RDN ", .make_drive_path(network_path, drive_letter))
   			)
   			mcr_lines <- c(mcr_lines, net_section)
   		
   		#	Add partition reading section  
   			part_section <- c(
-  				paste0("% Reading Partition   ---    ", .make_c_paths(partition_path)),
-  				paste0("C 1 RDC ", .make_c_paths(partition_path))
+  				paste0("% Reading Partition   ---    ", .make_drive_path(partition_path, drive_letter)),
+  				paste0("C 1 RDC ", .make_drive_path(partition_path, drive_letter))
   			)
   			mcr_lines <- c(mcr_lines, part_section)
   		
@@ -619,10 +619,10 @@ library("ollamar")
   										paste0("total_degree_community_", i, ".vec"))
   				
   				#	Create comment line for saving vector
-  					comment_save <- paste0("% Saving vector to file   ---    ", .make_c_paths(file_path))
+  					comment_save <- paste0("% Saving vector to file   ---    ", .make_drive_path(file_path, drive_letter))
   				
   				#	Create save command
-  					save_cmd <- paste0("V ", i, " WV ", 	.make_c_paths(file_path), " 0")
+  					save_cmd <- paste0("V ", i, " WV ", 	.make_drive_path(file_path, drive_letter), " 0")
   				
   				#	Add all lines for this community
   					mcr_lines <- c(mcr_lines, comment_deg, deg_cmd, comment_save, save_cmd)
@@ -633,32 +633,44 @@ library("ollamar")
   	}
 
 #   Generate MCR Paths Helper
-  	.make_c_paths <- function(directory_path) {
-  	  #	"""
-  	  #	Args:
-  	  #		directory_path: string, Unix-style path (e.g., "/Users/metal")
-  	  #	Returns:
-  	  #		string, Windows C: drive path (e.g., "C:\\Users\\metal")
-  	  #	Notes:
-  	  #		Helper function for internal use. Converts forward slashes to backslashes.
-  	  #	"""
-  	  
-  	  #	Validation
-  	  if (missing(directory_path) || is.null(directory_path)) {
-  	    stop("directory_path must be provided")
-  	  }
-  	  
-  	  #	Split into elements
-  	  path_elements <- base::strsplit(directory_path, "/")[[1]]
-  	  path_elements <- path_elements[nchar(path_elements) != 0]
-  	  
-  	  #	Build C: path
-  	  c_path <- paste0(path_elements, collapse = "\\")
-  	  c_path <- paste0("C:\\", c_path)
-  	  
-  	  #	Assemble result
-  	  return(c_path)
-  	}
+    .make_drive_path <- function(directory_path, drive_letter = "C") {
+        # """
+        # Args:
+        #     directory_path: string, Unix-style path (e.g., "/Users/metal")
+        #     drive_letter: string, target drive (default "C"). Case-insensitive; a
+        #         trailing ":" or "\\" is tolerated (e.g., "C", "z", "C:", "z:\\").
+        # Returns:
+        #     string, Windows drive path (e.g., "C:\\Users\\metal", "Z:\\Users\\metal")
+        # Notes:
+        #     Helper function for internal use. Converts forward slashes to backslashes
+        #     and prefixes the chosen drive.
+        # """
+
+        # Validation
+            if (missing(directory_path) || is.null(directory_path)) {
+                stop("directory_path must be provided")
+            }
+            if (is.null(drive_letter) || length(drive_letter) != 1 || is.na(drive_letter)) {
+                stop("drive_letter must be a single non-missing value")
+            }
+
+        # Normalize the drive letter (strip ":", "\\", spaces; take a single A-Z letter)
+            drive_clean <- base::toupper(base::gsub("[^A-Za-z]", "", drive_letter))
+            if (nchar(drive_clean) != 1) {
+                stop('drive_letter must resolve to a single letter A-Z (e.g., "C", "Z", or "C:")')
+            }
+
+        # Split into elements
+            path_elements <- base::strsplit(directory_path, "/")[[1]]
+            path_elements <- path_elements[nchar(path_elements) != 0]
+
+        # Build drive path
+            drive_path <- paste0(path_elements, collapse = "\\")
+            drive_path <- paste0(drive_clean, ":\\", drive_path)
+
+        # Assemble result
+            return(drive_path)
+    }
 
 #	Generate Complete Pajek MCR for Community Degree Centrality
 #' @title write_pajek_mcr
@@ -686,7 +698,7 @@ library("ollamar")
 #' write_pajek_mcr(network_file, partition_file, output_directory, mcr_script)
 #'
 #' @export
-write_pajek_mcr <- function(network_path, partition_path, output_dir, mcr_file_path) {
+write_pajek_mcr <- function(network_path, partition_path, output_dir, mcr_file_path, drive_letter = "C") {
 	#	"""
 	#	Args:
 	#		network_path: string, full path to the .net network file
@@ -714,7 +726,7 @@ write_pajek_mcr <- function(network_path, partition_path, output_dir, mcr_file_p
 		stopifnot(is.character(mcr_file_path), length(mcr_file_path) == 1)
 	
 	#	Generate complete MCR content
-		mcr_content <- .generate_pajek_community_mcr(network_path, partition_path, output_dir)
+		mcr_content <- .generate_pajek_community_mcr(network_path, partition_path, output_dir, drive_letter)
 	
 	#	Write to file
 		writeLines(mcr_content, mcr_file_path)

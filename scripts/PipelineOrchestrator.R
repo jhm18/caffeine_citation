@@ -12,6 +12,7 @@
 ##########################
 #####     Import      ####
 ##########################
+  setwd("/workspace/caffeine_citation/")
 
   load("data/citation_node_list_3Oct2024.Rda")
   load("data/article_combinedv2.Rda")
@@ -21,12 +22,13 @@
 ########################
 ###     Functions    ###
 ########################
-  setwd("/workspace/caffeine_citation/scripts")
+  
 
 # Source Pipeline functions
 
   source("/workspace/caffeine_citation/scripts/EraPipeline.R")
   source("/workspace/caffeine_citation/scripts/Labeling_Communities_Ollama.R")
+  source(""/workspace/caffeine_citation/scripts/run_pajek.R")
 
 # Pipeline Wrapper
 #
@@ -94,7 +96,7 @@
         partition_path <- paste0(era1_dir, "/", comm1, ".clu")
         output_dir <- paste0(era1_dir, "/Community_Degree_Files")
         mcr_file_path <- paste0(era1_dir, "/net1.MCR")
-        write_pajek_mcr(network_path,  partition_path,  output_dir,  mcr_file_path)
+        write_pajek_mcr(network_path,  partition_path,  output_dir,  mcr_file_path, drive_letter = "Z")
     
       # Mapping Community Degrees to Prompt Data  
 
