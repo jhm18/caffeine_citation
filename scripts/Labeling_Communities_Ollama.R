@@ -204,12 +204,12 @@ library("ollamar")
             community_idx <- community_idx[c(1,2,6)]
             
         #   Load prompt data
-            environment_elements <- ls()
-            load(era_prompt)
-            workspace_elements <- ls()
-            workspace_elements <- workspace_elements[workspace_elements %notin% environment_elements]
-            era_name <- workspace_elements[workspace_elements != "environment_elements"]
-            iteration_prompt <- get(era_name)
+        #    environment_elements <- ls()
+        #    load(era_prompt)
+        #    workspace_elements <- ls()
+        #    workspace_elements <- workspace_elements[workspace_elements %notin% environment_elements]
+        #    era_name <- workspace_elements[workspace_elements != "environment_elements"]
+            iteration_prompt <- era_prompt
             
         #   Loop through communities
             community_ids <- unique(community_idx$communities)
@@ -741,17 +741,17 @@ write_pajek_mcr <- function(network_path, partition_path, output_dir, mcr_file_p
 ##################
 
 #   Test if ollamar is available
-    if (require(ollamar, quietly = TRUE)) {
+   # if (require(ollamar, quietly = TRUE)) {
         #   Test connection
-            cat("✓ ollamar package is available\n")
-            test_connection()
-    } else {
+         #   cat("✓ ollamar package is available\n")
+         #   test_connection()
+   # } else {
         #   Error Warnings
-            cat("✗ ollamar package not found\n")
-            cat("We'll use direct HTTP calls instead\n")
-    }
+      #      cat("✗ ollamar package not found\n")
+      #      cat("We'll use direct HTTP calls instead\n")
+   # }
 
 #   Performing Basic Test
-    test_result <- test_ai_generation()
+    # test_result <- test_ai_generation()
 
     

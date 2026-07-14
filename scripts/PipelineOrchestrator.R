@@ -28,7 +28,7 @@
 
   source("/workspace/caffeine_citation/scripts/EraPipeline.R")
   source("/workspace/caffeine_citation/scripts/Labeling_Communities_Ollama.R")
-  source(""/workspace/caffeine_citation/scripts/run_pajek.R")
+  source("/workspace/caffeine_citation/scripts/run_pajek.R")
 
 # Pipeline Wrapper
 #
@@ -85,26 +85,29 @@
 
     # Currently not saving out data - come back here if we want to change that
 
+    ########### Go back and copy this part for the second era as well ##############
     # Labeling Era1 Communities with Ollama
       # Formatting data (May Back Keywords and Title Later)
-        era1_prompt <- era1_data[c(4,6:8)]
-        colnames(era1_prompt)[[1]] <- c("community_id")
+        era1_prompt <- era1_data[c(3,4,6:8)]
+        colnames(era1_prompt)[[2]] <- c("community_id")
         community_data <- data.frame(community_id = era1_prompt$community_id, text_theme = as.character(era1_prompt$abstract_list))
         
       # Generating Cluster Degree Rankings for the Purpose of Prompt Weighting
         network_path <- paste0(era1_dir, "/", citation_net1)
         partition_path <- paste0(era1_dir, "/", comm1, ".clu")
-        output_dir <- paste0(era1_dir, "/Community_Degree_Files")
+        deg_file_dir <- paste0(era1_dir, "/Community_Degree_Files")
         mcr_file_path <- paste0(era1_dir, "/net1.MCR")
         write_pajek_mcr(network_path,  partition_path,  output_dir,  mcr_file_path, drive_letter = "Z")
     
       # Mapping Community Degrees to Prompt Data  
 
-        # Need to change mcr function for Z drive
-      ##################
-      ## Add sending Pajek the file after writing mcr, start here next
-      ###########  
-        era1_prompt <- community_degree_mapper(network_path,partition_path,era1_prompt, output_dir)
+		    #	Non-default Wine prefix? Set it before running:
+			    Sys.setenv(WINEPREFIX = path.expand("~/.wine-pajek"))
+
+		    #	Run (wine_cmd: "wine", "wine64", or "" on native Windows)
+			    run_pajek(mcr_file_path, pajek_dir = "/root/.wine/drive_c/Program Files/Pajek", pajek_exe = "Pajek.exe", wine_cmd = "wine", wait = FALSE)
+
+        era1_prompt <- community_degree_mapper(network_loc = network_path,community_loc = partition_path,era_prompt = era1_prompt, degree_file_loc = deg_file_dir)
     
 #   Generating Community Labels & Exporting Era 22 Results
     era22_results <- generate_community_themes(era22_prompt, core_threshold = 8000, max_timeout = 1200,

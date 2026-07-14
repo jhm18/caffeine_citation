@@ -173,9 +173,9 @@ run_pajek <- function(mcr_file, pajek_dir, pajek_exe = "pajek.exe", wine_cmd = N
 #	-----------------------------------------------------------------------------
 
 #	Example Usage
-	if (FALSE) {
+	#if (FALSE) {
 		#	Locate the macro file
-			mcr <- find_mcr_file("~/Desktop/DNAC/Pendant_Paper/Data and Scripts")
+	#		mcr <- find_mcr_file("~/Desktop/DNAC/Pendant_Paper/Data and Scripts")
 
 		#	Non-default Wine prefix? Set it before running:
 		#	Sys.setenv(WINEPREFIX = path.expand("~/.wine-pajek"))
@@ -183,19 +183,19 @@ run_pajek <- function(mcr_file, pajek_dir, pajek_exe = "pajek.exe", wine_cmd = N
 		#	Which launcher do you have? Sys.which(c("wine", "wine64"))
 
 		#	Run (wine_cmd: "wine", "wine64", or "" on native Windows)
-			run_pajek(mcr, pajek_dir = "~/Pajek64", wine_cmd = "wine", wait = FALSE)
-	}
+	#		run_pajek(mcr, pajek_dir = "~/Pajek64", wine_cmd = "wine", wait = FALSE)
+#	}
 
 #	Test 1
 #	Locate the macro file
-			mcr <- "/workspace/caffeine_citation/pajek_files/Era22/net1.MCR"
+		#	mcr <- "/workspace/caffeine_citation/pajek_files/Era22/net1.MCR"
 
 		#	Non-default Wine prefix? Set it before running:
-			Sys.setenv(WINEPREFIX = path.expand("~/.wine-pajek"))
+		#	Sys.setenv(WINEPREFIX = path.expand("~/.wine-pajek"))
 
 		#	Which launcher do you have? Sys.which(c("wine", "wine64"))
 
 		#	Run (wine_cmd: "wine", "wine64", or "" on native Windows)
-			run_pajek(mcr, pajek_dir = "/root/.wine/drive_c/Program Files/Pajek", pajek_exe = "Pajek.exe", wine_cmd = "wine", wait = FALSE)
+		#	run_pajek(mcr, pajek_dir = "/root/.wine/drive_c/Program Files/Pajek", pajek_exe = "Pajek.exe", wine_cmd = "wine", wait = FALSE)
 
 
