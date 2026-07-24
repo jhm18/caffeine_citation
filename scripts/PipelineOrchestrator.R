@@ -85,7 +85,6 @@
 
     # Currently not saving out data - come back here if we want to change that
 
-    ########### Go back and copy this part for the second era as well ##############
     # Labeling Era1 Communities with Ollama
       # Formatting data (May Back Keywords and Title Later)
         era1_prompt <- era1_data[c(3,4,6:8)]
@@ -97,7 +96,7 @@
         partition_path <- paste0(era1_dir, "/", comm1, ".clu")
         deg_file_dir <- paste0(era1_dir, "/Community_Degree_Files")
         mcr_file_path <- paste0(era1_dir, "/net1.MCR")
-        write_pajek_mcr(network_path,  partition_path,  output_dir,  mcr_file_path, drive_letter = "Z")
+        write_pajek_mcr(network_path,  partition_path,  deg_file_dir,  mcr_file_path, drive_letter = "Z")
     
       # Mapping Community Degrees to Prompt Data  
 
@@ -110,18 +109,60 @@
         era1_prompt <- community_degree_mapper(network_loc = network_path,community_loc = partition_path,era_prompt = era1_prompt, degree_file_loc = deg_file_dir)
     
 #   Generating Community Labels & Exporting Era 22 Results
-    era22_results <- generate_community_themes(era22_prompt, core_threshold = 8000, max_timeout = 1200,
+    era1_results <- generate_community_themes(era1_prompt, core_threshold = 8000, max_timeout = 1200,
                                           model = "llama3.1:8b", fallback_timeout = 900,     # 15 minutes
                                           cooldown_seconds = 30)
-    readr::write_csv(era22_results, file=c("/workspace/caffeine_citation/data/era22_results.csv"))
+    readr::write_csv(era1_results, file=paste0(era1_dir, "/era1_results.csv"))
+
+# Repeat for Era 2
+# Labeling Era2 Communities with Ollama
+      # Formatting data (May Back Keywords and Title Later)
+        era2_prompt <- era2_data[c(3,4,6:8)]
+        colnames(era2_prompt)[[2]] <- c("community_id")
+        community_data <- data.frame(community_id = era2_prompt$community_id, text_theme = as.character(era2_prompt$abstract_list))
+        
+      # Generating Cluster Degree Rankings for the Purpose of Prompt Weighting
+        network_path <- paste0(era2_dir, "/", citation_net2)
+        partition_path <- paste0(era2_dir, "/", comm2, ".clu")
+        deg_file_dir <- paste0(era2_dir, "/Community_Degree_Files")
+        mcr_file_path <- paste0(era2_dir, "/net1.MCR")
+        write_pajek_mcr(network_path,  partition_path,  deg_file_dir,  mcr_file_path, drive_letter = "Z")
+    
+      # Mapping Community Degrees to Prompt Data  
+
+		    #	Non-default Wine prefix? Set it before running:
+			    Sys.setenv(WINEPREFIX = path.expand("~/.wine-pajek"))
+
+		    #	Run (wine_cmd: "wine", "wine64", or "" on native Windows)
+			    run_pajek(mcr_file_path, pajek_dir = "/root/.wine/drive_c/Program Files/Pajek", pajek_exe = "Pajek.exe", wine_cmd = "wine", wait = FALSE)
+
+        era2_prompt <- community_degree_mapper(network_loc = network_path,community_loc = partition_path,era_prompt = era2_prompt, degree_file_loc = deg_file_dir)
+  
+      # Generating Community Labels & Exporting Era 22 Results
+        era2_results <- generate_community_themes(era2_prompt, core_threshold = 8000, max_timeout = 1200,
+                                          model = "llama3.1:8b", fallback_timeout = 900,     # 15 minutes
+                                          cooldown_seconds = 30)
+        readr::write_csv(era2_results, file=paste0(era2_dir, "/era2_results.csv"))
 
 
-    #Labeling_Communities_Ollama: write_pajek_mcr()
-    #Labeling_Communities_Ollama: community_degree_mapper()
-    #Labeling_Communities_Ollama: generate_community_themes()
-    #Era Pipeline: community_era_net()
-    #Era Pipeline: write_clu()
-    #Era Pipeline: write_net()
 
+      # Era Pipeline: community_era_net()
+        era_community_list <- community_era_net(eras_edges, era2_results, era1_results)
+
+      # Era Pipeline: write_clu()
+        # Stack era_community_list
+          community_nodes <- era_community_list$community_nodes
+          community_edges <- era_community_list$community_edges
+
+      # Write .clu file to label sender vs target for our node list
+        role <- strsplit(community_nodes$label, "_")
+        role <- unlist(lapply(role, function(x) x[[1]]))
+        community_role <- ifelse(role == "sender", 1,2)
+        write_clu(community_role,"community_role")
+
+      # Era Pipeline: write_net()
+        write_net('Arcs', era_community_list$community_nodes$name, '', '', '', 'blue', 'white', 
+            era_community_list$community_edges$sender_id, era_community_list$community_edges$target_id,
+            era_community_list$community_edges$proportion, 'gray', paste0('Era_community_', era1, '_', era2), TRUE)
 
   }
