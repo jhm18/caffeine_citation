@@ -1,0 +1,795 @@
+community_id,theme,processing_time,status
+1,Drug Metabolism and Pharmacokinetics Alterations,42.2,success
+2,Pharmaceutical Cocrystals for Enhanced Drug Properties,3,success
+3,Electrochemical Sensors for Pharmaceutical Analysis,2.8,success
+4,Phytochemicals for Pain Management Research,2.2,success
+5,Emerging Contaminants in Water and Wastewater Systems,3,success
+6,Caffeine's Effects on Physical Performance and Cognition,1.7,success
+7,Passivating Defects in Metal Halide Perovskites,1.1,success
+8,Cognitive and Motor Performance Research Cluster,1.9,success
+9,Psychostimulant Effects on Fetal Brain Development,1.3,success
+10,Caffeine Adsorption Studies,2.2,success
+11,MOFs and Nanoparticles in Water Purification Systems,1.5,success
+12,Green Catalysts for Sustainable Organic Synthesis,1,success
+13,Sublingual Drug Delivery and Mucosal Permeability Research,1,success
+14,Caffeine's Effects on Brain Functions and Diseases,1.5,success
+15,Pharmaceutical Residues in Drinking Water,2.7,success
+16,Aqueous Two-Phase Systems for Caffeine Partitioning Research,1,success
+17,Carbon Nitride Coated Functional Cotton Fabrics Research,0.9,success
+18,Botanical Insecticides from Tea Extracts Research,2,success
+19,Hydrotrope Effects on Drug Solubility and Aggregation,2.4,success
+20,GPCRs and Adenosine Receptors Research Cluster Content,1.1,success
+21,Gut Microbiota and Obesity Research,2.4,success
+22,Protein Lysine Methyltransferases in Saccharomyces cerevisiae Research Cluster,1.4,success
+23,Pregnancy Outcomes and Socioeconomic Status Factors,1.1,success
+24,Nanoparticles for Lung Cancer Treatment Research,0.8,success
+25,Calcium Binding Site Dynamics in Sarcoplasmic Reticulum,1,success
+26,MicroRNAs in Tea Plant Development and Quality Formation,2.4,success
+27,Herbal Medicine Safety Concerns Worldwide,2.7,success
+28,Pharmacokinetic Interactions and Herbal Drug Interactions,3.3,success
+29,Ryanodine Receptors and Calcium Signaling Mechanisms,2.1,success
+30,Dietary Influences on Migraine Pathophysiology and Treatment,1.6,success
+31,Digital ELISA Systems with Enhanced Detection Sensitivity,1.2,success
+32,Nanoparticle Encapsulation for Controlled Drug Release Systems,0.9,success
+33,Phenolic Compounds Extraction Methods Comparison,2.1,success
+34,Tea's Health Benefits and Seasonal Variance Effects,0.8,success
+35,Urinary Incontinence During Pregnancy Management Strategies,1,success
+36,Encapsulation Efficiency of Phenolic Compounds in Wastewater,1.8,success
+37,Caffeine's Impact on Human Health Outcomes,2.7,success
+38,Exposure to Endocrine-Disrupting Chemicals in Consumer Products,2.5,success
+39,Coffee Consumption and Sleep-Disordered Breathing Research,1.1,success
+40,Respiratory Consequences in Premature Infants,2.8,success
+41,Autism Diet and Physical Activity Patterns Study,1.2,success
+42,Neuroprotection and Parkinson's Disease Research,2.5,success
+43,Neural Correlates of Consciousness Research Cluster,2.3,success
+44,Animal Models for Anxiety Research Studies,2.2,success
+45,Wound Healing with Ascorbic Acid and Caffeine,0.9,success
+46,Liquid Chromatography Method Validation Techniques,1.1,success
+47,Circadian Rhythm Disorders and Treatments,2.8,success
+48,Coffee Consumption and Metabolic Syndrome Research,1.4,success
+49,Emerging Contaminants in Water and Soil Environments,2.2,success
+50,Crystal Engineering for Enhanced Solubility Properties,1.8,success
+51,Particle Size and Shape Analysis in Pharmaceuticals,0.9,success
+52,Antioxidant Properties of Tea Extracts in Cosmetics Research,2.1,success
+53,Methylxanthines in Food and Beverage Systems,2.7,success
+54,Lifestyle Factors and Inflammation Research Cluster,2,success
+55,Pharmaceuticals and their Disintegration in the Human Body,1.9,success
+56,Caffeine Detection Methods and Techniques,2.7,success
+57,Pharmaceuticals and Their Dissolution Rates Studied,0.9,success
+58,Liquid Chromatographic Analysis in Food and Feed Laboratories,1.8,success
+59,Synthesis and Evaluation of Caffeine Derivatives,1,success
+60,Electrochemical Sensors for Ascorbic Acid Detection,0.9,success
+61,In Vitro Models for Barrier Permeability Research,1.3,success
+62,Ocular Therapeutic Delivery Systems Development,1.3,success
+63,Exploring the Intersection of Technology and Community Development Initiatives,0.6,success
+64,Water Pollution Removal Technologies and Methods,1.9,success
+65,Cocoa's Cognitive and Metabolic Impact,2.2,success
+66,Exploring Local History Through Community Archives and Oral Traditions,0.5,success
+67,Caffeine's Role in Cancer Immunotherapy Research,1.5,success
+68,Respiratory Distress Syndrome Management Guidelines Update,2.8,success
+69,Health Risks of Energy Drinks Consumed,2.8,success
+70,Biochemical Effects of Caffeine and EGCG on Human Cells,2,success
+71,Caffeine's Effect on Brain-Computer Interface Signals,1.1,success
+72,Health Impacts of Modern Technology and Lifestyle Habits,2,success
+73,Socially Transmitted Placebo Effect in Healthcare Interactions,2.2,success
+74,Green Tea's Effects on Brain Activity,0.9,success
+75,Community Engagement Strategies in Rural and Urban Areas,0.5,success
+76,Emerging Contaminant Removal Technologies,2.3,success
+77,Restless Legs Syndrome Research Cluster Content,0.8,success
+78,Calorimetry Techniques in Peptide-Metal Ion Interactions Research,1.1,success
+79,Ocular Biometric Changes After Caffeine Consumption,1.4,success
+80,Metal Complexes of Caffeine and Curcumin Derivatives,2,success
+81,Quantifying Emerging New Psychoactive Substances in Seizures,1.2,success
+82,UV Spectrophotometric Method Validation,0.8,success
+83,Caffeine's Impact on Seizure Activity and Brain Function,3.1,success
+84,Energy Drinks and Alcohol Interactions Study,1,success
+85,Caffeine and Ethanol Rewarding Effects Research,1.1,success
+86,Nitrous Oxide Abuse Epidemic Rising Globally Everywhere,1,success
+87,Action Potentials in Horizontal Cells of the Retina,1.5,success
+88,Stress and Fertility in Women Research Cluster,1.6,success
+89,Nutrition and Exercise Impact on Health Outcomes,2.8,success
+90,Pharmaceuticals in Urban Water Systems,1.2,success
+91,Modafinil's Protective Effects Against Testicular Torsion Injury,1.3,success
+92,Biosynthesis and Degradation of Methylxanthines,2.1,success
+93,Purinergic Signaling in Brain Development and Disorders,2.8,success
+94,Calcium's Role in Associative Learning Mechanisms,1.1,success
+95,Pharmaceutical Research and Development Challenges,1,success
+96,Cancer Treatment Efficacy Research Studies Database,1.3,success
+97,Microbial Communities in Plant-Drug Interactions,1.9,success
+98,Cellular Stress Response and Adaptation Mechanisms,2,success
+99,Metabolic Changes in Plants Under Environmental Stressors,1.3,success
+100,Pharmaceuticals in Water Environments Worldwide,2.2,success
+101,Speech Therapy for Chronic Cough,2.6,success
+102,Coffee Waste Valorization Technologies,2.7,success
+103,Exploring the Intersection of Technology and Community Development Initiatives,0.5,success
+104,Caffeine's Impact on Adenosine Receptors,3.1,success
+105,Nutrition and Supplements for Athletes and Bodybuilders,2.1,success
+106,Coffee's Protective Effects on Human DNA Integrity,1,success
+107,Coffee and Tea Cancer Research Findings,1,success
+108,Type D Personality and Cardiovascular Reactivity Interactions,0.9,success
+109,Coffee's Impact on Human Health and Disease Prevention,2.2,success
+110,Caffeine's Impact on Bone Mineral Density Regulation,1,success
+111,Green Tea Processing and Chemical Constituent Variation,0.8,success
+112,Environmental Factors in Childhood Leukaemia Development,1,success
+113,Caffeine's Impact on Human Health and Food Systems,2.9,success
+114,Coffee Extraction Simulation Models,0.9,success
+115,Environmental Contaminants and Human Health Risks Worldwide,2.1,success
+116,Phytochemicals from Coffee and Cocoa By-Products Research,2.1,success
+117,Nutrition and Liver Disease Prevention Strategies,2.3,success
+118,Caffeine Theanine Tyrosine Performance Enhancement Study,1.4,success
+119,Anemia in Pregnancy Research Study Findings,1.5,success
+120,Community Engagement Strategies in Rural and Urban Areas,0.5,success
+121,Caffeine's Multifaceted Applications in Medicine and Materials Science,2,success
+122,Microfluidic Dried Blood Spot Sampling Devices,1.7,success
+123,Muscle Bone Crosstalk Pathways Disrupted by FGF9,1.6,success
+124,Emerging Contaminants in Water and Air Environments Worldwide,2.2,success
+125,Natural Deep Eutectic Solvents Extraction Methods,1.1,success
+126,Metabolomic Changes During Early Pregnancy,1.2,success
+127,Solvent Interactions and Caffeine Extraction Processes,1,success
+128,Coffee's Impact on Health Outcomes,2.5,success
+129,Caffeine and Exercise Performance Optimization Strategies,2.3,success
+130,Caffeine Biosynthesis in Pu'erh Tea Fermentation Process,1.1,success
+131,Pharmaceutical Cocrystal Characterization Techniques Development,1.4,success
+132,Photocatalytic Degradation of Micropollutants in Water Environments,1.4,success
+133,Phrenic Motoneurons and Respiratory Pathway Restoration,1.3,success
+134,Quantitative Caffeine Analysis in Beverages and Supplements,1.1,success
+135,Drowsiness Detection in Commercial Motor Vehicle Operations,2.3,success
+136,Phytochemicals and Their Therapeutic Effects,2.2,success
+137,Caffeine's Impact on Fetal Development Outcomes,1.6,success
+138,Antibiotic Penetration in Cancer Cells Research,1.1,success
+139,Biomechanical Regulation of Arterial Vasoregulation Mechanisms,1.3,success
+140,Metal Complexes with Caffeine Ligands,1.8,success
+141,Caffeine's Impact on Ethanol Consumption in Mice Models,1.3,success
+142,Pig Fertility and Seminal Supplement Effects Study,1.2,success
+143,Caffeine's Effects on Neurotransmitters During Exercise,1,success
+144,Extraction Methods for Caffeine Analysis,2.1,success
+145,Dermatology Complications of Cosmetic Treatments,0.9,success
+146,Biocatalytic Synthesis of L-Theanine Enzymes,1,success
+147,Weight Loss with Herbal Medicine Extracts,1.2,success
+148,Quantum Dots and Chemiluminescence Applications Research,1,success
+149,FPGA Acceleration for Deep Learning Applications,1.2,success
+150,Analyzing Adulterants in Illicit Drugs for Forensic Purposes,3.1,success
+151,Sleep Patterns in Different Populations,2.7,success
+152,Resveratrol's Neuroprotective Effects on Adenosine Receptors,2.2,success
+153,Cardiac Arrhythmias and Electrophysiology Research Network,1.2,success
+154,Pharmaceuticals and Biophysics Interactions Research,2.2,success
+155,Caffeine's Impact on Premature Infant Health Outcomes,2.1,success
+156,Metabolic Effects of Flavonoid-Caffeine Supplements on Women,1.6,success
+157,Effects of Caffeine and Ethanol on MicroRNA Expression,1.7,success
+158,Emerging Contaminants in Water Resources,2.3,success
+159,Kratom Toxicity and Its Lethal Consequences Uncovered,1,success
+160,Coffee Pulp Waste Utilization and Optimization Process,1,success
+161,Economic Assessment of Black Tea Waste Valorization,1.1,success
+162,Toxicokinetics of Paracetamol and Other Medications in Rats,1.4,success
+163,Autonomic Nervous System and Antisocial Behavior Research,1.6,success
+164,Urotherapy Interventions in Children with Bladder Bowel Dysfunction,1.2,success
+165,Exercise and Nutrition for Chronic Disease Prevention,2.8,success
+166,Coffee's Impact on Cancer Risks,2.8,success
+167,Caffeine in Aquaculture Stress Management,2.4,success
+168,Microbial Genomics of Novel Caffeine-Degrading Bacteria,0.8,success
+169,Pediatric Gastroesophageal Reflux Disease Management Strategies,0.9,success
+170,Caffeine Effects on Ice Hockey Performance,1.1,success
+171,Prenatal Caffeine Exposure and Developmental Toxicity Effects,3,success
+172,Analytical Techniques in Environmental Monitoring,2.6,success
+173,Pharmacokinetic Effects of Lycopene in Rat Models,1.9,success
+174,Pretreatment Methods for Lignocellulosic Agro-Food Wastes Analysis,1.4,success
+175,Electrophysiological Methods in Food Product Design Research,1,success
+176,Ionic Liquids in Chemical and Environmental Applications,1.6,success
+177,Exercise and Sports Performance Outcomes,2.2,success
+178,Decaffeination Methods for Green Tea Extraction,1,success
+179,Caffeine's Impact on Mental Health and Sleep Disturbances,1.5,success
+180,Sleep Disturbances in Adults and Children,2.8,success
+181,Electro-Fenton Treatment of Coffee Industry Wastewater Effluent,1.3,success
+182,The Effects of Sleep Inertia on Cognitive Performance,1.6,success
+183,Caffeine's Effect on Insect Vigilance Decrement,1,success
+184,Genetic Influences on Food Timing and Preferences,2.4,success
+185,Irritable Bowel Syndrome Disease Burden Research Study Results,1.3,success
+186,Microbial Community Structure Alterations by DEET Exposure,1.4,success
+187,Nocturia Risk Factors in Community Residents,1.1,success
+188,Caffeinated Alcohol Beverage Use Risks and Consequences,1.5,success
+189,Mars Nucleobase Thermochemolysis Research Cluster Content,1.3,success
+190,Antioxidant Properties of Tea Compounds,2.8,success
+191,Neurological Health Properties of Caffeine Research,1.8,success
+192,Cryopreservation Effects on Spermatozoa Quality and Viability,1.5,success
+193,Rosin-Based Polymer Chromatography Applications Research,1.1,success
+194,Antioxidant Properties of Caffeine and Copper/Zinc Superoxide Dismutase,1.5,success
+195,Coffee's Effect on Alzheimer's Disease Pathologies,1,success
+196,Calcium Homeostasis and Cellular Survival Mechanisms,1.2,success
+197,Muscle Fascia Mechanics and Pain Research,2.2,success
+198,Neonatal Drug Use Patterns Across European Regions,1.2,success
+199,Multiplexed Immunoassays for Wastewater Analysis,1.8,success
+200,Shift Work and Lifestyle Factor Trajectories,1,success
+201,Biosensors for Stimulant Detection and Analysis,3,success
+202,Removal of Emerging Contaminants from Water Sources,1.9,success
+203,Exploring the Intersection of Technology and Community Development Initiatives,0.6,success
+204,Coffee Oil as Natural Surfactant Substitute,0.9,success
+205,Hydrogel Materials from Honeybee Origin Research,0.7,success
+206,Toxicity and Environmental Risk Assessment,2.3,success
+207,Nutrigenomics and Personalized Nutrition Strategies,2.3,success
+208,Chemicals Inducing Systemic Resistance in Arabica Coffee Plants,1,success
+209,Agroforestry Systems and Medicinal Plant Development Research,1,success
+210,Sweetener Synergy and Energy Drink Effects,1.4,success
+211,Renal Failure Biomarkers and Prognostic Indicators Research,1,success
+212,Placenta and Pregnancy Outcomes Research,2.3,success
+213,Microbiome-Gut-Brain Axis Research Findings,2,success
+214,Antioxidants and Coronary Artery Disease Research Findings,0.8,success
+215,Pharmaceutical Pollution in Freshwater Lakes Worldwide,1.1,success
+216,Coffee's Impact on Cardiovascular Health,2.8,success
+217,Green Nanoporous Photocatalytic Materials Development,0.9,success
+218,Factors Affecting Resting Metabolic Rate Measurements Variability,1.3,success
+219,Coffee Research and Development Studies,2.7,success
+220,Caffeine Exposure in Pregnancy Risks Neurological Disorders,0.9,success
+221,Toxicology of New Psychoactive Substances in Human Tissues,2,success
+222,Exploring the Intersection of Technology and Rural Community Development,0.5,success
+223,Risk Factors for Teachers' Voice Disorders,1,success
+224,Metabolomics and Hormone Dynamics in Somatic Embryogenesis,1.4,success
+225,Chromatography Signal Reconstruction Techniques,0.8,success
+226,Polymer-Based Chromatographic Monolithic Column Development Research,1,success
+227,Electrochemical Treatment of Pharmaceutical Residues in Wastewater,1.4,success
+228,Caffeine Addiction Among University Students in Korea,0.8,success
+229,Phytochemicals and Nutraceutical Ingredients,2.3,success
+230,Health Benefits of Tea Consumption Worldwide,2.3,success
+231,Effects of Caffeine on Fetal Health Tests,0.9,success
+232,Cosmetic Product Safety and Transdermal Absorption Studies,1.1,success
+233,Mechanisms of Tetrabenazine Facilitating Exocytosis in Bovine Chromaffin Cells,1.8,success
+234,Community Engagement Strategies for Small Town Revitalization Initiatives,0.5,success
+235,Exploring the Intersection of Technology and Rural Community Development,0.5,success
+236,Oxidative Stress in Pseudorabies Virus Infection Research,1.1,success
+237,Youth Electronic Cigarette Use Patterns and Correlates,1.4,success
+238,Caffeine Metabolism Inhibition Studies,1.4,success
+239,Infant Behavior and Medication Effects Study Results,0.6,success
+240,Osteoporosis Research and Prevention Strategies for Healthy Bones,1.1,success
+241,Caffeine's Effects on Operant Behavior and Reinforcement,1.2,success
+242,Stability Indicating HPLC Method Development and Validation,1,success
+243,Alzheimer's Disease Prevention through Dietary Modulation Strategies,1.8,success
+244,Exploring the Impact of Technology on Rural Community Development,0.5,success
+245,Liposomes and Ionic Strength Dynamics Research,0.9,success
+246,Natural Alpha Amino Acid Surrogates Synthesis Research,0.9,success
+247,Neonatal Respiratory Complications Research,2.4,success
+248,Polymer Synthesis and Extraction Methods Development,1.5,success
+249,Pharmacological Effects of Methylxanthine Alkaloids in Beverages,1.1,success
+250,Placebo Effect on Athletic Performance Outcomes,1.2,success
+251,Coffee Metabolomics Biomarkers Research Cluster,1,success
+252,Effects of Hormonal Contraceptives on Bone Density,1.2,success
+253,Microbial Dynamics in Anaerobic Co-Digestion Systems,1.1,success
+254,Green Tea's Anti-Obesity Properties Revealed,0.9,success
+255,Exploring the Intersection of Technology and Rural Community Development,0.5,success
+256,Caffeine's Impact on Adolescent Brain Development,0.9,success
+257,Electrochemistry of Biomolecules and Nanomaterials Synthesis,1.3,success
+258,Muscle Function and Calcium Release Mechanisms Studied,1.1,success
+259,Modafinil Efficacy in Cognitive and Physical Performance Enhancement,1.9,success
+260,Coffee Leaf Nutritional and Health Benefits Research,2.8,success
+261,Mitochondrial Dysfunction in Malignant Hyperthermia Susceptibility Model,1.3,success
+262,Alpha 2 Receptor Agonist Effects on Pulmonary Arteries,1.6,success
+263,Regulation of Sleep by Environmental Factors,1.7,success
+264,Analyzing Novel Psychoactive Substances and Fentanyl Derivatives,1.7,success
+265,Delivery Methods Impact Therapeutic Efficacy Outcomes Significantly Always,1.2,success
+266,Caffeine's Effect on Weight Loss Outcomes,1.2,success
+267,Tea Consumption and Depressive Symptoms in Elderly Population,0.8,success
+268,Coffee Consumption and Overactive Bladder Symptoms,0.7,success
+269,Coffee's Impact on Breast Cancer Risk Factors,0.9,success
+270,Xenobiotics Impact on Placental Development Processes,0.7,success
+271,Carbon Electrodes in Water Analysis Research,1,success
+272,Caffeine's Impact on Neonatal Piglet Vitality and Growth,1.6,success
+273,Spectrophotometric Assisted Mathematical Techniques in Analytical Chemistry,1.1,success
+274,Validation of Alternative Analytical Methods,0.9,success
+275,Coffee and Chronic Disease Prevention Research,0.8,success
+276,Pharmaceuticals and Herbal Supplements Research Cluster,1.4,success
+277,Cellulose Modification for Paper Strengthening Applications,1,success
+278,Doping Prevention through Interactive Sports Education Games,1.2,success
+279,Caffeine's Impact on Anthocyanin-Based Solar Cells Efficiency,1.1,success
+280,Pharmacokinetics of Alnustone in Rat Plasma Samples,1.5,success
+281,Antioxidant Properties of Cyperus Rotundus Extracts,1,success
+282,Biophysical Tools for High-Throughput Screening Applications,1,success
+283,Caffeine's Neuroprotective Effects Against Beta-Amyloid Toxicity Studied,1.1,success
+284,Coffee's Impact on Viral Load Reduction,0.9,success
+285,Cannabis Use Risks and Health Consequences,1,success
+286,Caffeine's Effects on Working Memory and Brain Activity,0.8,success
+287,Electrochemical Analysis of Cobalt Ferrite Nanoparticles,1,success
+288,Carbon Nanotube Based THC Sensors Development,0.9,success
+289,Mathematical Modeling of Drug Combinations,2.4,success
+290,Urinary Tract Symptoms Management Strategies,1.3,success
+291,Vascular Density in Aging Population Study,0.8,success
+292,Exploring the Intersection of Technology and Community Development Initiatives,0.5,success
+293,Fungal Genomics and Disease Association Studies,0.9,success
+294,Tinnitus Treatment Outcomes and Associated Factors Research,1.1,success
+295,Exploring the Intersection of Technology and Community Development Initiatives,0.5,success
+296,Coffee Roast Chemistry Analysis Methods,1,success
+297,Emerging Pollutants in South African Urban Waters,1.8,success
+298,Molecularly Imprinted Polymer Sensors Development,1,success
+299,Mass Spectrometry and Thin-Layer Chromatography Techniques Combined,1.5,success
+300,Exploring the Impact of Social Media on Local Communities,0.5,success
+301,Caffeine's Hidden Health Benefits Revealed Through Research Studies,1,success
+302,Caffeine Effects on Preterm Infant Physiology,1.6,success
+303,Exploring the Intersection of Technology and Rural Community Development,0.5,success
+304,Electrochemical Sensors for Pharmaceutical Applications Research,0.8,success
+305,Caffeine's Antioxidant and Genotoxic Effects on Cells,1.4,success
+306,Coffee Grinding and Extraction Methods Optimization,1.2,success
+307,Detection of Explosives with Nanoparticle Sensors,1.3,success
+308,Forensic Toxicology and Non-Destructive Analytical Techniques,1.1,success
+309,Nanomaterials for Controlled Drug Release Applications,1.2,success
+310,Drying Methods Impact Arabica Coffee Quality Significantly Always,0.9,success
+311,Community Engagement and Participation in Local Government Initiatives,0.5,success
+312,Cocoa Bean Bioactive Compound Research Cluster Content,0.9,success
+313,Exploring the Intersection of Technology and Community Development Initiatives,0.6,success
+314,Exploring the Intersection of Technology and Community Development Initiatives,0.6,success
+315,Coffee's Neuroprotective Effects on Traumatic Brain Injury,0.8,success
+316,Muscular-Hydrostat Configuration of Octopus Arms,1.2,success
+317,Sugar Content in Non-Carbonated Beverages in China,1.3,success
+318,Ion Channels and Cellular Responses to Stimuli,1.6,success
+319,Metabolic Biomarkers for Calcium Oxalate Urolithiasis,1.2,success
+320,Photocatalytic Degradation of Water Pollutants,2.9,success
+321,Coffee's Impact on Parkinson's Disease Symptoms,0.9,success
+322,Cardiac Arrhythmia and Neurodevelopmental Disorder Research,1.9,success
+323,Stress and Cortisol Response in General Population,1,success
+324,Aroma Compounds in Viscum articulatum Tea Trees,1.3,success
+325,Ionic Liquids for Sustainable Catalytic Applications,1,success
+326,Adenosine Receptor Modulators and Antagonists Research,2.6,success
+327,Pharmaceutical Analysis and Validation Methods,1.2,success
+328,Electrochemical Methods for Analytical Chemistry Research,1,success
+329,Phytoconstituents and Antinociceptive Activity Research,1.6,success
+330,Environmental Xenobiotics and Skin Absorption Kinetics,1.8,success
+331,Effects of Shuanghuanglian Injection on Cytochrome P450 Enzymes,1.3,success
+332,Environmental Impact on Human Health Outcomes,1.6,success
+333,Caffeine's Impact on Cardiovascular Health Risks,1.6,success
+334,Metabolomics in Systemic Lupus Erythematosus Research,1.4,success
+335,Calcium Signaling in Malignant Hyperthermia Patients,1.3,success
+336,Caffeine's Effects on Human Physiological Responses,1,success
+337,Membrane Distillation for Industrial Water Treatment Applications,1,success
+338,Caffeine Consumption and Regulatory Policy Impacts,0.8,success
+339,Noise Exposure on River Barges Crews,1.1,success
+340,Sensing Chemical Substances for Infant Health Risks,1,success
+341,Quantifying Caffeine with LC-MS/MS Techniques and Methods,1,success
+342,Hair Follicle Biology and Photoprotectant Agents,1.3,success
+343,Planarian Experiments for Drug Education Awareness Research,0.7,success
+344,Caffeine's Effect on Basketball Player Performance Times,1.1,success
+345,Analytical Methods for Caffeine Determination in Beverages Worldwide,0.9,success
+346,Exploring the Intersection of Technology and Social Impact Spaces,0.5,success
+347,Antioxidant Effects on Stress and Anxiety Levels,1.3,success
+348,Aqueous Biphasic Systems and Zwitterion Chemistry Research,1.2,success
+349,Xanthine Derivatives in Bone Regeneration Research,1.2,success
+350,Stress and Immune System Interactions in Mice,1.6,success
+351,Pharmacokinetic Studies of Ibuprofen Formulations,1.3,success
+352,Taste Receptors and Insect Behavior Mechanisms,1.3,success
+353,Polymer Membranes for Controlled Drug Delivery Systems,1.1,success
+354,Exercise-Induced Gastrointestinal Distress in Athletes,3,success
+355,Ambient Ionization Methods for Complex Mixture Analysis,1.3,success
+356,Community Engagement Strategies in Rural and Urban Areas,0.5,success
+357,Vocal Hydration and Voice Quality Research,1.2,success
+358,Metabolism and Enzyme Activity Variations in Species,1.1,success
+359,Caffeine Use in Premature Infants Study,1.1,success
+360,Coffee Plantation Research and Development Insights,0.8,success
+361,The Effects of Night Shift Work on Cognitive Performance,1.1,success
+362,Mitochondrial Dysfunction in Critical Illness,1.5,success
+363,The Power of Placebo Effects on Cognitive Performance,2,success
+364,Equine Sports Doping Regulations and Performance Enhancers,1,success
+365,Cytochrome P450 Enzyme Activity Research Cluster,1.2,success
+366,Coffee Consumption and Health Outcomes Research,1.6,success
+367,Dietary Inflammation and Mental Health Disorders,1.3,success
+368,Coffee's Impact on Genetic Blood Pressure Risks,1.5,success
+369,Matcha's Anxiolytic Effects on Brain Functions Studied,1,success
+370,Water Treatment Technologies for Emerging Pollutants Removal,1.3,success
+371,Green Tea Catechins and Their Bioavailability in Humans,1.2,success
+372,Chrysin's Effects on Parkinson's Disease Model,1,success
+373,Electrochemical Detection of Vanillin in Food Samples,1,success
+374,Advancements in Organic Photovoltaic Materials and Devices Research,0.9,success
+375,Muscle Biomechanics and Desmin Mutations Research,1.1,success
+376,Energy Drink Effects on Blood Pressure,1.2,success
+377,Chemical Synthesis and Nanoparticle Applications Research,1.4,success
+378,Genetic Influence on Postprandial Glycemic Response,1,success
+379,Multicomponent One-Pot Synthesis of Pharmaceutically Interesting Compounds,0.9,success
+380,Green Catalysts for Efficient Organic Synthesis Reactions,0.8,success
+381,Caffeine Citrate in Cancer Treatment Research,1.4,success
+382,Caffeine's Impact on Dementia Symptoms and Behavior,1.1,success
+383,Adulterated Food Supplements and Consumer Safety Risks,1.1,success
+384,Caffeine's Hidden Consequences on Brain Health,0.9,success
+385,Host Pathogen Interaction Dynamics Modeling,0.9,success
+386,Taste and Smell Perceptions in Aging Population,1.5,success
+387,Risk Factors for Syncope in Blood Donors,0.9,success
+388,Matcha's Effects on Stress and Emotional Behaviors Studied,0.8,success
+389,Energy Drinks and Physiological Effects Research,0.9,success
+390,Tea Plant Mycorrhizal Fungi Research Outcomes,1.3,success
+391,Palm Pollen's Anticancer Properties in Rat Models Studied,1.1,success
+392,Phytochemicals and Their Therapeutic Applications,1.3,success
+393,Anthocyanins and Related Compounds Equilibrium Constants Research,1.2,success
+394,Antioxidants in Sunscreen Formulations Research Study Results,1.1,success
+395,Oxytocin Measurement Variations Across Different Specimens and Studies,0.9,success
+396,Oxidative Stress in Endometriosis Treatment Research,1.3,success
+397,Caffeine and Bronchopulmonary Dysplasia Research Study Results,1.4,success
+398,Cell Cycle Arrest and DNA Damage Response Mechanisms,0.8,success
+399,Coffee By-Product Utilization Research,0.9,success
+400,Dietary Management of Autosomal Dominant Polycystic Kidney Disease,2,success
+401,Phytotoxic Effects of Caffeine in Tea Samples,1.1,success
+402,Semen Quality Improvement Techniques for Canine Breeding,1,success
+403,Theacrine's Antimetastatic Potential on Breast Cancer Cells,0.9,success
+404,Protein Binding and Drug Interaction Dynamics,1.3,success
+405,Pharmacokinetics and Variability of Clozapine Metabolites,1,success
+406,Bruxism Research and Management Outcomes Study,1.1,success
+407,Coffee Compound Analysis Method Development,1.1,success
+408,Restless Legs Syndrome in Children and Adolescents,1.2,success
+409,Headaches in Pupils: Prevalence and Impact on Learning,1.9,success
+410,Fermentation Characteristics of Spent Instant Coffee Grounds,1.3,success
+411,Caffeine's Impact on Fetal Testicular Development Toxicity,1.3,success
+412,Pharmaceuticals Impact on Drinking Water Microbiota Systems,1.2,success
+413,Pu-erh Tea Volatile Compound Analysis,1.2,success
+414,Electrochemical Synthesis of Polypyrrole for Extraction Applications,1.1,success
+415,Telomerase's Non-Canonical Functions Revealed,1.7,success
+416,Decaffeination of Tea and Coffee Products,1.1,success
+417,Raman Spectroscopy of Pharmaceutical Tablets with Multiple APIs,0.9,success
+418,Metal Complexes with N-Heterocyclic Carbene Ligands,1.5,success
+419,Caffeine's Effect on Pain Relief Combinations,2.3,success
+420,Hypnic Headache Disorder Research Cluster Content,1.3,success
+421,Magnetic Microspheres for Polyphenol Extraction and Analysis,1,success
+422,Thyroid Hormone Effects on Cardiac Electrical Remodeling,1.6,success
+423,Adsorption Dynamics on Polystyrene Surfaces Studied,1,success
+424,Nanoparticles Effects on Plant Growth and Development,1.1,success
+425,Chlorination Reactions with Trichloroisocyanuric Acid and Catalysts,0.9,success
+426,Exploring the Intersection of Technology and Community Development Initiatives,0.5,success
+427,Cardiovascular Effects of Methylxanthines in Preterm Neonates,1.2,success
+428,Metabolic Diversification in Plant Specialized Metabolites,0.9,success
+429,Embodied Experiences in Everyday Life Contexts,1,success
+430,Caffeine's Impact on Offspring Adiposity Outcomes Studied,1.1,success
+431,Coffee Contamination and Mitigation Strategies Worldwide,0.5,success
+432,Caffeine and Copper Complexes Characterization Methods,1.3,success
+433,Assessing Hypertension Management Capacity in Ghanaian Communities,1.3,success
+434,Exploring the Intersection of Technology and Community Development Initiatives,0.5,success
+435,Therapeutic Approaches for Genetic Diseases and Disorders,1.4,success
+436,Comparing Vertebral Anesthesia Methods for Reduced Headache Risk,1.3,success
+437,Green Tea Amino Acid Research Findings Revealed,0.9,success
+438,Wafer Cream Substitution with Carob Pods Powder,1.1,success
+439,Supercritical Fluid Extraction Methods,1.4,success
+440,Caffeine Complexes and Co-Crystal Stability Research,1.1,success
+441,Effects of Midday Naps on Cognitive Performance,1.1,success
+442,Caffeine's Effects on Brain Metabolism in Rats,1.3,success
+443,Caffeine's Impact on Brain and Behavior Development,1.7,success
+444,Nutrition Habits During Pregnancy Study Results,1.1,success
+445,Phytochemicals and Hepatoprotection in Traditional Medicine,1.6,success
+446,Virtual Lab Experiments for High School Biology Classrooms,1,success
+447,Medication Misappropriation in the ED Setting,1.3,success
+448,Coffee and Tea Cancer Research Study Results,1.1,success
+449,Exploring the Intersection of Technology and Community Development Initiatives,0.5,success
+450,Anxiety Management for Adolescents and Young Adults,0.7,success
+451,Coffee Consumption in Hemodialysis Patients,1.1,success
+452,Energy Drink Use and Marijuana Intentions Among Adolescents,1,success
+453,Xanthine Derivatives for Parkinson's Disease Treatment Research,1.2,success
+454,Cola's Protective Effect on Urinary Tract Infections,1,success
+455,Forensic Analysis of Illicit Substance Sources,1.1,success
+456,Natural Product Chemistry and Biochemical Diversity,1.2,success
+457,High-Performance Liquid Chromatography Method Validation,1.2,success
+458,Catalytic Degradation of Caffeine Contaminants in Water Systems,1.1,success
+459,Antipsychotic Medication and Inflammation Modulation Research,1.2,success
+460,Nutrient Variation in African Pear Accessions,1.6,success
+461,Self-Selected Intensity Exercise in College-Aged Men Study,1.3,success
+462,Radiation Therapy and Tumor Cell Recovery Mechanisms,1.3,success
+463,Molecular Interactions and Binding Dynamics Study,0.8,success
+464,Liquid Chromatography Tandem Mass Spectrometry Methods Development,1.5,success
+465,Exploring the Intersection of Technology and Community Development Initiatives,0.6,success
+466,Energy Drinks Consumption Among Medical Students,0.8,success
+467,Exercise and Diabetes Management Strategies,1.5,success
+468,Phosphorylation Reactions with Metal Catalysts Under Mild Conditions,0.7,success
+469,Bioactive Compounds in Metabolic Syndrome Prevention,0.9,success
+470,Mitochondrial Dysfunction in Cardiac Muscle Tissue,1.1,success
+471,Skin Vascularization and Permeation Modeling Strategies,1,success
+472,Enzyme Catalyzed Reactions in Glycogen Metabolism,1.5,success
+473,Pharmacology of Alpha-2 Adrenergic Receptor Agonists,1.2,success
+474,Floral Traits and Rewards in Agricultural Systems,0.9,success
+475,College Student Substance Use Patterns Study,0.9,success
+476,Chronic Fatigue Syndrome Research and Treatment Strategies,1.3,success
+477,Drug Interactions in Pharmaceutical Research,1.2,success
+478,Antibiotics in Hospital Waste Systems Study Results,0.7,success
+479,Sleepy Risk-Takers and the Balloon Analog Task,1,success
+480,Brain Regions Associated with Human Taste Perception,1.2,success
+481,Effects of tDCS and Caffeine on Muscular Strength,1.3,success
+482,Rugby League Performance Enhancement Strategies,0.9,success
+483,Caffeine's Effects on Macular Microvasculature Studied,1.2,success
+484,Coffee Roasting Kinetics Modeling Research,0.8,success
+485,Caffeine and Embryonic Development Outcomes Studied,1.3,success
+486,Skin Diffusion Anisotropy Research Cluster,1,success
+487,Caffeine and Cognitive Function in Older Adults,1.1,success
+488,Adenosine's Role in Chronic Pain Reactivation Mechanisms,1,success
+489,Neurodegenerative Disease Risk Factors Research,1.6,success
+490,Tobacco Industry Manipulation of Nicotine Research,1.1,success
+491,Conditioning Response to Non-Alcoholic Beer Stimuli,1.1,success
+492,Caffeine's Impact on Adrenal Gland Development in Rats,1.3,success
+493,Genetic Variants and Methotrexate Treatment Response,1.3,success
+494,Caffeine's Impact on Fetal Immune Development,1.3,success
+495,Caffeine's Impact on Stingless Bee Foraging Behavior Studied,0.9,success
+496,Caffeine's Impact on Fetal Development Outcomes,1.3,success
+497,Pharmacokinetic Models for Drug-Drug Interaction Prediction,1,success
+498,Bioactivity of Yellow Tea with Different Processing Times,1,success
+499,Psychoactive Alkaloids from Areca Nuts and Central Nervous System Effects,1.1,success
+500,Liver Function Assessment in Hepatic Tumors,1.4,success
+501,Nutrition's Impact on Inflammatory Pilosebaceous Disorders,1,success
+502,Tea Processing and Flavonoid Content Variations,1,success
+503,Coffee Content in Korean Market Products,1,success
+504,Methylxanthines in Beverages and Their Health Implications,1.3,success
+505,Aqueous Biphasic Systems for Efficient Separation Techniques,0.9,success
+506,Caffeine's Effects on Children's Processing Stages,1.2,success
+507,Plant Metabolite Transfer and Contamination Dynamics,1,success
+508,Accessibility and Inclusive Design for Digital Communities,0.5,success
+509,Exercise and Metabolic Improvement in Obese Rats,0.8,success
+510,Exploring the Intersection of Technology and Community Development Initiatives,0.6,success
+511,Community Engagement Strategies in the Digital Age Today,0.5,success
+512,Pharmacological Effects on Gastric Smooth Muscle Tone,1.3,success
+513,Replantation and Revascularization Rehabilitation Protocols Established,0.8,success
+514,Caffeine's Effects on Vessel Anastomosis Healing Process,1.4,success
+515,Exploring the Intersection of Technology and Rural Community Development,0.5,success
+516,Purinergic System and Amyotrophic Lateral Sclerosis Research,1.1,success
+517,Cinnamon and Neuroprotection Research Cluster Content,1.4,success
+518,Pre-Conception Care Considerations and Breastfeeding Practices,1.6,success
+519,Temperature Regulation in Sonoporation Systems,0.9,success
+520,Coordination Chemistry of Theophylline Gold Complexes,0.9,success
+521,Green Waste Utilization for Sustainable Future,0.9,success
+522,Molecular Dynamics of Adenosine Analogues in Solution,0.8,success
+523,Migraine Management and Treatment Outcomes in Italy,1.3,success
+524,Methylxanthines in Cocoa Products and Drugs Analyzed,0.8,success
+525,Functionalization of Heterocyclic Systems Review,1,success
+526,Phytochemicals and Their Therapeutic Applications,1.3,success
+527,Transport Parameters in Release Experiments,0.9,success
+528,Carbon Nanotube-Based Sensor Technology Advancements,0.8,success
+529,Coffee Bean Encapsulation Research Cluster Content,1.1,success
+530,Metabolomics in Food Chemistry Research Cluster,0.7,success
+531,Caffeine's Effects on Rugby Player Performance,1.5,success
+532,Effects of Creatine Supplementation on Anaerobic Capacity and Performance,1.5,success
+533,Micropollutant Removal from Water Resources Worldwide,1.3,success
+534,Uridylation-Dependent RNA Decay Pathways in Eukaryotes Revealed,1.3,success
+535,Caffeine's Effects on Cardiovascular Function,1.3,success
+536,Exploring the Intersection of Technology and Rural Community Development,0.5,success
+537,Exploring the Impact of Technology on Rural Community Development,0.6,success
+538,Molecularly Imprinted Polymers for Drug Detection Research,1.3,success
+539,Effects of High Hydrostatic Pressure on Green Tea Taste,0.9,success
+540,Chemistry of Tea Infusion Precipitation Processes,0.9,success
+541,Adsorption of Caffeine on Montmorillonite Surfaces,1.1,success
+542,Caffeine Degradation by Microbial Enzymes in Food Industry,1.1,success
+543,Caffeine Content Analysis in Food Products,0.9,success
+544,Coffee's Impact on Cardiovascular Health Outcomes Worldwide,0.9,success
+545,Benchtop NMR for Undergraduate Chemistry Laboratories,1.1,success
+546,Metal Complexes in Antioxidant Activity Research,1,success
+547,Chemoprotective Effects of Betong Watercress Compounds,1.3,success
+548,Rhabdomyolysis and Hypokalemia Prevention Strategies in Clinical Settings,0.9,success
+549,Caffeine Release Dynamics in Chewing Time Study,0.7,success
+550,Adenosine's Role in Vasodilation and Ischemia/Reperfusion Injury,1.4,success
+551,Migraine Prognosis in Pediatric and Young Adult Patients,1.3,success
+552,Brainstem Respiratory Control Mechanisms Uncovered,1.1,success
+553,Clozapine and Electroencephalogram Abnormalities Research Study,1.2,success
+554,Fullerene Nanoparticles and Caffeine Interaction,1,success
+555,Equine Sperm Motility and Fertilization Research,1.6,success
+556,Fungal Decay Detection in Strawberry Using Hyperspectral Imaging,0.9,success
+557,Child Obesity and Taste Sensitivity Research,1,success
+558,Coffee and Tea Consumption Patterns in Older Adults,1,success
+559,Fluoride's Impact on Tea Plant Biochemistry,1.5,success
+560,Premature Birth Fracture Risk Study Outcomes,1,success
+561,Methylation Patterns in Plant Transposable Elements,0.9,success
+562,Advanced Materials for High Temperature Processing Applications,0.8,success
+563,Continuous Pharmaceutical Manufacturing Techniques and Technologies,1.2,success
+564,Varroa Mite Impact on Honey Bees,1,success
+565,Environmental Impact of Organotin Pollutants on Cardiac Function,1.3,success
+566,Caffeine's Impact on Sprint Cycling Performance Factors,1.1,success
+567,MRI Method for Whole-Brain Water Permeability Mapping,1.6,success
+568,Caffeine's Protective Effects on Preterm Infant Kidneys,1.3,success
+569,Chocolate Analysis Methods Comparison Study,0.8,success
+570,Functional Connectivity Analysis of Resting-State FMRI Data,1.6,success
+571,Urban Watershed Fecal Contamination Research Cluster,1.1,success
+572,Impact of Withering on Tea Catechin Profiles,1,success
+573,Fiber Optic Dissolution Method Development Challenges,1,success
+574,Cardiovascular Effects of Rolipram Inhibition Research,1.3,success
+575,Alexithymia and Substance Use Disorders Research,1,success
+576,Caffeine Effects on Visual Evoked Potentials Research,1.3,success
+577,Axolotl TRPA1 Heat Activation Properties Studied,1,success
+578,Brain Activity Changes in Premature Newborns Studied,0.9,success
+579,Coffee Consumption Patterns and Health Perceptions,0.8,success
+580,Carbon Isotope Analysis in Tea and Beverage Industry,1.2,success
+581,Wolfram Syndrome and Cardiac Calcium Signaling Alterations,1.4,success
+582,Optogenetic Stimulation of Schwann Cells in Developmental Research,1.2,success
+583,Natural Antimicrobial Agents from Plant Extracts,2,success
+584,Caffeine's Impact on Medical Students' Sleep Patterns,1.1,success
+585,Caffeine's Impact on Synthetic Cathinone Abuse Liability,1.3,success
+586,Caffeine's Effect on Chondrocyte Viability and Synthesis,1.3,success
+587,Comparing Caffeine and Aminophylline in Premature Newborns,1.3,success
+588,Skin Flap Necrosis Therapeutic Approaches Research,1,success
+589,Combating Antibiotic Resistance through Combination Therapy Approaches,1,success
+590,Corrosion Inhibition of Triazole-Theophylline Derivatives,1.2,success
+591,Dietary Impact on Tinnitus Symptoms Research,0.8,success
+592,Eating Disorders and Substance Use Comorbidity Research,1.1,success
+593,Derivatization Methods for Improved SALDI Analysis Efficiency,0.8,success
+594,Electrochemical Methods for Pharmaceutical Analysis Development,0.9,success
+595,Energy Drink Consumption Among Turkish University Students,0.9,success
+596,Gene Duplication and Novel Function Acquisition,1,success
+597,Caffeine Intake Patterns in Youth Populations Worldwide,1.2,success
+598,Advanced Materials for Environmental Remediation Technologies,1.4,success
+599,Caffeine's Impact on Neurobehavioral Recovery Post-Injury,1.1,success
+600,Caffeine's Effects on Maximum Strength and Mechanisms,1.1,success
+601,Maternal Obesity and Offspring Metabolic Health,1.1,success
+602,Activated Carbons in Environmental Analysis Research,1,success
+603,Caffeine Abuse Among Indian Children and Youths,1,success
+604,Tea and Parkinson's Disease Meta-Analysis Results,1.2,success
+605,Titanate Nanowires as Photocatalysts for Oxidation Processes,1.4,success
+606,Community Engagement Strategies in Urban Neighborhood Revitalization Initiatives,0.5,success
+607,Caffeine's Impact on Hemodynamic Parameters and Gene Polymorphisms,1.3,success
+608,Cocoa Beans Bioactive Compounds Research Cluster Content,1.2,success
+609,Ionic Liquid Aqueous Biphasic Systems Research,1,success
+610,Encapsulation Methods for MOFs and Organic Additives,1.1,success
+611,Prescription Medication Abuse in Eating Disorders,0.8,success
+612,Caffeine's Impact on Pregnancy and Fetal Development,1.2,success
+613,Caffeine and Exercise Research Studies Database,0.6,success
+614,Toxic Effects of Caffeine Overdose in Emergency Medicine Cases,0.8,success
+615,Caffeine's Effects on Human Brain Plasticity,1.1,success
+616,Placenta Research and Development Challenges,0.9,success
+617,Caffeine's Impact on Rodent Behavior and Cognition,1.2,success
+618,Caffeine's Impact on Fetal Thyroid Development,1.1,success
+619,Caffeine's Effect on Exercise and Blood Clotting,1.5,success
+620,Testosterone's Role in Anxiety Disorders Research,1,success
+621,Caffeine and Neurodevelopment in Premature Infants,1,success
+622,Coffee and Tea Consumption Meta Analysis Study Results,1.2,success
+623,Biotechnology for Enhanced Protein Production Systems,1.2,success
+624,Electrochemical Sensors for Pharmaceutical Analysis Development,0.9,success
+625,Caffeine Free Herbal Teas in South Africa,0.9,success
+626,Recycling Expired Medicines as Sustainable Energy Sources,1,success
+627,Molecularly Imprinted Polymers for Caffeine Detection,1.3,success
+628,Stimulant-Induced Psychosis in Modern Clinical Practices,1.1,success
+629,Glycocalyx Degradation in Preeclampsia Research,1.6,success
+630,Functional Magnetic Resonance Imaging Techniques and Applications,0.8,success
+631,Biochemical Interactions and Molecular Consequences,0.9,success
+632,Toxoplasma gondii Parasite Life Cycle Research,1.3,success
+633,Caffeine's Effects on Exercise Performance in Sedentary Adults,1.4,success
+634,Metabolic Response to Citrus Aurantium and Caffeine Ingestion,1.5,success
+635,Green Tea Quality Control Methods,0.9,success
+636,Exploring the Intersection of Technology and Rural Community Development,0.5,success
+637,PTSD Symptoms Vary By Day of Week,1,success
+638,Coffee Grounds as Humidity Sensing Material,1.1,success
+639,Caffeine Effects on Preterm Infant Vascular Flow,1.1,success
+640,Plant Sources of Methylxanthines Compounds,0.9,success
+641,Effects of Caffeine and Taurine on Water Mobility,0.8,success
+642,Protein Expression and Purification Techniques,0.9,success
+643,Green Coffee Bean Nutraceuticals for Lifestyle Disorders,0.9,success
+644,Sperm Motility and Fertility Treatment Outcomes Research,1.2,success
+645,Exploring the Intersection of Technology and Community Development Initiatives,0.6,success
+646,Neurotransmitter Regulation and Spinal Cord Function Dynamics,0.9,success
+647,Fuss Protein Function and Bitter Taste Perception,1.7,success
+648,Medication Side Effects in Unlikely Locations,0.6,success
+649,Wood Protection with Natural Compounds Research,0.8,success
+650,Carbon Nanotubes Based Magnetic Separation Techniques,1.2,success
+651,Sleep and Mental Health in College Students,1.3,success
+652,Electrochemical Determination of Caffeine Content,1,success
+653,Brewers' Spent Grain as a Sustainable Resource,1.2,success
+654,Calcium Signaling in Cardiac Myocytes Research,1.1,success
+655,Beverage Consumption Patterns in Korean Adolescents,1,success
+656,Caffeine's Effect on Ram Sperm Quality and Preservation,1.3,success
+657,Coffee and Liver Disease Outcomes Research,1.2,success
+658,Prebiotic Properties of Green Tea Extractives Investigated,0.9,success
+659,Tablets for Oral Suspension (TOS) Formulation Development,0.9,success
+660,Theanine Biosynthesis Pathway in Tea Plants Revealed,1.4,success
+661,Pesticide Research and Development for Sustainable Agriculture,1,success
+662,Cardiotoxicity and Secreted Frizzled-related Protein 1 Interaction,1.5,success
+663,Green Tea Effects on Textured Vegetable Protein Properties,0.9,success
+664,Portable Fluorescence Sensors for Water Contaminant Monitoring,1.1,success
+665,Protein Phosphatases in Fungal Pathogens Research Cluster,1.1,success
+666,Addictive Properties of Sugar-Sweetened Beverages in Adolescents,1.2,success
+667,Aminophylline Use in Neonatal Intensive Care Unit,1.4,success
+668,Caffeine's Effects on Visual Perception and Sensitivity,0.9,success
+669,Metabolism of Chemicals in Human and Pig Skin,1.1,success
+670,Coffee's Impact on Metabolic Syndrome and Cataract Formation,1.2,success
+671,Coffee and Prostate Cancer Outcomes Study,1.2,success
+672,Consumer Acceptance of Carob as Chocolate Substitute,1.1,success
+673,Cocoa's Effect on Orthodontic Tooth Movement Research,1.2,success
+674,Phenolic Acids in Tea Samples Analysis,0.9,success
+675,Kinesio Tape Effectiveness Study Results Revealed,1,success
+676,Microbial Endocrinology and Host-Microbe Neuroendocrine Crosstalk,1.4,success
+677,Caffeine Detection Methods Development Project,1,success
+678,Electrochemical Quantification of Green Tea Catechins,1.1,success
+679,Amino Acids and Pancreatic Injury Mechanisms,1.3,success
+680,Cold Brew Coffee Extraction Techniques Comparison Study,0.8,success
+681,Alcohol's Impact on Cognition and Performance,1.1,success
+682,Polymer Monoliths in Capillary Electrochromatography Applications,1.1,success
+683,Caffeine's Impact on Adolescent Sleep Patterns and Behaviors,1,success
+684,Microbial Growth and Enzyme Activity Optimization,1.2,success
+685,Coffee Roasting Experimentation Methods Comparison Study,1.1,success
+686,Starbucks Drinks and Cardiovascular Disease Prevention Analysis,1,success
+687,Exploring the Intersection of Technology and Community Development Initiatives,0.5,success
+688,Exploring the Intersection of Technology and Community Development Initiatives,0.6,success
+689,Exploring the Intersection of Technology and Community Development Initiatives,0.6,success
+690,Exploring the Intersection of Technology and Community Development Initiatives,0.6,success
+691,Exploring the Intersection of Technology and Community Development Initiatives,0.5,success
+692,Exploring the Intersection of Technology and Community Development Initiatives,0.5,success
+693,Mold Growth Inhibition Studies in Laboratory Conditions,1,success
+694,Exploring the Intersection of Technology and Community Development Initiatives,0.5,success
+695,Sexualized Bodies in Video Game Live Streaming,1.1,success
+696,Impact of Ultrasound on Tea Extraction Processes,1,success
+697,Microfluidic Chip Design Innovations,0.9,success
+698,Coffee Poisoning in Horses in Brazil,1.8,success
+699,DNA-Based Biorecognition Agents for Pharmaceutical Detection,0.9,success
+700,Toxic Effects of Polyhexamethylene Guanidine Phosphate (PHMG-p),1.2,success
+701,Understanding Fatigue Across the Lifespan and Its Consequences,1.3,success
+702,Doping in Amateur Sports: A Growing Concern Worldwide,1.1,success
+703,Energy Drinks and Their Negative Health Impacts on Children,0.7,success
+704,Energy Drink Consumption and High Blood Pressure,1.1,success
+705,Lifestyle Interventions for Managing Parkinson's Disease Symptoms Effectively,0.9,success
+706,Caffeine Overdose and Its Fatal Consequences,0.9,success
+707,Caffeine and Exercise Performance Effects,0.9,success
+708,Equine Cloning Efficiency Improvement Strategies,1,success
+709,Natural Emulsion Formulation and Characterization Studies,0.9,success
+710,Volatile Compounds in Green Coffee Beans Research,1,success
+711,TGF-Beta and Hyperoxia Induced Brain Damage Research,1.1,success
+712,Ionic Liquids in Aqueous Biphasic Systems Research,1.2,success
+713,Diet-Induced Thermogenesis in Mice Research,1,success
+714,Caffeine Derivatives and Their Pharmacological Implications,1,success
+715,Green Analytical Chemistry Methods Development,0.9,success
+716,Coffee Quality Genetic Variability Analysis,0.8,success
+717,Adsorption Kinetics and Mechanisms Study,0.9,success
+718,Genetic Markers for Caffeine-Less Tea Cultivars Development,1,success
+719,Exercise Physiology in Diabetic Rats Study,1.2,success
+720,Caffeine's Impact on Human Cognitive Function,1,success
+721,Pharmaceutical Micropollutants in Municipal Wastewater Treatment Plants,1.4,success
+722,Shift Work Effects on Dietary Habits and Health Outcomes,1.3,success
+723,Effects of Caffeine on Marathon Runners' Physiological Responses,1.2,success
+724,Chromatographic Data Processing Techniques Comparison Study,0.9,success
+725,Natural Compounds Extraction and Analysis Research,0.8,success
+726,Exploring the Intersection of Technology and Rural Community Development,0.5,success
+727,OTC Medicines in South Africa Research Cluster,1.2,success
+728,Sleep Disorders in Hospitalized Children Study,1,success
+729,Exploring the Intersection of Technology and Community Development Strategies,0.6,success
+730,Herbal Slimming Product Quality Control Analysis,0.9,success
+731,Shift Work and Diet Outcomes Research,1.4,success
+732,Liquid Chromatography Analysis Techniques Development,0.9,success
+733,Hidden Dangers in Sport Supplements,1,success
+734,Blueberries and Fatigue Research Studies,0.9,success
+735,Urbanization and Water Quality Deterioration in Rivers,1,success
+736,Caffeine and Temperature Effects on Cognitive Performance,1,success
+737,Phytocomponents of Shammah in Middle Eastern Countries,1.2,success
+738,Cortisol's Impact on Systemic Arterial Hypertension Research,1.1,success
+739,Caffeine's Effect on Athletic Performance Measures,1,success
+740,Antidiabetic Effects of Black Tea Samples Compared,0.9,success
+741,Permeation Enhancers and Skin Penetration Mechanisms,1,success
+742,Marmoset Models for Drug Development Research,1.1,success
+743,Bayesian Methods for Informative Sampling Designs,0.8,success
+744,Coffee Bean Quality Attributes Research Study,0.9,success
+745,Comparing Caffeine and Theophylline in Premature Infants Study,1.5,success
+746,Iron Chelators in Cancer Therapeutic Research,1,success
+747,Liquid Chromatography Tandem Mass Spectroscopy Methods,1.3,success
+748,UVB Irradiation and Skin Cancer Research,1,success
+749,Computing Phase Equilibria in Supercritical Fluids Challenges,0.7,success
+750,Coffee Consumption and Female Hormone-Related Cancers Research,1.2,success
+751,Pain's Impact on Cognitive Function and Mobility,1.3,success
+752,Caffeine's Effect on Local Anesthesia Outcomes Studied,1.2,success
+753,Caffeine's Protective Effects on Bilirubin Neurotoxicity,1.5,success
+754,Effects of Caffeine on Learning and Memory Functions,1.2,success
+755,Phytochemicals and Their Sedative-Hypnotic Effects on Mammals,1.1,success
+756,Exploring the Intersection of Technology and Rural Community Development,0.5,success
+757,Lifestyle Factors Influence Parkinson's Disease Progression and Mortality,1.5,success
+758,Corrosion Inhibition with Caffeine and Nicotine Coatings,1,success
+759,Caffeine Habits Among College Students Studied,1,success
+760,Elevated Plus Maze Anxiety Research Study Design,1,success
+761,Heterogeneous Fenton Catalyst Development Research,0.9,success
+762,Peptide Structure and Bitter Taste Relationships,0.9,success
+763,Caffeine's Impact on Taste Processing Mechanisms,1,success
+764,Toxicity Testing for Embryonic Developmental Safety,1,success
+765,Coffee Bean Fermentation Process Optimization Research,1,success
+766,PMS Prevalence Among Female University Students in Saudi Arabia,1.3,success
+767,Phytochemicals for Pollinator Health and Survival,1,success
+768,DNA Damage Response Pathways Under UV Stress Conditions,1,success
+769,Women's Sleep Disturbances and Health Risks,1.2,success
+770,Advanced Capillary Separation Techniques for Complex Mixtures,1.3,success
+771,Nicotine's Impact on Drug Sensitivity and Addiction Liability,1.1,success
+772,Sleep Patterns in Medical Students Impact Academic Performance,1.3,success
+773,Adolescent Caffeine Consumption and Addiction Vulnerability Research,1,success
+774,Drosophila Wing Chemoreceptors in Grooming Reflex Behavior,1.1,success
+775,Cellular Signaling Pathways Regulation Mechanisms,1,success
+776,Solubility Measurements in Compressed Carbon Dioxide Systems,0.8,success
+777,Coffee's Impact on Adiposity in Adults Studied,1.4,success
+778,Community Engagement Strategies in Rural and Urban Areas,0.5,success
+779,Effects of Benzodiazepines on Vital Organs in Rats,1.3,success
+780,Cyclooxygenases and Their Role in Human Health Processes,1,success
+781,Herbal Medicine Quality Control Methods,0.9,success
+782,Hippocampal Area CA2 Function and Connectivity,1.3,success
+783,Genetic Risk Scores and Insulin Resistance Interaction,1.3,success
+784,Fetal Motion and Maternal Diet Studies,1,success
+785,Toxic Tea Brewing Habits Research Study,0.9,success
+786,Solid Lipid Microparticles Dissolution Behavior,1.1,success
+787,Cancer Immunotherapy and NKG2D Ligand Expression,1.4,success
+788,Caffeine's Effects on Bladder Function in Diabetes Rats,1,success
+789,Exploring the Intersection of Technology and Community Development Initiatives,0.6,success
+790,Food Quality Inspection with Terahertz Spectroscopy Techniques,0.7,success
+791,Artificial Attractants for Ants and Aphid Control,1,success
+792,Vasorelaxation Mechanisms and Effects Research,1.5,success
+793,Exploring the Intersection of Technology and Community Development Initiatives,0.6,success
+794,Detection and Quantification of Caffeine Molecules,0.8,success

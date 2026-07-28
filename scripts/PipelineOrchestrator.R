@@ -112,6 +112,8 @@
     era1_results <- generate_community_themes(era1_prompt, core_threshold = 8000, max_timeout = 1200,
                                           model = "llama3.1:8b", fallback_timeout = 900,     # 15 minutes
                                           cooldown_seconds = 30)
+
+
     readr::write_csv(era1_results, file=paste0(era1_dir, "/era1_results.csv"))
 
 # Repeat for Era 2
@@ -142,9 +144,9 @@
         era2_results <- generate_community_themes(era2_prompt, core_threshold = 8000, max_timeout = 1200,
                                           model = "llama3.1:8b", fallback_timeout = 900,     # 15 minutes
                                           cooldown_seconds = 30)
+
+
         readr::write_csv(era2_results, file=paste0(era2_dir, "/era2_results.csv"))
-
-
 
       # Era Pipeline: community_era_net()
         era_community_list <- community_era_net(eras_edges, era2_results, era1_results)
