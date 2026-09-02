@@ -1,0 +1,106 @@
+% caffeine_dag_body.tex -- the tikzpicture from caffeine_dag.tex with the notation
+% key removed, for inlining into caffeine_model_spec_outline.tex (Figure 1).
+% Revision 4: includes the hand-placed V -> C edge. Keep in step with
+% caffeine_dag.tex; see that file's header for provenance and the dot2tex warning.
+\begin{tikzpicture}[>=latex',line join=bevel,]
+%%
+\begin{scope}
+  \pgfsetstrokecolor{black}
+  \definecolor{strokecol}{rgb}{1.0,1.0,1.0}
+  \pgfsetstrokecolor{strokecol}
+  \definecolor{fillcol}{rgb}{1.0,1.0,1.0}
+  \pgfsetfillcolor{fillcol}
+  \fill [opacity=1] (0.0bp,0.0bp) -- (0.0bp,344.82bp) -- (644.32bp,344.82bp) -- (644.32bp,0.0bp) -- cycle;
+  \draw [opacity=0.0] (0.0bp,0.0bp) -- (0.0bp,344.82bp) -- (644.32bp,344.82bp) -- (644.32bp,0.0bp) -- cycle;
+\end{scope}
+\begin{scope}
+  \pgfsetstrokecolor{black}
+  \definecolor{strokecol}{rgb}{1.0,1.0,1.0}
+  \pgfsetstrokecolor{strokecol}
+  \definecolor{fillcol}{rgb}{1.0,1.0,1.0}
+  \pgfsetfillcolor{fillcol}
+  \fill [opacity=1] (0.0bp,0.0bp) -- (0.0bp,344.82bp) -- (644.32bp,344.82bp) -- (644.32bp,0.0bp) -- cycle;
+  \draw [opacity=0.0] (0.0bp,0.0bp) -- (0.0bp,344.82bp) -- (644.32bp,344.82bp) -- (644.32bp,0.0bp) -- cycle;
+\end{scope}
+\begin{scope}
+  \pgfsetstrokecolor{black}
+  \definecolor{strokecol}{rgb}{1.0,1.0,1.0}
+  \pgfsetstrokecolor{strokecol}
+  \definecolor{fillcol}{rgb}{1.0,1.0,1.0}
+  \pgfsetfillcolor{fillcol}
+  \fill [opacity=1] (0.0bp,0.0bp) -- (0.0bp,344.82bp) -- (644.32bp,344.82bp) -- (644.32bp,0.0bp) -- cycle;
+  \draw [opacity=0.0] (0.0bp,0.0bp) -- (0.0bp,344.82bp) -- (644.32bp,344.82bp) -- (644.32bp,0.0bp) -- cycle;
+\end{scope}
+\begin{scope}
+  \pgfsetstrokecolor{black}
+  \definecolor{strokecol}{rgb}{1.0,1.0,1.0}
+  \pgfsetstrokecolor{strokecol}
+  \definecolor{fillcol}{rgb}{1.0,1.0,1.0}
+  \pgfsetfillcolor{fillcol}
+  \fill [opacity=1] (0.0bp,0.0bp) -- (0.0bp,344.82bp) -- (644.32bp,344.82bp) -- (644.32bp,0.0bp) -- cycle;
+  \draw [opacity=0.0] (0.0bp,0.0bp) -- (0.0bp,344.82bp) -- (644.32bp,344.82bp) -- (644.32bp,0.0bp) -- cycle;
+\end{scope}
+\begin{scope}
+  \pgfsetstrokecolor{black}
+  \definecolor{strokecol}{rgb}{1.0,1.0,1.0}
+  \pgfsetstrokecolor{strokecol}
+  \definecolor{fillcol}{rgb}{1.0,1.0,1.0}
+  \pgfsetfillcolor{fillcol}
+  \fill [opacity=1] (0.0bp,0.0bp) -- (0.0bp,344.82bp) -- (644.32bp,344.82bp) -- (644.32bp,0.0bp) -- cycle;
+  \draw [opacity=0.0] (0.0bp,0.0bp) -- (0.0bp,344.82bp) -- (644.32bp,344.82bp) -- (644.32bp,0.0bp) -- cycle;
+\end{scope}
+  \definecolor{fillcolor}{rgb}{0.89,0.85,0.94}
+  \node (Cog) at (473.0bp,319.37bp) [draw,fill=fillcolor,ellipse] {\shortstack{Cognitive\\[-1pt]orientation}};
+  \node (V) at (435.0bp,217.46bp) [draw,fill=gray93,ellipse] {$V_{ij}$ venue};
+  \node (U) at (578.0bp,217.46bp) [draw,fill=gray93,ellipse] {$U_{ij}$ authors};
+  \definecolor{strokecolor}{rgb}{0.72,0.53,0.04}
+  \definecolor{fillcolor}{rgb}{0.97,0.91,0.74}
+  \node (S) at (284.0bp,217.46bp) [draw=strokecolor,fill=fillcolor,ellipse] {\shortstack{Topical proximity\\[-1pt]$S_{ij}$}};
+  \node (T) at (248.0bp,113.0bp) [draw,fill=gray93,ellipse] {Era $p$};
+  \definecolor{strokecolor}{rgb}{0.48,0.12,0.12}
+  \node (A) at (123.0bp,113.0bp) [draw=strokecolor,ellipse,dashed,fill=white] {\shortstack{$A_{ij}$\\[-1pt]{\scriptsize\itshape latent}}};
+  \definecolor{strokecolor}{rgb}{0.18,0.49,0.2}
+  \definecolor{fillcolor}{rgb}{0.85,0.92,0.83}
+  \node (EK) at (27.0bp,113.0bp) [draw=strokecolor,fill=fillcolor,ellipse] {$E^{K}_{ij}$};
+  \definecolor{strokecolor}{rgb}{0.18,0.49,0.2}
+  \definecolor{fillcolor}{rgb}{0.85,0.92,0.83}
+  \node (EC) at (332.0bp,113.0bp) [draw=strokecolor,fill=fillcolor,ellipse] {$E^{C}_{ij}$};
+  \node (W) at (452.0bp,113.0bp) [draw,fill=gray93,ellipse] {$u_h$};
+  \node (K) at (182.0bp,22.0bp) [draw,fill=white,ellipse,double,double distance=1.2pt,line width=0.9pt] {\shortstack{Coupling\\[-1pt]$K_{ij}$}};
+  \node (C) at (399.0bp,22.0bp) [draw,fill=gray98,ellipse,double,double distance=1.2pt,line width=0.9pt] {\shortstack{Descent\\[-1pt]$C_{hij}$}};
+  \definecolor{strokecolor}{rgb}{0.42,0.25,0.63}
+  \draw [strokecolor,->] (Cog) ..controls (404.78bp,282.31bp) and (360.87bp,259.09bp)  .. (S);
+  \definecolor{strokecolor}{rgb}{0.42,0.25,0.63}
+  \draw [strokecolor,->] (Cog) ..controls (567.5bp,298.55bp) and (613.58bp,279.46bp)  .. (637.0bp,242.91bp) .. controls (649.21bp,223.86bp) and (643.35bp,213.72bp)  .. (637.0bp,192.0bp) .. controls (617.47bp,125.18bp) and (601.84bp,100.97bp)  .. (540.0bp,69.0bp) .. controls (513.73bp,55.422bp) and (482.66bp,44.769bp)  .. (C);
+  \draw [gray55,->] (V) ..controls (337.04bp,184.29bp) and (226.56bp,148.01bp)  .. (A);
+  % hand-placed: V -> C, direct venue path (see header note, revision 4)
+  \draw [gray55,->] (V) ..controls (409.0bp,167.0bp) and (392.0bp,88.0bp)  .. (C);
+  \draw [gray55,->] (U) ..controls (524.13bp,200.04bp) and (508.44bp,195.61bp)  .. (494.0bp,192.0bp) .. controls (365.8bp,159.95bp) and (332.3bp,158.29bp)  .. (203.0bp,131.0bp) .. controls (192.58bp,128.8bp) and (181.39bp,126.43bp)  .. (A);
+  \draw [gray55,->] (U) ..controls (575.38bp,165.54bp) and (568.97bp,123.8bp)  .. (548.0bp,95.0bp) .. controls (526.39bp,65.322bp) and (489.23bp,47.332bp)  .. (C);
+  \draw [gray60,->] (T) ..controls (202.97bp,126.48bp) and (185.66bp,127.54bp)  .. (A);
+  \draw [gray60,->] (T) ..controls (292.89bp,85.542bp) and (331.36bp,62.865bp)  .. (C);
+  \definecolor{strokecolor}{rgb}{0.72,0.53,0.04}
+  \draw [strokecolor,->] (S) ..controls (224.33bp,178.49bp) and (183.06bp,152.22bp)  .. (A);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0}
+  \pgfsetstrokecolor{strokecol}
+  \draw (222.5bp,161.5bp) node {$\bm{\alpha}_S$};
+  \definecolor{strokecolor}{rgb}{0.72,0.53,0.04}
+  \draw [strokecolor,->] (S) ..controls (390.95bp,182.41bp) and (497.38bp,146.43bp)  .. (508.0bp,131.0bp) .. controls (531.78bp,96.472bp) and (485.13bp,63.579bp)  .. (C);
+  \draw (528.0bp,113.0bp) node {{\scriptsize direct}};
+  \definecolor{strokecolor}{rgb}{0.48,0.12,0.12}
+  \draw [strokecolor,->] (A) ..controls (142.17bp,83.084bp) and (153.3bp,66.291bp)  .. (K);
+  \definecolor{strokecolor}{rgb}{0.48,0.12,0.12}
+  \draw [strokecolor,->] (A) ..controls (203.5bp,86.043bp) and (290.35bp,58.036bp)  .. (C);
+  \definecolor{strokecolor}{rgb}{0.18,0.49,0.2}
+  \draw [strokecolor,->] (EK) ..controls (70.909bp,86.788bp) and (111.69bp,63.372bp)  .. (K);
+  \definecolor{strokecolor}{rgb}{0.18,0.49,0.2}
+  \draw [strokecolor,->] (EC) ..controls (352.95bp,84.174bp) and (366.18bp,66.596bp)  .. (C);
+  \draw [gray60,->] (W) ..controls (372.93bp,85.936bp) and (289.29bp,58.367bp)  .. (K);
+  \draw [gray60,->] (W) ..controls (434.9bp,83.281bp) and (425.1bp,66.834bp)  .. (C);
+%
+%
+  % --- hand-drawn bow arc: residual common causes beyond A and U ---
+  \draw[<->,dashed,zred,line width=1.0pt] (K) to[bend right=28]
+       node[pos=0.5,below=1pt,text=black,font=\small]
+       {residual $Z$} (C);
+\end{tikzpicture}

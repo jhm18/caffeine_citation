@@ -1,0 +1,83 @@
+// caffeine_dag.gv  --  Knowledge-integration causal diagram
+//                      (Pearl semi-Markovian / ADMG style)
+// NOTE: each element carries a plain `label` (Graphviz uses it to SIZE the box)
+//       and a `texlbl` (LaTeX, what renders).
+//       Render via dot2tex WITHOUT --autosize, then xelatex the wrapper.
+//   dot2tex --texmode=raw --format=tikz caffeine_dag.gv > body ; see caffeine_dag.tex
+//
+// REVISION 3. Coupling is no longer drawn as a mediator. Bibliographic coupling
+// and citation are two OBSERVED INDICATORS of a latent shared knowledge base A;
+// K does not occupy the causal path from S to C. The K-C association is therefore
+// a diagnostic decomposition of an observed relationship, not a causal effect.
+//
+// REVISION 4 (2 Sept 2026). Added V -> C. Both statistical models carry venue
+// overlap as a covariate on descent, and the accompanying text asserts a direct
+// venue effect on citation, so routing V to C only through A understated the
+// adjustment set the models actually use.
+//
+// LAYOUT WARNING. caffeine_dag.tex and caffeine_dag_body.tex were generated from
+// REVISION 3 of this file and then finished by hand (double ovals, bow arc,
+// notation key). The revision-4 edge was added to those files by hand at
+//   \draw [gray55,->] (V) ..controls (409.0bp,167.0bp) and (392.0bp,88.0bp) .. (C);
+// so that the printed figure matches. Re-running dot2tex on this file will
+// RELAYOUT the whole graph and discard that hand finishing. Do it only if you
+// intend to redo the hand finishing as well; otherwise this file is the record
+// of structure and the .tex files are what reproduce the printed figure.
+digraph KNOWLEDGE_INTEGRATION {
+  d2tdocpreamble = "\usepackage{amsmath}\usepackage{bm}";
+  rankdir=TB; ranksep=0.70; nodesep=0.35; newrank=true;
+  node [shape=ellipse, fontname="Helvetica", fontsize=13, penwidth=1.3, style=filled, fillcolor=white];
+  edge [fontname="Helvetica", fontsize=10, color="gray25", penwidth=1.2];
+
+  // ---- observed variables ----
+  Cog [label="Cognitive\norientation", texlbl="\shortstack{Cognitive\\[-1pt]orientation}", fillcolor="#E3D8F0"];
+  V [label="Venue\noverlap", texlbl="$V_{ij}$ venue", fillcolor="gray93"];
+  U [label="Author\noverlap", texlbl="$U_{ij}$ authors", fillcolor="gray93"];
+  T [label="Era p", texlbl="Era $p$", fillcolor="gray93"];
+
+  S [label="Topical\nproximity", texlbl="\shortstack{Topical proximity\\[-1pt]$S_{ij}$}", fillcolor="#F7E7BD", color="#B8860B", penwidth=1.6];
+
+  // ---- the latent variable: shared knowledge base / intellectual exposure ----
+  A [label="A latent", texlbl="\shortstack{$A_{ij}$\\[-1pt]{\scriptsize\itshape latent}}", style="dashed,filled", fillcolor=white, color="#7B1E1E", penwidth=1.6];
+
+  EK [label="EK", texlbl="$E^{K}_{ij}$", fillcolor="#D9EAD3", color="#2E7D32", penwidth=1.5];
+  EC [label="EC", texlbl="$E^{C}_{ij}$", fillcolor="#D9EAD3", color="#2E7D32", penwidth=1.5];
+  W [label="work uh", texlbl="$u_h$", fillcolor="gray93"];
+
+  K [label="Coupling K", texlbl="\shortstack{Coupling\\[-1pt]$K_{ij}$}", peripheries=2, penwidth=2.0];
+  C [label="Descent C", texlbl="\shortstack{Descent\\[-1pt]$C_{hij}$}", peripheries=2, penwidth=2.0, fillcolor="gray98"];
+
+  {rank=same; Cog}
+  {rank=same; S; V; U}
+  {rank=same; A; T}
+  {rank=same; EK; EC; W}
+  {rank=same; K; C}
+  S -> V [style=invis]; V -> U [style=invis];
+  A -> T [style=invis];
+  EK -> EC [style=invis]; EC -> W [style=invis];
+  K -> C [style=invis];
+
+  // ---- what drives the latent shared knowledge base ----
+  S -> A [color="#B8860B", penwidth=2.2, label="alpha S", texlbl="$\bm{\alpha}_S$"];
+  U -> A [color="gray55", penwidth=1.0];
+  V -> A [color="gray55", penwidth=1.0];
+  T -> A [ color="gray60", penwidth=0.9];
+  Cog -> S [color="#6A3FA0", penwidth=1.0];
+
+  // ---- A is manifested in two observed indicators ----
+  A -> K [color="#7B1E1E", penwidth=2.0];
+  A -> C [color="#7B1E1E", penwidth=2.0];
+
+  // ---- direct paths not routed through the shared knowledge base ----
+  S -> C [ color="#B8860B", penwidth=1.2, label="direct", texlbl="{\scriptsize direct}"];
+  Cog -> C [ color="#6A3FA0", penwidth=1.0];
+  T -> C [ color="gray60", penwidth=0.9];
+  U -> C [ color="gray55", penwidth=0.9];
+  V -> C [ color="gray55", penwidth=0.9];   // revision 4
+
+  // ---- opportunity and salience, kept distinct from the latent construct ----
+  EK -> K [color="#2E7D32", penwidth=1.4];
+  EC -> C [color="#2E7D32", penwidth=1.4];
+  W  -> C [color="gray60", penwidth=1.0];
+  W  -> K [color="gray60", penwidth=1.0];
+}

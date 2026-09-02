@@ -1,0 +1,2098 @@
+% =====================================================================
+% Caffeine Citation: Knowledge Integration in a Cross-Disciplinary Literature
+% Specification Outline -- revision 4
+% Rewritten for a reader who knows the project and has a seminar's worth of
+% network science, and who should not be expected to reconstruct a Bayesian
+% multilevel model from notation. Every symbol is defined in prose before it
+% appears in an equation. Decisions still open are boxed at the end of the
+% section they belong to.
+% Causal diagram: caffeine_dag.gv (structure) -> dot2tex -> caffeine_dag.tex.
+% =====================================================================
+\documentclass[11pt]{article}
+
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{pdflscape}
+\usepackage{changepage}
+\usepackage{ragged2e}
+\usepackage{natbib}
+\usepackage{titling}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{underscore}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{caption}
+\captionsetup{labelfont=bf}
+\usepackage{tikz}
+\usetikzlibrary{arrows,arrows.meta,shapes,positioning}
+\usepackage{bm}
+\usepackage[margin=1in]{geometry}
+
+\usepackage{fontspec}
+\IfFontExistsTF{Latin Modern Roman}{\setmainfont{Latin Modern Roman}}{}
+
+\usepackage[x11names, svgnames, rgb]{xcolor}
+\definecolor{gray25}{gray}{0.25}\definecolor{gray45}{gray}{0.45}
+\definecolor{gray55}{gray}{0.55}\definecolor{gray60}{gray}{0.60}
+\definecolor{gray93}{gray}{0.93}\definecolor{gray98}{gray}{0.98}
+\definecolor{zred}{rgb}{0.69,0.19,0.19}
+\usepackage{hyperref}
+\definecolor{navlink}{rgb}{0.10,0.22,0.55}
+\hypersetup{
+  colorlinks=true, linkcolor=navlink, citecolor=navlink, urlcolor=navlink,
+  linktoc=all, bookmarksnumbered=true,
+  pdftitle={Knowledge Integration in the Caffeine Literature: Specification Outline},
+  pdfauthor={Jonathan H. Morgan}
+}
+
+\newcommand{\customtitle}[1]{%
+  \title{\vspace{-1.5em}#1}
+  \pretitle{\begin{center}\LARGE\bfseries}
+  \posttitle{\par\end{center}\vskip 12pt}
+  \preauthor{\begin{center}\normalsize}
+  \postauthor{\par\end{center}\vskip 4pt}
+  \predate{\begin{center}\small}
+  \postdate{\par\end{center}}
+}
+
+\newenvironment{springerabstract}{
+  \begin{adjustwidth}{2em}{2em}
+  \noindent\textbf{Abstract.}\hspace{0.5em}\justifying
+}{
+  \end{adjustwidth}
+}
+
+\newcommand{\springerkeywords}[1]{%
+  \begin{adjustwidth}{2em}{2em}
+  \vspace{1ex}
+  \noindent\textbf{Keywords:} #1
+  \end{adjustwidth}
+}
+
+\newcommand{\seccap}[1]{{\slshape\small #1\par}\vspace{0.8em}}
+
+% Create Double Rule Column Headers
+\newcommand{\doublerule}{%
+  \specialrule{\lightrulewidth}{0pt}{\doublerulesep}%
+  \specialrule{\lightrulewidth}{0pt}{0pt}}
+
+\newcommand{\meas}{{\footnotesize\textsf{[measured]}}}
+
+% -- Two kinds of open decision, boxed at the end of the section they belong to --
+% \begin{decision}  : a substantive judgment the coauthors must make together.
+% \begin{measure}   : a measurement-design choice to be settled empirically.
+\newcounter{decisioncnt}
+\newenvironment{decision}[1]{%
+  \refstepcounter{decisioncnt}%
+  \par\vspace{0.8em}\noindent
+  \begin{adjustwidth}{1em}{1em}%
+  \rule{\linewidth}{1.1pt}\par\vspace{0.3em}
+  \noindent\textbf{Substantive decision \thedecisioncnt: #1}\par\vspace{0.2em}\small
+}{%
+  \par\vspace{0.3em}\noindent\rule{\linewidth}{1.1pt}%
+  \end{adjustwidth}\vspace{0.8em}
+}
+\newcounter{measurecnt}
+\newenvironment{measure}[1]{%
+  \refstepcounter{measurecnt}%
+  \par\vspace{0.8em}\noindent
+  \begin{adjustwidth}{1em}{1em}%
+  \rule{\linewidth}{0.4pt}\par\vspace{0.3em}
+  \noindent\textbf{Measurement decision \themeasurecnt: #1}\par\vspace{0.2em}\small
+}{%
+  \par\vspace{0.3em}\noindent\rule{\linewidth}{0.4pt}%
+  \end{adjustwidth}\vspace{0.8em}
+}
+
+\newcommand{\code}[1]{\texttt{\small #1}}
+
+\setlength{\droptitle}{0pt}
+\customtitle{Knowledge Integration in the Caffeine Literature\\
+\large Where Useful Connections Between Research Communities Fail to Form:\\
+A Specification Outline}
+\author{
+  \shortstack{
+    Jonathan H. Morgan, Ph.D.$^{1}$ \quad Sarah Delmar, Ph.D.$^{2}$
+  }
+}
+\date{
+  $^1$\,Duke Network Analysis Center\\
+  $^2$\,Department of Psychology, University of Chicago\\
+  \today
+}
+
+\begin{document}
+\maketitle
+
+\begin{springerabstract}
+Caffeine is studied by pharmacologists, food chemists, sleep researchers,
+environmental scientists, analytical chemists, and cognitive psychologists. They share
+a molecule and very little else. That makes caffeine research a domain without being a
+discipline, and it raises a question that a more institutionally coherent field would
+not pose so sharply: when one of these communities produces knowledge another could
+use, does the knowledge actually travel? Researchers have named specific places where
+it should. Ricupero and Ritter, for instance, argue that caffeine's documented effects
+on vigilance and appraisal could be implemented in cognitive architectures, and that
+the caffeine literature would have to report its results differently for that to
+happen. This specification sets out how to test, against the citation record,
+whether such connections form. It distinguishes three things that are usually run
+together: whether two research communities address related problems, whether they draw
+on a common body of prior work, and whether they actually cite one another. Integration can
+fail at either transition, and the two failures mean different things.
+\end{springerabstract}
+
+\springerkeywords{knowledge integration; citation networks; bibliographic coupling;
+community detection; Bayesian multilevel models; caffeine; cognitive science}
+
+\vspace{1em}
+\tableofcontents
+\newpage
+
+% =====================================================================
+\section{Purpose: Caffeine as a Test Case for Knowledge Integration}
+\label{sec:purpose}
+\seccap{Why caffeine constitutes a research domain without being a field, and why that
+makes integration rather than fragmentation the interesting question.}
+
+\subsection{Caffeine creates a domain, not a discipline}
+
+Caffeine supports many research agendas at once. Its pharmacological profile is unusually
+well characterized which makes it useful as a precise experimental instrument. Its
+consumption is nearly universal which gives findings about it relevance beyond research
+settings. The molecule also appears in enough contexts that very different research
+programs encounter it while pursuing very different questions. In the literature,
+caffeine is simultaneously a drug, a cognitive enhancer, a food constituent, an
+environmental contaminant, and an analytical target.
+
+Caffeine research therefore constitutes a substantive domain without constituting a
+single discipline. The distinction is important. Researchers do specialize in caffeine,
+journals publish caffeine research repeatedly, and recognizable clusters of investigators
+know one another. What the domain lacks is a single institutional structure that
+encompasses it as a whole. The questions researchers ask about caffeine, the methods they
+use, and the literature they treat as foundational remain strongly shaped by their
+parent disciplines.
+
+The result is a domain organized more like a watercooler than a library. Researchers
+arrive from different intellectual traditions, exchange knowledge, and move on, without
+any structure ensuring that what one group knows reaches another group that could use it.
+
+The venue distribution reflects this structure. Of the 639{,}663 cited works whose
+journals can be identified from the Web of Science records, the ten most common journals
+account for 7.1\% of the total, and the top fifty account for 19.9\%. Reaching half
+requires 374 journals, drawn from 49{,}174 distinct venues \meas{}. Across the full
+history of the corpus, the leading venues are broad biomedical and physiological
+journals: the \emph{Journal of Biological Chemistry}, \emph{PNAS}, the
+\emph{Journal of Physiology}, \emph{Nature}, and \emph{Science}. Within the
+2009--2020 window, however, the leading venues shift markedly toward food chemistry,
+environmental science, analytical chemistry, and applied biomedical research:
+\emph{PLoS ONE}, \emph{Food Chemistry}, \emph{Science of the Total Environment},
+the \emph{Journal of Agricultural and Food Chemistry}, the
+\emph{Journal of Chromatography~A}, \emph{Water Research}, and
+\emph{Chemosphere} \meas{}. A literature organized primarily around one or two research
+traditions would not be expected to show either this degree of venue dispersion or this
+much change in its leading outlets over time. The evidence does not show that caffeine
+research lacks institutions. It shows that no single disciplinary infrastructure
+organizes the domain as a whole.
+
+\begin{quote}
+\small
+A note on what this establishes. The evidence shows that caffeine research is spread
+across venues belonging to substantively different domains. It does \emph{not} establish
+that caffeine is unusually interdisciplinary, because that is a comparative claim and we
+have no matched benchmark. The argument only needs the weaker fact, so we assert only
+the weaker fact.
+\end{quote}
+
+\subsection{Which makes integration, not fragmentation, the question}
+
+Given all that, finding that the literature is fragmented would be unremarkable. We
+should expect distinct communities; the substance does not oblige a pharmacokineticist
+and an environmental engineer to read one another.
+
+The interesting question is what happens when they \emph{should}. Sometimes a finding
+produced in one corner of this domain is exactly what another corner needs, and the two
+corners have every substantive reason to connect. Does the knowledge move?
+
+This is not a bibliometric abstraction we are imposing on the literature. Researchers
+have identified the connection points themselves. Ricupero and Ritter's (2024) review argues
+that caffeine's measured effects on vigilance, attention, and appraisal could be
+implemented directly in cognitive architectures such as ACT-R, which would let system
+designers predict how an operator's performance changes over a shift. They also identify
+why it has not happened: caffeine studies typically report statistical significance
+rather than effect sizes, doses rather than dosages, and no distributional information
+about half-life. The knowledge exists; it is not in a form the modeling community can
+use. Other reviews in this literature make structurally similar recommendations.
+
+So the questions are: how often are proposed integration points actually realized, where
+has integration happened, and what do the successes and the misses have in common?
+
+\subsection{What we need to distinguish, and how bibliometrics lets us}
+
+Answering that requires separating three things that are easy to conflate:
+
+\begin{enumerate}[leftmargin=2em]
+  \item whether two research communities \textbf{address related problems};
+  \item whether they \textbf{draw on a common body of prior work}; and
+  \item whether they \textbf{actually cite and build on one another}.
+\end{enumerate}
+
+Two long-standing bibliometric measures map onto the last two.
+\textbf{Bibliographic coupling} asks whether two bodies of work cite the same earlier
+sources. Two communities that are coupled draw on overlapping bodies of cited literature,
+whether or not either is aware of the other. \textbf{Descent} -- direct citation from a
+later community to work belonging to an earlier one -- is the stronger relation: a later
+community directly references work associated with the earlier one.
+
+The first item, whether the problems are related, has to be measured \emph{outside} the
+citation record. Communities are constructed from citation structure, so measuring their
+substantive similarity from that same structure would build the answer partly into the
+definition. The measure would not be empty -- citation similarity does vary, and
+communities differ in density -- but the inference would be circular in exactly the place
+where we need it not to be. We measure topical proximity instead from what the articles
+say: their abstracts, keywords, and publication venues.
+
+Two further ideas matter later and are worth defining now. A
+\textbf{stochastic blockmodel} is a way of estimating how strongly groups connect to one
+another while accounting for the fact that large groups have more connections simply by
+being large. And a \textbf{generative model} is one that states how the observed counts
+could have arisen, which is what lets us say a particular connection is weaker than it
+should have been rather than merely small.
+
+\subsection{Caffeine as a case, and the general problem behind it}
+
+Interdisciplinary research is usually justified by the expectation that knowledge
+produced in one tradition will become useful in another. A great deal of institutional
+effort rests on that expectation, and the outcomes have often fallen short of it.
+Existing bibliometric work can count interdisciplinary publications and cross-disciplinary
+citations, which tells us where integration \emph{occurred}. It does not tell us where
+substantively plausible integration \emph{could have occurred and did not}.
+
+That is the general problem, and caffeine is a case chosen because it offers unusually
+favorable conditions for observing it: one shared object, many parent disciplines,
+abundant literature, and -- in Ricupero and Ritter and others -- concrete prior claims
+that particular connections ought to exist. The method is designed to transfer to other interdisciplinary domains, with the caffeine
+case providing its first demonstration.
+
+Finally, this is a literature that changes. Communities appear, grow, merge, and
+disappear. We will need to distinguish a \emph{community} in a single year from a
+\emph{literature} that persists across years, and from a \emph{lineage} claim that one
+year's community is the same community as the next year's. Section~\ref{sec:objects}
+does that, and the distinction turns out to determine which questions we can answer with
+the data we have.
+
+% =====================================================================
+\section{Two Views of the Literature Through Time}
+\label{sec:paths}
+\seccap{Two ways of building the networks, answering two different kinds of temporal questions.}
+
+The corpus is divided into eras -- for the analytic window, single publication years from
+2009 to 2020. How we assign works to eras determines what kind of temporal object we can
+study, and there are two defensible constructions that answer different questions. They
+are not competing implementations. They are different measurement instruments.
+
+\subsection{Path A: birth-era networks}
+
+A work belongs to the era in which it was published. Each era's network therefore
+contains that year's articles and the references entering the literature with them, and
+no work appears in two eras.
+
+This construction supports questions about the \emph{relationships between} communities
+in successive years:
+
+\begin{itemize}[leftmargin=2em]
+  \item What knowledge does a later community inherit from an earlier one?
+  \item Which communities draw on the same prior works?
+  \item When does a shared body of knowledge translate into direct citation?
+  \item Where do plausible connections fail to occur?
+\end{itemize}
+
+Descent and coupling live here, and so does the whole question of missed opportunities.
+This is the path the present analysis takes because the tools needed to construct the
+networks and identify their communities already exist.
+
+\subsection{Path B: active-era networks}
+
+A work belongs to \emph{every} era in which it is active -- published in that year or
+cited by an article from that year. Works therefore recur across eras, and because they
+recur, a community in one year can share members with a community in the next.
+
+That shared membership is what makes it possible to follow a community through time, and
+so this construction supports a different class of question:
+
+\begin{itemize}[leftmargin=2em]
+  \item Does a research community persist from one year to the next?
+  \item Does it grow or contract?
+  \item Does it split into several, or merge with others?
+  \item Is it absorbed into a neighboring literature?
+  \item What predicts how long it survives?
+\end{itemize}
+
+\subsection{How the two relate}
+
+The difference is not implementation history. Path A's networks cannot answer Path B's
+questions because their communities share no members and therefore have no continuity to
+track; Path B's networks cannot sharpen Path A's descent relation because when works
+recur across eras, ``cites something that was active in the previous era'' becomes true
+of nearly every citation and stops distinguishing anything.
+
+\subsection{Which community partitions the final analysis uses}
+
+The partitions currently on disk were produced at different times by different
+procedures -- eras 1--21 under one naming convention, eras 22--23 under another -- and
+their community counts swing by a factor of 2.4 across three adjacent eras \meas{}. That
+would be a problem for any temporal comparison if those were the partitions we intended
+to analyze.
+
+They are not. The final analysis will generate every era's partition under a common
+procedure: a Julia implementation of CHAMP, which selects the community-detection
+resolution from the data rather than from a value someone typed, and applies the same
+selected resolution independently to each era. Because one procedure produces all of
+them, community counts become comparable across eras, and a change in the number of
+communities becomes a fact about the literature rather than an artifact of method.
+
+The existing partitions remain useful as \emph{development fixtures}: they let the
+orchestrator be built and tested against known outputs before the final partitions
+exist. They are not the partitions the inference will run on.
+
+Path B is more than a refactor of the current pipeline: it requires rebuilding the
+networks, re-running community detection, and re-generating the community labels, and
+the memory demands are large enough that the construction is better done in Julia.
+But it is a second analysis of the same corpus, not a separate project. What Path B
+invalidates is the \emph{reuse} of Path A's community partitions and their derived files
+for Path B's purposes -- not Path A's results, which stand on their own networks.
+
+\begin{quote}
+\textbf{\itshape The logical progression across the document runs from the narrowest
+relation outward: descent first, then coupling, then -- in Path B -- persistence.}
+\end{quote}
+
+% =====================================================================
+\section{Objects We Need to Distinguish}
+\label{sec:objects}
+\seccap{Four things that all get called ``a research area'' in ordinary speech, and why
+keeping them apart lets us answer a hard question with easy data.}
+
+Community detection gives us clusters within a single year. Everything else we might want
+to say about how research areas behave over time is a further claim, and the claims
+differ in how much they cost.
+
+\begin{center}
+\small
+\begin{tabular}{@{}lp{0.70\linewidth}@{}}
+\toprule
+\textbf{Object} & \textbf{What it is, and what claiming it commits us to}\\
+\doublerule
+Article    & An observable document: a caffeine paper, or a work one cites. No
+             inference involved.\\[3pt]
+Community  & A set of articles clustered together \emph{within one era}. Under Path A,
+             calling something ``Community 17'' in 2016 makes no claim whatever that
+             there is a Community 17 in 2017. The label is local to the year.\\[3pt]
+Literature & A higher-order grouping of communities that occupy a common position in
+             the citation structure. Several communities across different years may all
+             belong to a pharmacokinetic literature without any one of them persisting
+             intact. Identified by a nested stochastic blockmodel
+             (\S\ref{sec:literatures}), \emph{not} by journal membership.\\[3pt]
+Lineage    & The stronger claim that community $A$ in 2016 \emph{is} the predecessor of
+             community $B$ in 2017. This requires a rule for establishing identity through
+             time, which Path A cannot supply.\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The definition of a literature deserves one further sentence, because it is easy to
+assume we are simply grouping journals. We are not. Literatures are found from the
+citation structure itself, using a blockmodel that groups communities occupying similar
+positions in it. Journal composition and community labels then serve to \emph{interpret}
+those groupings and to test whether they correspond to recognizable disciplinary
+boundaries. Discovery and validation stay separate, and the validation is meaningful only
+because the journal information played no part in the discovery.
+
+The payoff is worth stating plainly, because it determines the shape of the project:
+
+\begin{quote}
+We can study the rise and decline of a \emph{literature} without solving the much harder
+problem of establishing \emph{community} identity through time.
+\end{quote}
+
+A literature's lifecycle is measured by how much of the field it occupies in each year --
+how many articles and how many communities belong to it, and what share of citation
+traffic passes through it. Those quantities can rise and fall without our ever claiming
+that any particular community survived. Community-level survival, which does require the
+identity claim, is Path B's business (\S\ref{sec:pathb}).
+
+% =====================================================================
+\section{Research Questions}
+\label{sec:questions}
+\seccap{Why a baseline has to come before any claim that a connection is missing.}
+
+\subsection{Two temporal windows}
+
+The corpus spans 23 eras, from 1907--1944 through 2020. Those eras are not equal in
+width: the early ones cover decades, and eras 12--23 are the only unbroken run of single
+years. Two different
+spans are therefore in play, and confusing them makes several questions ambiguous.
+
+\begin{center}
+\small
+\begin{tabular}{@{}lp{0.66\linewidth}@{}}
+\toprule
+\textbf{Window} & \textbf{What it covers and what it is used for}\\
+\doublerule
+Historical window & All 23 eras. Used to reconstruct the major literatures and describe
+                    how they emerge, grow, contract, and decline over the full history of
+                    the field.\\[3pt]
+Integration window & Eras 12--23, single years from 2009 to 2020, giving eleven adjacent
+                    era pairs on a constant one-year base. Used for the models of
+                    integration, where comparing across pairs requires that the pairs be
+                    commensurable.\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Era width matters for the integration models because the descent relation looks one era
+back: a one-year window and a thirty-eight-year window select very different citations.
+It matters much less for describing a literature's trajectory, where the quantity is how
+much of the field the literature occupies and the eras are simply time points.
+
+\subsection{Why the questions come in tiers}
+
+We cannot call a connection ``missing'' merely because two communities fail to cite one
+another. Most communities probably should not cite one another -- an environmental
+chemistry cluster and a sleep-deprivation cluster have little to say to each other, and
+their mutual silence is not a failure of anything.
+
+So a claim about a missed opportunity requires three things in order. First, we need to
+know how integration \emph{normally} works in this literature: given two communities with
+comparable overlap in what they read, how much citation ordinarily follows? Second, we
+need to know where those communities sit in the larger intellectual structure, because a
+shortfall between two clusters of the same literature means something different from a
+shortfall across a disciplinary boundary. Only then can we ask whether cognitive research
+departs from the pattern.
+
+That is why the questions come in three tiers, and why the third is uninterpretable
+without the first.
+
+\subsection{Tier 1: what normal integration looks like}
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{RQ1.} Do communities that work on related problems end up drawing on a
+        common body of prior work, and how strongly?
+  \item \textbf{RQ2.} Given a common body of prior work, how much direct citation
+        ordinarily follows? \emph{This is the baseline every later claim is read
+        against.}
+  \item \textbf{RQ3.} Are communities that draw heavily on the past also the ones the
+        future draws on? That is, are being derivative and being generative related
+        traits?
+  \item \textbf{RQ4.} Does either conversion strengthen or weaken across the integration
+        window?
+\end{itemize}
+
+\subsection{Tier 2: the intellectual structure the communities sit in}
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{RQ5.} What are the major literatures in caffeine research, and how do
+        they emerge, grow, contract, and decline across the historical window -- the full
+        23 eras, not only the recent ones?
+  \item \textbf{RQ6.} Is the pharmacokinetic literature as large and persistent as the
+        argument assumes? This tests the premise of the project rather than its
+        conclusion -- if that literature turns out to be small or transient, the claim
+        that it offers underused knowledge weakens before cognitive science is examined.
+  \item \textbf{RQ7.} Does the problems-to-shared-reading conversion differ among
+        literatures? And do the communities the citation data produce line up with the
+        disciplinary boundaries that journals imply, or cut across them?
+\end{itemize}
+
+\subsection{Tier 3: whether cognitive research is different}
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{RQ8.} Where does cognitive research sit -- gathered into its own
+        communities, or scattered through communities organized around other concerns?
+  \item \textbf{RQ9.} Is the conversion from shared knowledge into citation
+        \emph{asymmetric} where cognitive research is involved? \emph{This is the primary
+        claim, and unlike the others it comes with a stated expectation.}
+  \item \textbf{RQ10.} Which specific pairs of communities show a connection that should
+        have formed and did not, and is cognitive research overrepresented among them?
+  \item \textbf{RQ11.} Has the shortfall changed across the integration window?
+\end{itemize}
+
+\subsection{What we expect to find, and why}
+
+RQ9 is not a neutral question about which side shows a shortfall. We expect a particular
+asymmetry, and stating it in advance is what makes the finding informative either way.
+
+\begin{quote}
+\textbf{Expectation.} Conditional on shared knowledge and comparable opportunity,
+cognitive communities should be more likely to cite relevant neuroscientific and
+pharmacological caffeine research than those literatures are to incorporate higher-level
+cognitive constructs.
+\end{quote}
+
+The reason is a difference in the level of abstraction at which the two literatures
+operate. Neuroscience and pharmacology characterize lower-level mechanisms -- receptor
+binding, adenosine antagonism, coordination among neural systems. Cognitive science
+organizes such mechanisms under higher-order constructs: working memory, sustained
+attention, appraisal. A cognitive researcher has a standing reason to reach downward for
+mechanistic evidence, because the mechanism is what the construct is supposed to be
+implemented in. A neuroscientist studying receptor kinetics does not need to reach upward
+to a cognitive architecture in order to answer the question in front of them.
+
+If that is right, the shortfall should appear on one side and not the other, and the
+direction is predicted rather than discovered. A symmetric shortfall, or one running the
+other way, would be evidence against this account of how the two fields relate.
+
+\subsection{One limit the corpus imposes on RQ9}
+
+The corpus consists of caffeine papers plus everything those papers cite. Work that never
+mentions caffeine is not in it at all. That asymmetry constrains what RQ9 can observe, and
+the constraint is worth making concrete.
+
+Suppose cognitive caffeine researchers cite pharmacokinetic caffeine research. We can see
+that, because both sides are inside a caffeine-centered corpus.
+
+Now suppose the reverse: pharmacokinetic researchers should be incorporating a general
+cognitive model -- a theory of vigilance, say -- that never mentions caffeine. That model
+is outside the frame entirely. Its absence from the corpus is guaranteed by how the corpus
+was built and tells us nothing about whether anyone should have cited it.
+
+So absence cannot be read symmetrically. We can measure whether cognitive communities cite
+caffeine work, and whether caffeine communities cite cognitive work \emph{that is
+already inside the caffeine literature}. We cannot measure whether they should have reached
+outside it. Any claim about direction is reported as a bound, not an estimate.
+
+\begin{decision}{Whether the predicted asymmetry is theoretically right}
+The expectation above rests on a characterization of how cognitive science and
+neuroscience relate -- that one organizes the other's mechanisms under higher-order
+constructs, and that the reaching-down relation is more natural than the reaching-up one.
+That is a claim about the two fields, not about the data, and Sarah is far better placed
+than the citation record to judge whether it is accurate. If the characterization is
+wrong the model still estimates both directions, but the paper would be reporting a
+discovery rather than testing a prediction, which is a weaker result.
+\end{decision}
+
+% =====================================================================
+\section{A Conceptual Model of Knowledge Integration}
+\label{sec:causal}
+\seccap{The argument as a diagram: what we think produces a citation between two
+communities, and which parts of that we can observe.}
+
+\begin{landscape}
+\begin{figure}[p]
+\centering
+\begin{tikzpicture}[>=latex',line join=bevel,]
+%%
+\begin{scope}
+  \pgfsetstrokecolor{black}
+  \definecolor{strokecol}{rgb}{1.0,1.0,1.0}
+  \pgfsetstrokecolor{strokecol}
+  \definecolor{fillcol}{rgb}{1.0,1.0,1.0}
+  \pgfsetfillcolor{fillcol}
+  \fill [opacity=1] (0.0bp,0.0bp) -- (0.0bp,344.82bp) -- (644.32bp,344.82bp) -- (644.32bp,0.0bp) -- cycle;
+  \draw [opacity=0.0] (0.0bp,0.0bp) -- (0.0bp,344.82bp) -- (644.32bp,344.82bp) -- (644.32bp,0.0bp) -- cycle;
+\end{scope}
+\begin{scope}
+  \pgfsetstrokecolor{black}
+  \definecolor{strokecol}{rgb}{1.0,1.0,1.0}
+  \pgfsetstrokecolor{strokecol}
+  \definecolor{fillcol}{rgb}{1.0,1.0,1.0}
+  \pgfsetfillcolor{fillcol}
+  \fill [opacity=1] (0.0bp,0.0bp) -- (0.0bp,344.82bp) -- (644.32bp,344.82bp) -- (644.32bp,0.0bp) -- cycle;
+  \draw [opacity=0.0] (0.0bp,0.0bp) -- (0.0bp,344.82bp) -- (644.32bp,344.82bp) -- (644.32bp,0.0bp) -- cycle;
+\end{scope}
+\begin{scope}
+  \pgfsetstrokecolor{black}
+  \definecolor{strokecol}{rgb}{1.0,1.0,1.0}
+  \pgfsetstrokecolor{strokecol}
+  \definecolor{fillcol}{rgb}{1.0,1.0,1.0}
+  \pgfsetfillcolor{fillcol}
+  \fill [opacity=1] (0.0bp,0.0bp) -- (0.0bp,344.82bp) -- (644.32bp,344.82bp) -- (644.32bp,0.0bp) -- cycle;
+  \draw [opacity=0.0] (0.0bp,0.0bp) -- (0.0bp,344.82bp) -- (644.32bp,344.82bp) -- (644.32bp,0.0bp) -- cycle;
+\end{scope}
+\begin{scope}
+  \pgfsetstrokecolor{black}
+  \definecolor{strokecol}{rgb}{1.0,1.0,1.0}
+  \pgfsetstrokecolor{strokecol}
+  \definecolor{fillcol}{rgb}{1.0,1.0,1.0}
+  \pgfsetfillcolor{fillcol}
+  \fill [opacity=1] (0.0bp,0.0bp) -- (0.0bp,344.82bp) -- (644.32bp,344.82bp) -- (644.32bp,0.0bp) -- cycle;
+  \draw [opacity=0.0] (0.0bp,0.0bp) -- (0.0bp,344.82bp) -- (644.32bp,344.82bp) -- (644.32bp,0.0bp) -- cycle;
+\end{scope}
+\begin{scope}
+  \pgfsetstrokecolor{black}
+  \definecolor{strokecol}{rgb}{1.0,1.0,1.0}
+  \pgfsetstrokecolor{strokecol}
+  \definecolor{fillcol}{rgb}{1.0,1.0,1.0}
+  \pgfsetfillcolor{fillcol}
+  \fill [opacity=1] (0.0bp,0.0bp) -- (0.0bp,344.82bp) -- (644.32bp,344.82bp) -- (644.32bp,0.0bp) -- cycle;
+  \draw [opacity=0.0] (0.0bp,0.0bp) -- (0.0bp,344.82bp) -- (644.32bp,344.82bp) -- (644.32bp,0.0bp) -- cycle;
+\end{scope}
+  \definecolor{fillcolor}{rgb}{0.89,0.85,0.94}
+  \node (Cog) at (473.0bp,319.37bp) [draw,fill=fillcolor,ellipse] {\shortstack{Cognitive\\[-1pt]orientation}};
+  \node (V) at (435.0bp,217.46bp) [draw,fill=gray93,ellipse] {$V_{ij}$ venue};
+  \node (U) at (578.0bp,217.46bp) [draw,fill=gray93,ellipse] {$U_{ij}$ authors};
+  \definecolor{strokecolor}{rgb}{0.72,0.53,0.04}
+  \definecolor{fillcolor}{rgb}{0.97,0.91,0.74}
+  \node (S) at (284.0bp,217.46bp) [draw=strokecolor,fill=fillcolor,ellipse] {\shortstack{Topical proximity\\[-1pt]$S_{ij}$}};
+  \node (T) at (248.0bp,113.0bp) [draw,fill=gray93,ellipse] {Era $p$};
+  \definecolor{strokecolor}{rgb}{0.48,0.12,0.12}
+  \node (A) at (123.0bp,113.0bp) [draw=strokecolor,ellipse,dashed,fill=white] {\shortstack{$A_{ij}$\\[-1pt]{\scriptsize\itshape latent}}};
+  \definecolor{strokecolor}{rgb}{0.18,0.49,0.2}
+  \definecolor{fillcolor}{rgb}{0.85,0.92,0.83}
+  \node (EK) at (27.0bp,113.0bp) [draw=strokecolor,fill=fillcolor,ellipse] {$E^{K}_{ij}$};
+  \definecolor{strokecolor}{rgb}{0.18,0.49,0.2}
+  \definecolor{fillcolor}{rgb}{0.85,0.92,0.83}
+  \node (EC) at (332.0bp,113.0bp) [draw=strokecolor,fill=fillcolor,ellipse] {$E^{C}_{ij}$};
+  \node (W) at (452.0bp,113.0bp) [draw,fill=gray93,ellipse] {$u_h$};
+  \node (K) at (182.0bp,22.0bp) [draw,fill=white,ellipse,double,double distance=1.2pt,line width=0.9pt] {\shortstack{Coupling\\[-1pt]$K_{ij}$}};
+  \node (C) at (399.0bp,22.0bp) [draw,fill=gray98,ellipse,double,double distance=1.2pt,line width=0.9pt] {\shortstack{Descent\\[-1pt]$C_{hij}$}};
+  \definecolor{strokecolor}{rgb}{0.42,0.25,0.63}
+  \draw [strokecolor,->] (Cog) ..controls (404.78bp,282.31bp) and (360.87bp,259.09bp)  .. (S);
+  \definecolor{strokecolor}{rgb}{0.42,0.25,0.63}
+  \draw [strokecolor,->] (Cog) ..controls (567.5bp,298.55bp) and (613.58bp,279.46bp)  .. (637.0bp,242.91bp) .. controls (649.21bp,223.86bp) and (643.35bp,213.72bp)  .. (637.0bp,192.0bp) .. controls (617.47bp,125.18bp) and (601.84bp,100.97bp)  .. (540.0bp,69.0bp) .. controls (513.73bp,55.422bp) and (482.66bp,44.769bp)  .. (C);
+  \draw [gray55,->] (V) ..controls (337.04bp,184.29bp) and (226.56bp,148.01bp)  .. (A);
+  % hand-placed: V -> C, direct venue path (see caffeine_dag.tex, revision 4)
+  \draw [gray55,->] (V) ..controls (409.0bp,167.0bp) and (392.0bp,88.0bp)  .. (C);
+  \draw [gray55,->] (U) ..controls (524.13bp,200.04bp) and (508.44bp,195.61bp)  .. (494.0bp,192.0bp) .. controls (365.8bp,159.95bp) and (332.3bp,158.29bp)  .. (203.0bp,131.0bp) .. controls (192.58bp,128.8bp) and (181.39bp,126.43bp)  .. (A);
+  \draw [gray55,->] (U) ..controls (575.38bp,165.54bp) and (568.97bp,123.8bp)  .. (548.0bp,95.0bp) .. controls (526.39bp,65.322bp) and (489.23bp,47.332bp)  .. (C);
+  \draw [gray60,->] (T) ..controls (202.97bp,126.48bp) and (185.66bp,127.54bp)  .. (A);
+  \draw [gray60,->] (T) ..controls (292.89bp,85.542bp) and (331.36bp,62.865bp)  .. (C);
+  \definecolor{strokecolor}{rgb}{0.72,0.53,0.04}
+  \draw [strokecolor,->] (S) ..controls (224.33bp,178.49bp) and (183.06bp,152.22bp)  .. (A);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0}
+  \pgfsetstrokecolor{strokecol}
+  \draw (222.5bp,161.5bp) node {$\bm{\alpha}_S$};
+  \definecolor{strokecolor}{rgb}{0.72,0.53,0.04}
+  \draw [strokecolor,->] (S) ..controls (390.95bp,182.41bp) and (497.38bp,146.43bp)  .. (508.0bp,131.0bp) .. controls (531.78bp,96.472bp) and (485.13bp,63.579bp)  .. (C);
+  \draw (528.0bp,113.0bp) node {{\scriptsize direct}};
+  \definecolor{strokecolor}{rgb}{0.48,0.12,0.12}
+  \draw [strokecolor,->] (A) ..controls (142.17bp,83.084bp) and (153.3bp,66.291bp)  .. (K);
+  \definecolor{strokecolor}{rgb}{0.48,0.12,0.12}
+  \draw [strokecolor,->] (A) ..controls (203.5bp,86.043bp) and (290.35bp,58.036bp)  .. (C);
+  \definecolor{strokecolor}{rgb}{0.18,0.49,0.2}
+  \draw [strokecolor,->] (EK) ..controls (70.909bp,86.788bp) and (111.69bp,63.372bp)  .. (K);
+  \definecolor{strokecolor}{rgb}{0.18,0.49,0.2}
+  \draw [strokecolor,->] (EC) ..controls (352.95bp,84.174bp) and (366.18bp,66.596bp)  .. (C);
+  \draw [gray60,->] (W) ..controls (372.93bp,85.936bp) and (289.29bp,58.367bp)  .. (K);
+  \draw [gray60,->] (W) ..controls (434.9bp,83.281bp) and (425.1bp,66.834bp)  .. (C);
+%
+%
+  % -- hand-drawn bow arc: residual common causes beyond A and U --
+  \draw[<->,dashed,zred,line width=1.0pt] (K) to[bend right=28]
+       node[pos=0.5,below=1pt,text=black,font=\small]
+       {residual $Z$} (C);
+\end{tikzpicture}
+\caption{The conceptual model. Topical proximity $S_{ij}$ shapes a shared knowledge base
+$A_{ij}$, which we cannot observe (dashed). Coupling $K_{ij}$ and descent $C_{hij}$ are
+two observed manifestations of it (double outlines). Remaining arrows are the alternative
+reasons a connection might form: shared authors $U_{ij}$, shared venues $V_{ij}$,
+opportunity $E^{K}$ and $E^{C}$, individual work salience $u_h$, and era $p$. Drawn in
+Pearl's semi-Markovian notation; the dashed double-headed arc marks common causes of both
+indicators that we cannot measure, such as reciprocal reviewing obligations and shared
+institutional context.}
+\label{fig:dag}
+\end{figure}
+\end{landscape}
+
+\subsection{Reading the causal diagram from left to right}
+
+The diagram organizes the argument around a latent \textbf{shared knowledge base}
+$A_{ij}$ and its two observable manifestations, \textbf{coupling} $K_{ij}$ and
+\textbf{descent} $C_{hij}$. The variables above and around them represent the
+conditions that can shape those relationships.
+
+Start with \textbf{topical proximity} $S_{ij}$, shown in the upper-left portion of
+the diagram. Communities that study similar problems have more reason to encounter
+the same underlying work. We measure that proximity from what their articles say
+rather than from whom they cite. Topical proximity can affect integration in two
+ways. First, it can shape the shared knowledge base $A_{ij}$. Second, the diagram
+allows a direct relationship with descent, recognizing that communities working on
+similar problems may cite one another for reasons not fully captured by their shared
+references.
+
+The \textbf{shared knowledge base} $A_{ij}$ appears below topical proximity. It
+represents the overlap in what the two communities actually know about. We cannot
+observe that knowledge directly; nobody records everything researchers have read or
+know. The dashed outline therefore marks $A_{ij}$ as latent.
+
+At the bottom of the diagram are the two relationships we can observe.
+\textbf{Bibliographic coupling} $K_{ij}$ provides one trace of the shared knowledge
+base. When two communities cite the same earlier works, they reveal common
+intellectual foundations. \textbf{Descent} $C_{hij}$ provides a second, stronger
+form of integration: a later community directly cites work belonging to an earlier
+community. The later community is therefore not merely drawing on some of the same
+background literature; it is citing the earlier community's output directly.
+
+The remaining variables represent other reasons these observed relationships may
+form. \textbf{Cognitive orientation}, shown at the top of the diagram, can shape
+both the problems a community studies and its propensity for direct citation.
+Shared authors $U_{ij}$ and shared venues $V_{ij}$ provide additional routes to
+connection. Opportunity $E^{K}_{ij}$ and $E^{C}_{ij}$ records how many chances the
+two observed relationships had to form. Work salience $u_h$ allows some individual
+papers to attract citations across communities regardless of their substantive
+relationship, while era $p$ accounts for temporal differences in the opportunity
+to accumulate citations.
+
+Finally, the dashed double-headed arc between coupling and descent represents
+unmeasured common causes of both relationships. These may include shared
+institutional settings, reciprocal reviewing obligations, or other forms of
+intellectual contact that the citation record does not capture. The arc is important
+because it reinforces the central causal distinction developed in the next section:
+coupling and descent may covary without coupling itself causing descent.
+
+\subsection{Why coupling is evidence, not a cause}
+
+One feature of the diagram matters enough to state separately, because it changes what we
+are allowed to claim.
+
+It is tempting to say that shared reading \emph{causes} citation -- that $K$ leads to $C$.
+But bibliographic coupling is not something that happens to two communities before they
+cite each other. It is an observed consequence of their citation behavior, computed after
+the fact from the same reference lists. In the diagram, $K$ and $C$ are two manifestations
+of the same underlying thing, $A$. They covary because they share a cause, not because one
+produces the other.
+
+\begin{quote}
+The shared knowledge base is a theoretical construct, not an estimated score. Coupling is
+\emph{evidence} that it exists. We do not claim that coupling itself causes citation.
+\end{quote}
+
+This has a practical consequence: $A$ is not fitted. Two indicators are not enough to
+identify a latent variable without additional assumptions we have no grounds for, so we
+use $K$ as an observable stand-in and report the relationship between $K$ and $C$ as an
+association -- how much citation accompanies a given degree of shared reading -- rather
+than as a causal effect. Everything the argument needs survives that weakening.
+
+\subsection{Where the cognitive hypothesis lives}
+
+A causal diagram shows which variables affect which. It is not well suited to showing the
+claim this project actually makes, which is about the \emph{strength} of a relationship
+rather than its existence. Figure~\ref{fig:moderation} states that separately.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  var/.style={draw, rounded corners=2pt, inner sep=5pt, font=\small, align=center},
+  ind/.style={var, double, double distance=1.2pt},
+  mod/.style={var, fill=black!5},
+  arr/.style={-{Stealth[length=2.4mm]}, thick}]
+  \node[ind] (k) at (0,0) {Coupling $K_{ij}$\\{\scriptsize shared reading}};
+  \node[ind] (c) at (7,0) {Descent $C_{hij}$\\{\scriptsize citation}};
+  \node[mod] (m) at (3.5,2.0) {Cognitive orientation of the two communities};
+  \draw[arr] (k) -- node[below, font=\footnotesize] {how much citation follows} (c);
+  \draw[arr, zred] (m) -- (3.5,0.42);
+  \node[right=2pt, font=\footnotesize, text=zred] at (3.6,1.1) {weakens this?};
+\end{tikzpicture}
+\caption{The claim under test is not that cognitively-oriented communities cite less in
+general. It is that the \emph{conversion} of shared reading into citation is weaker where
+cognitive research is involved -- they read the same works, and citation does not follow.
+Statistically this is an interaction, which is why it cannot be drawn as an arrow in
+Figure~\ref{fig:dag}.}
+\label{fig:moderation}
+\end{figure}
+
+
+
+\subsection{Two places where integration can fail}
+\label{sec:twoplaces}
+
+The chain has two transitions, and a shortfall at each means something different. This
+distinction is the analytical core of the project.
+
+\paragraph{Stage 1 -- from related problems to shared knowledge.}
+If two communities work on similar problems but read largely different literatures, the
+barrier arises \emph{before} any question of direct citation. They are not positioned to
+integrate because they do not share foundations. Nothing is being ignored; the two
+research programs have grown from different roots.
+
+\paragraph{Stage 2 -- from shared knowledge to direct citation.}
+If two communities already draw on many of the same works and nevertheless do not cite one
+another, the situation is different. They have common intellectual foundations, and those
+foundations are not producing integration. This is the pattern that deserves to be called
+a missed opportunity, and it is what Ricupero and Ritter describe: a body of caffeine
+research whose findings the modeling community could use, built on overlapping
+foundations, yet not directly cited.
+
+Naming these separately is what makes the finding interpretable either way it comes out.
+
+\subsection{Alternative explanations we have to rule out}
+
+Before attributing a shortfall to non-integration, four other mechanisms have to be
+considered. Each predicts something we can look for.
+
+\begin{center}
+\small
+\begin{tabular}{@{}llp{0.50\linewidth}@{}}
+\toprule
+ & \textbf{Mechanism} & \textbf{What it predicts}\\
+\doublerule
+M1 & Vintage &
+  Cognitive work in this corpus is more recent, so less of it has been available long
+  enough to accumulate citations. If so, the shortfall shrinks once we account for how
+  old the cited work is.\\[3pt]
+M2 & Separation &
+  High topical proximity, unexpectedly low coupling. The communities work on related
+  problems and read different literatures. This is Stage~1 failing.\\[3pt]
+M3 & Non-integration &
+  High coupling, unexpectedly low citation. They hold foundations in common and citation
+  does not follow. This is Stage~2 failing.\\[3pt]
+M4 & Opportunity &
+  Coupling and citation are exactly what the communities' sizes and activity levels
+  predict. Nothing needs explaining. This is the null.\\[3pt]
+M5 & Disciplinary distance &
+  The shortfall tracks how far apart two communities are \emph{disciplinarily}, not
+  whether either is cognitive. If so, the cognitive result is an instance of a general
+  norm rather than a fact about cognitive science.\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+M2 and M3 are the substantively interesting outcomes, and they are separated by
+\emph{which} transition falls short -- which is why the two stages are estimated
+separately rather than collapsed into one relationship. M4 is why Tier~1 has to come
+first. M5 is a genuine rival to the cognitive claim, and testing it requires disciplinary
+distance in the model alongside cognitive orientation.
+
+These are mechanisms, not formal hypotheses. The formal questions are the RQs of
+\S\ref{sec:questions}; M1--M5 are the competing stories those questions have to
+adjudicate between.
+
+% =====================================================================
+\section{Constructing the Networks and Measures}
+\label{sec:networks}
+\seccap{What exactly gets built: the nodes, the ties, and how each measure is computed.}
+
+\subsection{The two network types}
+
+Three things are easy to run together here, so it is worth being explicit about the
+counting. There are \textbf{two network types} -- descent and coupling -- distinguished by
+what makes a tie. There are \textbf{three tie weightings} -- breadth, fractional, and
+intensity -- distinguished by what a tie's value counts. Each weighting applied to each
+type produces a different weighted network, so
+
+\[
+2 \text{ network types} \times 3 \text{ weightings} = 6 \text{ weighted networks per era
+pair.}
+\]
+
+All six share the same nodes. Within a type, all three weightings share the same ties as
+well, so one layout and one role partition serve all three.
+
+For each adjacent pair of eras $(t{-}1, t)$, Path A produces two community-level networks
+over the same conceptual population.
+
+\paragraph{The descent network.}
+\begin{itemize}[leftmargin=2em, itemsep=1pt]
+  \item \textbf{Nodes.} Communities from the two eras. A community appearing in both roles
+        is two nodes, one per era.
+  \item \textbf{Tie.} An era-$t$ community cites a work that belonged to an era-$(t{-}1)$
+        community and was actively cited during that earlier era.
+  \item \textbf{Direction.} Directed, from the citing community to the cited one, following
+        the citation.
+  \item \textbf{Weight.} Yes -- see \S\ref{sec:weightings}.
+  \item \textbf{Meaning.} Direct intellectual uptake. The later community reached into
+        material that was part of the earlier community's own structure.
+\end{itemize}
+
+\paragraph{The coupling network.}
+\begin{itemize}[leftmargin=2em, itemsep=1pt]
+  \item \textbf{Nodes.} The same communities.
+  \item \textbf{Tie.} The two communities' articles cite at least one work in common,
+        wherever that work sits.
+  \item \textbf{Direction.} \emph{Coupling is mathematically symmetric.} Sharing a
+        reference is a property of the pair, not of one member. The Path A output orients
+        it from the later era to the earlier one solely so that it aligns with the descent
+        network and the two can be compared tie by tie; that orientation is a
+        visualization convention and does not make coupling a directed relation. Because
+        it is symmetric, a weight normalized within the later community and one normalized
+        within the earlier community are both meaningful, and both are reported.
+  \item \textbf{Weight.} Yes.
+  \item \textbf{Meaning.} Common intellectual foundations, with no requirement that either
+        community cites the other.
+\end{itemize}
+
+\paragraph{How restrictive descent is.} Of the citations an era emits, 0.54\% and 1.55\%
+survive into the descent network on the two era pairs examined so far \meas{}. That is the
+price of the strong definition: the cited work must both belong to the earlier era and have
+been in active use there. It is an indication of how narrow a one-year inheritance window
+is, and not a clean measurement of citation lag -- it also reflects how the corpus was
+built and how the eras were partitioned, and separating those would take a decomposition
+we have not done.
+
+\subsection{Three ways to weight each network}
+\label{sec:weightings}
+
+Each tie can be weighted three ways, and each answers a different question. All three use
+the same nodes and the same ties; only the numbers change.
+
+\begin{center}
+\small
+\begin{tabular}{@{}lp{0.38\linewidth}p{0.34\linewidth}@{}}
+\toprule
+\textbf{Weighting} & \textbf{What is counted} & \textbf{Question it answers}\\
+\doublerule
+Breadth    & Distinct shared works, each counted once for every community that cites it &
+             How widely does one community draw on the other?\\[3pt]
+Fractional & Each shared work is one unit of evidence, divided equally among the community
+             pairs it connects &
+             How was one community's contribution distributed among its heirs?\\[3pt]
+Intensity  & Citation events rather than distinct works; for coupling, the product of the
+             number of citing articles on each side &
+             How heavily does one community lean on the other?\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Fractional weighting has one property the others lack: its totals do not change when the
+community partition is finer or coarser, because each shared work contributes exactly one
+unit however many pairs it spans. Breadth totals grow with the number of communities, and
+community counts vary by a factor of 2.4 across three adjacent eras \meas{}, so breadth
+totals are not comparable across pairs. Where a cross-year comparison is wanted, fractional
+is the weighting that supports it.
+
+\subsection{Topical proximity, measured outside the citation record}
+\label{sec:proximity}
+
+Topical proximity $S_{ij}$ is how similar two communities' subject matter is, computed from
+the articles' abstracts, keywords, and journals -- never from their references.
+
+That independence is the whole point. Communities are \emph{detected} from the citation
+network, so measuring their similarity from citations too would build the answer partly
+into the definition. Measuring similarity from text gives an independent yardstick, and
+only then does ``these two communities are substantively close and do not connect'' become
+a claim with content.
+
+Naming the data source is not the same as specifying the measure, though, and this measure
+carries more weight than any other single quantity in the design: $S_{ij}$ is what
+separates mechanism M2 from M3, and it is the covariate that makes a shortfall
+interpretable. It deserves to be built deliberately.
+
+\paragraph{The problem a naive measure runs into.}
+Every community in this corpus talks about caffeine. A conventional similarity measure over
+term-frequency vectors will therefore find every pair somewhat similar, because they share
+the domain's ubiquitous vocabulary -- \emph{caffeine}, \emph{coffee}, \emph{consumption},
+\emph{dose}. Worse, it rewards globally frequent terms, which are exactly the terms that
+carry no information about which community a document came from. If that happens, $S_{ij}$
+collapses toward a constant and stops doing any work.
+
+\paragraph{A measure built on what distinguishes rather than what is shared.}
+G.\,P. Morgan's corpora-comparison approach (2017) inverts the question. Rather than asking
+how much two bodies of text have in common, it asks, for each token: \emph{if I saw this
+word, would I know which of the two corpora it came from?} Tokens are scored by a
+transformed normalized odds ratio, so a word that appears constantly in both contributes
+nothing, while a word concentrated in one contributes a great deal. The method was
+designed precisely to distinguish corpora by differential usage rather than by shared
+frequency.
+
+Adapting it here is direct. Treat each community's article text as a corpus. For
+communities $i$ and $j$, compute token-level polarization across the two, and define
+topical \emph{distance} from the distribution of discriminating terms:
+\[
+D^{\text{text}}_{ij} \;=\; f\!\left(\{\,\text{polarization}_{w,ij}\,\}_{w \in V}\right),
+\qquad
+S_{ij} \;=\; 1 - D^{\text{text}}_{ij}
+\]
+after normalization. The substantive reading is attractive: two communities are topically
+proximate when their vocabularies are \emph{hard to tell apart}, not when both happen to
+contain the domain's boilerplate.
+
+Morgan's procedure also suggests a preprocessing step we would otherwise have to invent.
+Its random-draw stage accumulates evidence about tokens that repeatedly fail to distinguish
+randomly constructed subcorpora -- which is a principled way of identifying caffeine-domain
+boilerplate before any pairwise distance is computed.
+
+\paragraph{A measurement study, not a commitment.}
+We should not adopt this without checking it. Section~\ref{sec:pipeline} provides for a
+small measurement study comparing at least three candidates on the same community pairs:
+
+\begin{enumerate}[leftmargin=2em, itemsep=1pt]
+  \item corpora-comparison distance in the form above;
+  \item a conventional vector similarity over term frequencies, as the baseline the first
+        is supposed to improve on;
+  \item an embedding-based similarity, if a suitable model is already available.
+\end{enumerate}
+
+The validation is human. We select a set of community pairs whose substantive closeness we
+can judge from their labels and abstracts -- some obviously related, some obviously not,
+some genuinely ambiguous -- and ask which measure orders them the way a reader would. A
+measure that cannot separate the obvious cases is not going to be trusted on the ambiguous
+ones.
+
+\subsection{Cognitive orientation: two measures, deliberately kept apart}
+
+``Cognitive'' can mean two different things about a piece of research, and in this corpus
+they come apart sharply.
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Cognitive subject matter}, from abstracts and keywords: does the work study
+        attention, vigilance, memory, executive function, reaction time?
+  \item \textbf{Cognitive disciplinary provenance}, from journals: is the work published
+        where cognitive scientists publish?
+\end{itemize}
+
+In era 23, 36.6\% of caffeine articles carry cognitive subject matter \meas{}. Meanwhile
+the four core cognitive-architecture venues -- \emph{Cognitive Science}, \emph{Cognitive
+Systems Research}, \emph{BICA}, and \emph{Topics in Cognitive Science} -- hold nine nodes
+between them in a corpus of 590{,}170 \meas{}.
+
+A vigilance experiment published in \emph{Psychopharmacology} is exactly the case that
+makes this worth keeping separate. Its content is cognitive; its provenance is
+pharmacological. Collapsing the two into a single ``cognitive contribution'' score would
+hide precisely the distinction that might explain why integration succeeds or fails.
+
+We will write $c_i$ for the cognitive orientation of community $i$ -- a proportion between
+0 and 1, computed both ways, entering the model as two separate variables rather than an
+average.
+
+A caution about the keyword measure: a draft lexicon produced false positives on
+\code{inhibit} (enzyme inhibition), \code{memory} (immunological memory), and \code{affect}
+used as a verb \meas{}. The lexicon needs pruning and validation against a hand-coded
+sample before the measure is trusted, which is one reason the journal-based measure is
+worth having alongside it rather than instead of it.
+
+\subsection{Author and venue overlap}
+
+Two communities that share authors, or publish in the same journals, will cite one another
+more for reasons that have nothing to do with knowledge integration. Both are measured
+directly -- author overlap from the author identifiers in the node list, venue overlap from
+the journal profiles -- and both enter the model so that their contribution is not
+attributed to the process we care about.
+
+\begin{measure}{How topical proximity is computed}
+Three candidates are on the table (\S\ref{sec:proximity}), and the choice matters because
+$S_{ij}$ is what distinguishes ``these communities were never going to connect'' from
+``these communities should have connected''. The empirical part is a comparison on the same
+pairs; the part that needs Sarah is the validation set. Judging which community pairs are
+substantively close -- and which are close in a way that \emph{should} produce citation --
+is exactly the expertise the citation record does not contain.
+\end{measure}
+
+\begin{decision}{Which cognitive measure carries the primary claim}
+Subject matter and disciplinary provenance make different arguments. ``Research on
+cognitive questions is not taken up'' is a claim about what is studied; ``work from the
+cognitive science community is not taken up'' is a claim about who studies it. The model
+can carry both, but the theoretical argument should say which pattern we expect and treat
+the other as a competing explanation or a robustness check. Choosing after seeing the
+results would not be defensible.
+\end{decision}
+
+% =====================================================================
+\section{From Networks to Statistical Inference}
+\label{sec:inference}
+\seccap{Why counting ties is not enough, and the four ideas that make the models
+intelligible.}
+
+\subsection{The problem the networks cannot solve}
+
+The networks tell us which communities are connected and how strongly. They do not tell us
+whether an observed connection is stronger or weaker than it should have been.
+
+Consider two community pairs, each connected by a single shared work. In one, the citing
+community published forty papers and emitted several thousand citations; in the other, it
+published two papers and emitted ninety. The same observed tie means something very
+different in the two cases. Likewise, some individual works are cited by nearly everyone
+regardless of discipline, so a tie running through such a work is weak evidence of anything.
+
+Detecting a \emph{missed} connection therefore requires a model of what citation would
+normally look like between communities with comparable opportunities. That is what the rest
+of this section builds toward.
+
+\subsection{Four ideas the models rest on}
+
+\paragraph{Exposure.} How many chances did this community have to make this connection? A
+community that emits three thousand citations has three thousand opportunities to cite
+another literature; one that emits ninety has ninety. Exposure is a known quantity we
+compute from the data, and it enters the model as a fixed adjustment rather than something
+to be estimated -- we are asserting that twice the opportunity means twice the expected
+count, all else equal.
+
+\paragraph{Propensity.} After accounting for opportunity, are some communities simply more
+inclined to draw on others, or to be drawn upon? This is not known in advance; it is
+estimated. Two communities with identical opportunity can still differ in how outward-facing
+they are, and that difference should not be mistaken for the phenomenon of interest.
+Operationally, propensity is not measured; it is a pair of varying effects, one attached to
+the citing community and one to the cited, that absorb whatever systematic inclination
+remains once opportunity and the covariates have been accounted for. A community that cites
+widely across the board raises its own effect rather than inflating the estimate for any one
+partner.
+
+\paragraph{Work salience.} Some individual works are cited far more than others for reasons
+particular to them -- a canonical review, a widely used method. If we ignore this, a single
+famous paper shared between two communities inflates their apparent connection. Salience is
+likewise estimated rather than measured: it is a varying effect attached to the work itself,
+identified because most bridging works are cited by more than one community, so the model
+can separate ``this work is cited a great deal everywhere'' from ``this community cites this
+work unusually often.'' Section~\ref{sec:modelII} makes both of these concrete -- they are
+the terms $\theta_i$, $\psi_j$, and $u_h$ -- and this is the reason the unit of analysis
+there is the individual work rather than the community pair.
+
+\paragraph{Partial pooling.} Many communities in this data are small. A community with one
+observed tie tells us very little on its own, and treating its observed rate as its true
+rate would be overconfident. A multilevel model handles this by estimating each community's
+parameter partly from its own data and partly from the field-wide pattern, with the balance
+determined by how much data that community actually has. Communities with a lot of data are
+barely shrunk toward the average; communities with almost none are shrunk a great deal.
+
+This matters concretely here. Between 38\% and 60\% of participating communities have
+exactly one tie \meas{}, which under a simple proportion would give them a connection
+strength of 1.0 -- not because their connection is exceptional but because arithmetic
+leaves no alternative. Partial pooling is what stops that from happening.
+
+\subsection{Two further ideas used later}
+
+\paragraph{The risk set.} The model has to be told which community pairs \emph{could} have
+connected. A pair where the earlier community holds no works eligible to be cited, or the
+later community emits no citations at all, is not a case of a connection failing to form;
+it is a case where no connection was possible. Those pairs are excluded. The remaining pairs
+-- realized and unrealized alike -- are the risk set, and the unrealized ones carry real
+information, because a connection that could have formed and did not is exactly what we are
+looking for.
+
+\paragraph{Posterior prediction.} These are Bayesian models, so what they produce is not a
+single estimate but a distribution over plausible values given the data. That gives us
+something a single number cannot: for a particular pair of communities, we can ask what
+citation count the model expects and how confident it is, and then ask how far below that
+expectation the observed count actually falls. Section~\ref{sec:forgone} builds the
+definition of a forgone connection on exactly that.
+
+% =====================================================================
+\section{Model I: From Topical Proximity to Common Knowledge}
+\label{sec:modelI}
+\seccap{Stage 1. Do communities working on related problems end up reading the same
+things?}
+
+\subsection{The question and the outcome}
+
+Model~I asks whether topical proximity produces a common knowledge base, and how strongly.
+
+The outcome is the number of works two communities cite in common -- the coupling weight of
+\S\ref{sec:networks}. One row of data is one pair of communities in one era pair.
+
+\subsection{Why a negative binomial}
+
+The outcome is a count: it cannot be negative and has no upper bound in principle. The
+simplest count model, the Poisson, assumes the variance equals the mean. That assumption
+fails here, because community pairs differ enormously in how many chances they had to
+overlap, and because some pairs share a burst of works while most share none. The negative
+binomial is the same model with one extra parameter allowing the variance to exceed the
+mean, which is what this data does.
+
+\subsection{Exposure for coupling}
+
+Two communities can only share works they both had a chance to cite. If community $i$'s
+articles cite $R_i$ distinct works and $j$'s cite $R_j$, and works were cited uniformly at
+random, the expected overlap would be proportional to $R_iR_j$. But citation is not uniform
+-- a small number of works are cited enormously -- so the expected overlap is larger than
+the raw product suggests. Writing $d_w$ for the number of times work $w$ is cited,
+
+\begin{equation}
+E^{K}_{ijp} \;=\; R_{ip}\,R_{jp}\,\kappa_p,
+\qquad
+\kappa_p \;=\; \frac{\sum_w d_w^{2}}{\left(\sum_w d_w\right)^{2}},
+\end{equation}
+
+where $\kappa_p$ is a single number per era pair carrying the skew of the citation
+distribution. If every work were cited exactly once, $\kappa_p$ would be $1/W$ for $W$
+works, recovering the uniform case.
+
+\subsection{The model}
+
+Writing $K_{ijp}$ for the coupling count between communities $i$ and $j$ in era pair $p$:
+
+\begin{align}
+K_{ijp} &\sim \mathrm{NegBinomial}\!\left(\lambda_{ijp},\, \phi_K\right)\\[2pt]
+\log \lambda_{ijp} &= \underbrace{\alpha^{K}_{p}}_{\text{era baseline}}
+  + \underbrace{\log E^{K}_{ijp}}_{\text{opportunity}}
+  + \underbrace{\alpha_{S,p}\, S_{ijp}}_{\text{topical proximity}}
+  + \underbrace{\alpha_{S,\ell}\, S_{ijp}}_{\text{by literature}}
+  + \underbrace{\boldsymbol{z}_{ijp}^{\top}\boldsymbol{\gamma}}_{\text{other measures}}
+  + \underbrace{\theta^{K}_{i} + \psi^{K}_{j}}_{\text{propensities}}
+\end{align}
+
+with the proximity slope allowed to drift across the eleven era pairs,
+
+\begin{equation}
+\alpha_{S,p} \sim \mathrm{Normal}\!\left(\bar{\alpha}_S + \gamma_\alpha\,(t_p - \bar{t}),\;
+\sigma_\alpha\right),
+\qquad
+\alpha_{S,\ell} \sim \mathrm{Normal}\!\left(0,\; \sigma_\ell\right).
+\end{equation}
+
+\subsection{What each term means, and which question it answers}
+
+\begin{center}
+\small
+\begin{tabular}{@{}lp{0.72\linewidth}@{}}
+\toprule
+\textbf{Term} & \textbf{Meaning}\\
+\doublerule
+$\bar{\alpha}_S$ & How steeply shared reading rises with topical proximity, averaged over
+the eleven era pairs. \textbf{This answers RQ1.}\\[3pt]
+$\gamma_\alpha$ & Whether that relationship strengthens or weakens over time.
+\textbf{Half of RQ4.}\\[3pt]
+$\sigma_\ell$ & How much the relationship differs among literatures. If close to zero, the
+same rule holds everywhere; if large, some literatures convert proximity into shared
+reading far more readily than others. \textbf{Part of RQ7.}\\[3pt]
+$\theta^{K}_{i},\psi^{K}_{j}$ & Each community's own tendency to share references, beyond
+what opportunity explains.\\[3pt]
+$\boldsymbol{z}$ & Author overlap, venue overlap, disciplinary distance, and both cognitive
+measures for each community.\\[3pt]
+$\phi_K$ & The extra-variability parameter that makes this negative binomial rather than
+Poisson.\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+A community pair with high topical proximity and coupling far below what this model expects
+is mechanism M2: substantively related, reading different literatures.
+
+% =====================================================================
+\section{Model II: From Common Knowledge to Citation Integration}
+\label{sec:modelII}
+\seccap{Stage 2. Given that two communities read the same things, does citation follow --
+and is that weaker for cognitive research?}
+
+\subsection{The question and the outcome}
+
+Model~II asks how much direct citation accompanies a given degree of shared reading, and
+whether that conversion is weaker where cognitive research is involved.
+
+The outcome is a citation count. But rather than counting citations between two communities
+in aggregate, we count them at the level of the individual work being cited.
+
+\subsection{Why the unit is the individual work}
+
+Some works are cited by almost everyone. If we aggregate to the community-pair level, such a
+work inflates every connection it touches and we cannot separate ``these two communities are
+genuinely connected'' from ``they both happened to cite a canonical review''. Estimating a
+salience term for each work fixes that -- but a salience term needs a work to attach to,
+and an aggregated community-pair count has no single work in it. A pair connected by
+seventeen shared works would need seventeen salience terms.
+
+So one row of data is one \emph{bridging work} paired with one \emph{citing community}: did
+era-$t$ community $i$ cite work $h$, and how often? The cited community $j$ follows from
+$h$, since a bridging work belongs to a community in the earlier era by definition. For the
+2019--2020 pair the risk set pairs 877 bridging works with every era-23 community that
+emits citations -- up to all 394 of them -- giving on the order of 345{,}000 rows, the
+overwhelming majority of them zeros \meas{}. Only 151 of those communities appear in a
+realized tie; the rest contribute rows that are entirely zero, and those are precisely the
+observations RQ10 rests on.
+
+Aggregating the fitted model back over the works belonging to a community recovers the
+community-pair quantity, so the question remains one about communities even though the
+data are finer.
+
+\subsection{Exposure for citation}
+
+At this resolution the opportunity is simply how many citations the citing community emits:
+
+\begin{equation}
+E^{C}_{hip} \;=\; N^{\mathrm{out}}_{ip}.
+\end{equation}
+
+A work's own attractiveness does not belong in the exposure term, because that is exactly
+what the salience parameter $u_h$ is for.
+
+\subsection{Why the outcome is modeled in two stages}
+
+Citation between two communities involves two substantively distinct things.
+
+First, does any citation relationship form at all? This is a yes-or-no question about
+whether the later community is in contact with this piece of the earlier community's output.
+
+Second, given that some citation occurs, how much? This is a question about the strength of
+a relationship that already exists.
+
+We model these separately, with one submodel for whether the count clears zero and a second
+for how large it is once it has. That separation is a theoretical commitment, not a
+convenience. The claim under test is that two communities read the same works and citation
+does not follow, which sounds at least as much like a failure of contact as a weakness of an
+established connection. Forcing both into one parameter would hide which it is, and the
+answer is substantively interesting either way: cognitive orientation might govern whether a
+connection forms at all while leaving established connections perfectly normal, or the
+reverse. Estimating the two stages separately lets each covariate carry a different
+coefficient in each -- which is exactly the comparison RQ9 needs.
+
+\paragraph{What this construction is called, and what it is not.} A two-stage count model of
+this kind is a \textbf{hurdle model}. The name is unhelpful but the mechanics are simple: one
+process decides whether the outcome clears zero, and if it does, the size is drawn from a
+distribution that cannot produce a zero. Every zero in the data therefore comes from the
+first stage, and every positive count from the second.
+
+The closely related alternative is a \emph{zero-inflated} model, and the difference matters
+because the two are routinely conflated. In a zero-inflated model, zeros arise from two
+different sources: some communities are simply incapable of citing this work, and the rest
+cite it at some rate that happens to come out as zero. An observed zero is then ambiguous
+between the two, and the model has to apportion it. The hurdle form makes no such claim: a
+zero means one thing, that contact did not occur.
+
+The hurdle form is the right one here because the risk set has already done the work that
+zero inflation would otherwise be doing. Pairs where citation was impossible -- no eligible
+works, no emitted citations -- are excluded before estimation (\S\ref{sec:inference}). What
+remains are pairs that could have connected, so a zero among them is informative rather than
+structural. That is precisely the case the hurdle form describes, and it is the case RQ10
+depends on.
+
+\subsection{The model}
+
+For bridging work $h$ belonging to earlier community $j$, cited by later community $i$:
+
+\begin{align}
+C_{hip} &\sim \mathrm{Hurdle\text{-}NegBinomial}\!\left(\pi_{hip},\, \mu_{hip},\, \phi_C\right)
+\end{align}
+
+where $\pi$ is the probability that any citation occurs and $\mu$ the expected count given
+that it does. Both parts take the same form:
+
+\begin{align}
+\mathrm{logit}\,\pi_{hip} &= \eta_p + \log E^{C}_{hip}
+  + \beta^{(H)}_{K,p}\log(K_{ijp}{+}1)
+  + \beta^{(H)}_{Ki}\log(K_{ijp}{+}1)\,c_i
+  + \beta^{(H)}_{Kj}\log(K_{ijp}{+}1)\,c_j \nonumber\\
+  &\qquad + \boldsymbol{x}_{hijp}^{\top}\boldsymbol{\kappa}
+  + u^{(H)}_{h} + \theta^{(H)}_{i} + \psi^{(H)}_{j}\\[4pt]
+\log \mu_{hip} &= \alpha^{C}_p + \log E^{C}_{hip}
+  + \beta^{(+)}_{K,p}\log(K_{ijp}{+}1)
+  + \beta^{(+)}_{Ki}\log(K_{ijp}{+}1)\,c_i
+  + \beta^{(+)}_{Kj}\log(K_{ijp}{+}1)\,c_j \nonumber\\
+  &\qquad + \boldsymbol{x}_{hijp}^{\top}\boldsymbol{\delta}
+  + u^{(+)}_{h} + \theta^{(+)}_{i} + \psi^{(+)}_{j}
+\end{align}
+
+\subsection{What each term means, and which question it answers}
+
+\begin{center}
+\small
+\begin{tabular}{@{}lp{0.70\linewidth}@{}}
+\toprule
+\textbf{Term} & \textbf{Meaning}\\
+\doublerule
+$\beta_{K}$ & How much citation accompanies a given degree of shared reading, field-wide.
+\textbf{This is RQ2, the baseline everything else is read against.}\\[3pt]
+$\beta_{Ki}$ & Whether that conversion is weaker when the \emph{citing} community is
+cognitively oriented: cognitive communities not citing work despite shared foundations.
+\textbf{Part of RQ9.}\\[3pt]
+$\beta_{Kj}$ & Whether it is weaker when the \emph{cited} community is cognitively
+oriented: cognitive work not being cited despite common foundations.
+\textbf{Part of RQ9.}\\[3pt]
+$u_h$ & How citable work $h$ is in its own right, so a canonical paper does not manufacture
+apparent connections.\\[3pt]
+$\theta_i,\psi_j$ & Each community's tendency to cite and to be cited, beyond opportunity.\\[3pt]
+$\boldsymbol{x}$ & Topical proximity, author and venue overlap, disciplinary distance, and
+the cited work's vintage -- the last of these being the test of mechanism M1.\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The two superscripts matter: $\beta^{(H)}$ governs whether a connection forms and
+$\beta^{(+)}$ how strong it is once formed, so RQ9 has two answers rather than one.
+
+\subsection{Change over time, and the two community traits}
+
+The baseline conversion and the cognitive terms both drift, so that RQ4 and RQ11 are
+estimated rather than inferred by comparing separate fits:
+
+\begin{equation}
+\beta^{(\cdot)}_{K,p} \sim \mathrm{Normal}\!\left(\bar{\beta}^{(\cdot)}_{K}
+  + \gamma^{(\cdot)}_\beta (t_p - \bar{t}),\; \sigma_\beta\right),
+\qquad
+\beta^{(\cdot)}_{K\cdot,p} \sim \mathrm{Normal}\!\left(\bar{\beta}^{(\cdot)}_{K\cdot}
+  + \gamma^{(\cdot)}_{KC} (t_p - \bar{t}),\; \sigma_{KC}\right).
+\end{equation}
+
+RQ3 asks whether being derivative and being generative are related traits. A community in
+2019 appears as a citing community in the 2018--2019 pair and as a cited community in the
+2019--2020 pair, under the same partition -- so we can ask about both of its tendencies
+without ever claiming it persists as the same community. They are given a joint prior:
+
+\begin{equation}
+\begin{pmatrix}\theta_c\\ \psi_c\end{pmatrix}
+\sim \mathrm{MVNormal}\!\left[
+\begin{pmatrix}0\\0\end{pmatrix},\;
+\begin{pmatrix}\sigma_\theta^{2} & \rho\,\sigma_\theta\sigma_\psi\\
+               \rho\,\sigma_\theta\sigma_\psi & \sigma_\psi^{2}\end{pmatrix}\right],
+\end{equation}
+
+where $\rho$ is the correlation RQ3 asks about. Model~I supplies an analogous correlation
+for the tendency to share references, which is a different trait and is reported alongside
+rather than merged with it.
+
+The model estimates both $\beta_{Ki}$ (cognitive communities citing less than shared foundations predict) and
+$\beta_{Kj}$ (cognitive work being cited less than shared foundations predict). These are different claims
+about how the field works, and the corpus limit of \S\ref{sec:questions} bears on them
+differently. Which pattern we expect, and why, is stated in \S\ref{sec:questions}; it is
+registered there rather than here so that it is on record before the model is fit.
+
+\begin{decision}{Whether Model~I should also move to work resolution}
+Model~II sits at work resolution because it needs a salience term. Coupling has the same
+dependence -- one work shared by many communities generates related observations -- but its
+work-level form needs work--community--community triples rather than work--community pairs,
+and we have not counted how many rows that would be. Until we do, Model~I is specified at
+the community-pair level with the dependence acknowledged rather than modeled. Counting the
+triples is a half-hour job and should be done before the detailed specification.
+\end{decision}
+
+% =====================================================================
+\section{Identifying Forgone Connections}
+\label{sec:forgone}
+\seccap{Turning ``this connection should have happened'' into two stated quantities: how far
+short, and how sure.}
+
+RQ10 asks which particular community pairs show a connection that should have formed and did
+not. Answering it requires a definition that does not depend on how we happen to sort a list,
+and that can be argued with -- a reader should be able to disagree with a pair's placement on
+the list by disagreeing with a number, not with our taste.
+
+\subsection{What this is not}
+
+Because the language of ``should have happened'' invites the comparison, it is worth saying
+plainly what this procedure is not. It is not propensity-score matching, and it is not any
+other matched-contrast design.
+
+Matching answers a question of the form: this unit received a treatment; what would have
+happened to a comparable unit that did not? It requires a treatment that units either receive
+or do not, and it constructs a control group of units with similar propensity to be treated,
+so that the difference in outcomes can be read as an effect.
+
+Nothing here has that shape. There is no treatment: cognitive orientation, topical proximity,
+and shared reading are traits of communities, not interventions assigned to them. There is no
+control group: we are not comparing pair $(i,j)$ to some matched pair $(i',j')$. And the
+counterfactual is not another unit's realized outcome; it is a distribution the model
+generates for \emph{this} pair, given its own opportunity, its own partners' propensities,
+and the salience of the works involved. The comparison is within-pair and model-based,
+between what was observed and what the model considered plausible.
+
+The word ``propensity'' does appear in this document, but in an unrelated and more literal
+sense: the varying effects $\theta_i$ and $\psi_j$, which capture how outward-facing a
+community is. They are parameters of the outcome model, not scores used to build a matched
+sample.
+
+\subsection{Why the obvious approach fails}
+
+The natural first move is to rank pairs by how far the observed count falls below the model's
+expectation. That does not work, for two reasons.
+
+The gap is measured on the count scale, so it is mechanically larger for pairs with large
+expected counts. A pair expected to produce forty citations and producing thirty has a gap of
+ten; a pair expected to produce three and producing zero has a gap of three, and is far more
+interesting.
+
+The gap also says nothing about confidence. A pair whose expectation is $10 \pm 9$ and a pair
+whose expectation is $10 \pm 1$ would rank identically at an observed count of two, though the
+second is strong evidence and the first is almost none.
+
+\subsection{Two quantities, doing two different jobs}
+
+The Bayesian machinery gives us a distribution of plausible counts for each pair, and that
+distribution supports both questions directly.
+
+\paragraph{How far short.} The expected shortfall is the gap between what the model predicts
+and what occurred:
+
+\begin{equation}
+D_{ijp} \;=\; \mathbb{E}\!\left[\tilde{C}_{ijp} \;\middle|\; \text{data}\right] \;-\; C_{ijp}.
+\end{equation}
+
+This is a count, on the same scale as citations, and it answers ``how much integration is
+missing.'' It is the quantity to report when the question is magnitude, and the quantity to
+sum over pairs when the question is how much integration the field forgoes in total.
+
+\paragraph{How sure.} The confidence that a shortfall is real, and materially large, is the
+posterior probability that the observed count falls below the prediction by more than a
+stated margin $\Delta$:
+
+\begin{equation}
+F_{ijp} \;=\; \Pr\!\left(\tilde{C}_{ijp} - C_{ijp} > \Delta \;\middle|\; \text{data}\right).
+\end{equation}
+
+$F$ is a probability between $0$ and $1$. It is unitless, comparable across pairs of very
+different sizes, and it is the quantity to rank on.
+
+The two are not redundant. $D$ can be large while $F$ is low, when the model's prediction is
+uncertain -- a pair we cannot say much about. $F$ can be high while $D$ is small, when the
+model is confident about a modest shortfall -- a real but minor gap. A pair worth writing
+about has both.
+
+\subsection{A worked example}
+
+Consider a citing community $i$ in era~$p$ that publishes 30 articles and emits 2{,}400
+citations, and an earlier community $j$ holding 45 distinct works. The two share
+$K_{ij} = 22$ commonly cited references, which places them in the upper decile of shared
+reading for that era pair, and their topical proximity $S_{ij}$ is high. One is oriented
+toward cognitive subject matter and the other is not.
+
+Given that opportunity, that amount of shared reading, and the estimated propensities of both
+communities, the model's posterior predictive distribution for citations from $i$ to $j$'s
+works centers on 14, with an 80\% interval running from 6 to 24. The observed count is 1.
+
+Then $D_{ij} = 14 - 1 = 13$: thirteen citations' worth of integration did not happen. And
+with $\Delta = 3$, $F_{ij} = \Pr(\tilde{C} - 1 > 3) = \Pr(\tilde{C} > 4)$, which given that
+predictive distribution is roughly $0.93$. The pair clears both bars and goes on the list.
+
+Now change one thing. Suppose the citing community publishes 2 articles and emits 90
+citations. The predictive distribution now centers on $0.5$ and its 80\% interval runs from 0
+to 2. An observed count of 0 gives $D_{ij} = 0.5$ and $F_{ij} \approx 0.02$. Nothing is
+missing here: the community had almost no opportunity, and silence is what the model expects.
+This is the case that a raw proportion or a threshold rule would get wrong, and it is why the
+exposure term and the posterior predictive distribution are doing real work rather than
+decorating the argument.
+
+\subsection{The reporting rule}
+
+A pair is reported as a forgone connection when four conditions hold together:
+
+\begin{enumerate}[leftmargin=2em, itemsep=1pt]
+  \item the two communities share substantial reading, $K_{ijp}$ above a stated quantile of
+        the era pair's distribution;
+  \item they are substantively proximate, $S_{ij}$ above a stated quantile;
+  \item the shortfall is material, $D_{ijp} > \Delta$; and
+  \item the model is confident, $F_{ijp}$ above a stated cutoff.
+\end{enumerate}
+
+Conditions 1 and 2 are what make the pair a candidate for connection at all; conditions 3 and
+4 are what make the absence of connection notable. Reporting $D$ and $F$ together, rather
+than a rank, lets a reader see both how much is missing and how sure we are.
+
+\paragraph{From works to pairs.} Model~II estimates at the level of the individual bridging
+work, so $\tilde{C}_{ijp}$ is obtained by summing the posterior predictive draws over the
+works belonging to $j$ -- draw by draw, so that the resulting distribution carries the
+correlation the varying effects induce among works from the same community. Summing point
+estimates instead would understate the uncertainty, and $F$ would come out too confident.
+
+\paragraph{Two things the quantity does not claim.} It is not a claim that citation
+\emph{would} have occurred under some intervention; the association it departs from is not a
+causal effect, for the reasons in \S\ref{sec:causal}. And ``forgone'' means materially less
+than expected, not literally zero. Requiring zero would discard the many cases of a
+connection that exists but is far thinner than the shared foundations warrant -- which, given
+how many ties in this network rest on a single work \meas{}, is likely the more common form
+the phenomenon takes.
+
+\begin{decision}{The materiality margin and the probability threshold}
+$\Delta$ and the cutoff on $F$ determine which pairs appear on the list, as do the two
+quantile cuts on $K$ and $S$. All four should be set in advance and reported with the
+sensitivity analysis described in \S\ref{sec:validation}, showing how the list changes as
+they vary. Choosing them after seeing which pairs they produce would make RQ10
+unfalsifiable. The substantive question for us is what counts as a material shortfall: is
+$\Delta$ a fixed number of citations, or a proportion of the predicted count?
+\end{decision}
+
+% =====================================================================
+\section{Identifying Major Literatures and Their Lifecycles}
+\label{sec:literatures}
+\seccap{What a ``literature'' is operationally, how we find them, and how we follow them
+through time without claiming communities persist.}
+
+\subsection{What a literature is, operationally}
+
+Everything in this section rests on one definition, so it comes first.
+
+\begin{quote}
+\textbf{A literature is a higher-order block: a group of communities that connect to the rest
+of the field in the same way.}
+\end{quote}
+
+Communities are groups of \emph{articles}, found within a single era. A literature is a group
+of \emph{communities}, and it may span eras. It is neither a journal nor a keyword or
+label -- those enter later, and for different jobs.
+
+The criterion is structural equivalence in the blockmodel sense, and the phrase ``connect in
+the same way'' is doing precise work. Two communities belong to the same block not because
+they are densely tied to each other, but because they have the same pattern of ties to
+everything else: they draw on the same kinds of earlier work and are drawn on by the same
+kinds of later work. Two pharmacokinetic communities in adjacent years may barely cite each
+other and still be structurally identical, because the rest of the field treats them
+interchangeably. A grouping rule based on density would separate them; a blockmodel does not.
+This is why we use one.
+
+\subsection{Discovery, description, and validation are three separate steps}
+
+Conflating these is the standard failure mode of community-labeling work, so we keep them
+apart deliberately and give each its own instrument.
+
+\paragraph{Discovery is structural.} The blocks are estimated from the citation network of
+communities, and from nothing else. A \textbf{nested degree-corrected stochastic blockmodel}
+estimates which groups connect to which, at several levels at once -- communities within
+literatures, literatures within broader divisions. \emph{Degree-corrected} means it accounts
+for large communities having more connections by virtue of size rather than affinity, which
+matters here because community sizes are wildly uneven. The number of groups is chosen by the
+data rather than set by us, using a minimum-description-length criterion that balances how
+well the grouping fits against how complicated it is: a grouping that needs many blocks to
+explain a little more is rejected in favor of a simpler one.
+
+The output is not a single partition but a distribution over them, so each community carries a
+probability of belonging to each literature. That uncertainty is worth keeping. A community
+sitting ambiguously between two literatures is a substantively interesting object -- it may be
+exactly where integration is happening -- and a method that assigned it definitively to one
+would conceal that.
+
+\paragraph{Description is textual, and comes second.} Once the blocks exist, we say what each
+one is about, from the titles, abstracts, and keywords of its member articles and from the
+language-model labels of its member communities. This step is interpretive and it is
+downstream: the text never influences which communities are grouped together. Naming a block
+``caffeine and cardiovascular risk'' is a claim about what the block contains, and it can be
+wrong without the block itself being wrong.
+
+\paragraph{Validation is external.} Journals give an independent partition of the same
+communities, derived from publication venue rather than from citation. Comparing the two
+answers the second half of RQ7. If the citation-derived literatures line up with journal
+boundaries, then what organizes this field is disciplinary affiliation; if they cut across it,
+something else is doing the organizing -- which is the more interesting result, and the one
+\S\ref{sec:purpose} leads us to expect.
+
+We report agreement with the \textbf{adjusted Rand index}, which measures how much two
+partitions of the same objects agree, corrected for the agreement expected by chance alone.
+Because a community can publish in several journals and because the blockmodel returns soft
+assignments, the headline ARI is computed on hard assignments -- each community to its modal
+block and its modal journal -- and accompanied by a soft analogue computed across posterior
+draws, so that the reported agreement carries the same uncertainty the partition does. Because
+journal identity is not derived from the citation record at any point, the comparison is not
+circular. Two caveats belong in the reporting: ARI is sensitive to the number of groups, so
+the journal partition should be coarsened to a comparable granularity before comparing; and a
+low ARI is a substantive finding here rather than a failure of the method.
+
+\subsection{How this differs from the community detection in \S\ref{sec:paths}}
+
+Two partitioning procedures appear in this document at two different levels, and they should
+not be confused.
+
+\begin{center}
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+ & \textbf{CHAMP (\S\ref{sec:paths})} & \textbf{Nested SBM (here)}\\
+\doublerule
+Objects partitioned & Articles, within one era & Communities, across eras\\
+Produces            & Communities            & Literatures\\
+Criterion           & Modularity at a resolution & Description length\\
+Chooses its scale by & Sweeping $\gamma$ for a stable range & Model selection, automatic\\
+Run                 & Once per era, in Julia & Once over the whole community network\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+CHAMP settles a question modularity maximization cannot settle on its own -- which resolution
+parameter to use -- by identifying the range of $\gamma$ over which the partition is stable,
+and we apply a pooled $\gamma^{*}$ across eras so that community granularity is comparable
+from year to year. It operates on articles. The nested blockmodel then takes those communities
+as its nodes. Nothing about CHAMP determines the literatures, and nothing about the
+blockmodel revisits the communities.
+
+\subsection{Why not a threshold}
+
+An alternative to a blockmodel is to keep only the strongest ties and see what clusters
+remain. We avoid that for a specific and measurable reason: in these networks, between 72\%
+and 90\% of ties rest on a single shared work \meas{}. Any threshold either removes almost
+the entire network or almost nothing, so the choice of cutoff would determine the answer more
+than the data would. This is the general weakness of threshold methods, and it is unusually
+severe here. A model that accommodates weak ties with appropriately wide uncertainty is
+preferable to one that deletes them and then reports the survivors as though they were the
+whole picture.
+
+\subsection{Lifecycles without lineages}
+
+Once communities are assigned to literatures, a literature's trajectory is measured by how
+much of the field it occupies in each era: how many articles belong to it, how many
+communities, and what share of citation traffic passes through it. Rise, growth, contraction,
+and disappearance are movements in those quantities, and because block membership is
+probabilistic, each is reported with uncertainty rather than as a count.
+
+This is where the distinction of \S\ref{sec:objects} pays off. None of these measurements
+requires knowing that a particular community persisted from one era to the next. A
+pharmacokinetic literature can be growing while its constituent communities dissolve and
+reform each year, and we can observe the growth without adjudicating the identity claim --
+which is the claim Path~A cannot support.
+
+% =====================================================================
+\section{Path B: Community Lineages and Persistence}
+\label{sec:pathb}
+\seccap{The questions that need active-era networks, and the analysis available without
+them.}
+
+Section~\ref{sec:paths} set out what active-era networks would allow: following a community
+through time, and asking what predicts its survival. The natural model is a
+\textbf{discrete-time hazard model} -- for each community in each year, the probability that
+it ends that year, given that it has survived so far. Because eras here are single years,
+discrete time is the natural form. A \emph{competing risks} version separates two different
+endings, dying and being absorbed into another community, which the lifecycle vocabulary
+requires and a single-outcome model cannot distinguish.
+
+What that model needs is an identity rule: something that says this year's community is last
+year's. Path A cannot supply one. A rule based on citation ties would be built on the same
+single-work ties that make thresholding unreliable \meas{}, and an unresolved identity
+algorithm should not hold up the rest of the project.
+
+There is, however, a persistence analysis available now, and it needs no identity rule at
+all. Individual \emph{works} have observable lifespans: we can see the first year a work is
+cited and the last, directly from the edge list. Modeling how long works stay in circulation
+-- and whether that depends on the venue, the vintage, or the cognitive orientation of the
+communities citing it -- tests something in the review's argument directly. If
+pharmacokinetic works stay in circulation longer than cognitive ones, that is evidence about
+which knowledge the field retains.
+
+So the division is:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Path A now:} structure, integration, the cognitive case, literature
+        lifecycles, and the persistence of cited knowledge.
+  \item \textbf{Path B next:} persistence and transformation of the communities themselves.
+\end{itemize}
+
+% =====================================================================
+\section{Design Matrices}
+\label{sec:design}
+\seccap{Reference tables: which column implements which quantity.}
+
+The tables below are for looking things up while implementing. Every quantity in them has
+been introduced and motivated in the preceding sections; nothing new appears here.
+
+They are included because the gap between a model written in equations and a model a computer
+can fit is a table -- one row per observation, one column per quantity -- and most of the
+errors that survive a careful specification are errors in building it. Two in particular. The
+first is a row that should not exist: a community pair that had no opportunity to connect, or
+a bridging work paired with a community that emitted no citations that era. Those rows do not
+carry information about a connection failing to form, and including them would inflate the
+number of zeros the first stage of Model~II has to explain. The second is a row that should
+exist and does not: a pair that could have connected and did not. Those rows are exactly the
+evidence RQ10 rests on, and they are the ones a naive construction drops, because they appear
+nowhere in the edge list -- they have to be generated from the risk set rather than read off
+the data. The pipeline tests in \S\ref{sec:pipeline} check both directions.
+
+The unit of analysis differs between the three tables, and the difference is substantive
+rather than clerical. Model~II is at work resolution because that is what identifies the
+salience effect $u_h$ (\S\ref{sec:modelII}); Model~I is at pair resolution because coupling is
+a property of a pair and has no work-level analogue; the persistence table is at
+work--era resolution because it is a survival model, and a survival model needs one row for
+each period a unit was at risk. Aggregating the Model~II table over the works belonging to a
+community must reproduce the Model~I tie counts exactly, which is one of the consistency
+tests.
+
+Each column plays one of five roles. The distinction between \emph{exposure} and
+\emph{covariate} is the one to watch: an exposure enters with its coefficient fixed at one on
+the log scale, which asserts that twice the opportunity means twice the expected count, while
+a covariate's coefficient is estimated from the data. Putting a quantity in the wrong role
+changes what the model claims, not just how well it fits.
+
+\begin{center}
+\small
+\begin{tabular}{@{}lp{0.72\linewidth}@{}}
+\toprule
+\textbf{Role} & \textbf{Meaning}\\
+\doublerule
+Index    & Identifies the observational unit -- which work, community, era, or pair this row
+           refers to. Not used in estimation.\\
+Outcome  & The quantity being explained.\\
+Exposure & Known opportunity for the outcome to occur; enters with its coefficient fixed
+           rather than estimated.\\
+Covariate& A measured characteristic used to explain variation in the outcome.\\
+Grouping & An identifier used for partial pooling: rows sharing a value share a varying
+           effect.\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Model II: one row per bridging work $\times$ citing community}
+
+A row exists for every combination of a bridging work $h$ and a citing community $i$ in the
+risk set -- that is, for every work belonging to an earlier community that a later community
+\emph{could} have cited, whether or not it did. The outcome \code{y\_cites} is zero on most
+rows, and those zeros are the observations RQ10 is about.
+
+Three grouping columns appear because three varying effects do: \code{work\_id} groups the
+salience effect $u_h$, \code{citing\_community} groups the citing propensity $\theta_i$, and
+\code{cited\_community} groups the cited propensity $\psi_j$. Note that \code{cited\_community}
+is determined by \code{work\_id} rather than being an independent index -- each work belongs to
+exactly one earlier community, by the attribution rule the pipeline must fix
+(\S\ref{sec:pipeline}). Both cognitive measures appear for both communities, giving four
+columns, because \S\ref{sec:networks} keeps subject matter and disciplinary provenance apart
+deliberately; the model is fit with one pair and refit with the other.
+
+\begin{center}
+\small
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.30\linewidth}>{\raggedright\arraybackslash}p{0.13\linewidth}>{\raggedright\arraybackslash}p{0.47\linewidth}@{}}
+\toprule
+\textbf{Column} & \textbf{Role} & \textbf{Quantity}\\
+\doublerule
+\endhead
+\code{pair\_id}, \code{era\_t}, \code{era\_prior} & index & Era pair\\
+\code{work\_id} $h$ & index, grouping & Bridging work; groups the salience effect $u_h$\\
+\code{citing\_community} $i$ & index, grouping & Groups $\theta_i$\\
+\code{cited\_community} $j$ & index, grouping & Follows from $h$; groups $\psi_j$\\
+\midrule
+\code{y\_cites} & outcome & Citations from $i$'s articles to $h$; zero where none occurred\\
+\midrule
+\code{out\_citations\_i} & exposure & $E^{C}$, citations emitted by $i$\\
+\midrule
+\code{n\_coupling} & covariate & $K_{ij}$, works $i$ and $j$ cite in common\\
+\code{topical\_prox} & covariate & $S_{ij}$, from text and venue\\
+\code{disc\_distance} & covariate & Disciplinary distance from journal profiles\\
+\code{author\_overlap}, \code{venue\_overlap} & covariate & $U_{ij}$, $V_{ij}$\\
+\code{cog\_subject\_i}, \code{cog\_subject\_j} & covariate & $c_i$, $c_j$ by subject matter\\
+\code{cog\_venue\_i}, \code{cog\_venue\_j} & covariate & $c_i$, $c_j$ by provenance\\
+\code{work\_vintage} & covariate & Era of $h$; tests mechanism M1\\
+\code{pair\_index} & covariate & 1--11, carrying the time trends\\
+\bottomrule
+\end{longtable}
+\end{center}
+
+\subsection{Model I: one row per community pair}
+
+A row exists for every ordered community pair in the risk set for that era pair. The exposure
+is stored as its three components rather than as a single product, so that the degree
+correction $\kappa_p$ can be recomputed or varied without rebuilding the frame, and so that
+the exposure test in \S\ref{sec:pipeline} has something to check against.
+
+\code{literature\_i} and \code{literature\_j} come from the blockmodel of
+\S\ref{sec:literatures}, which means this table cannot be built until that has been fit --
+the only ordering dependency between the two models. Because block membership is
+probabilistic, the column holds the modal assignment for the primary fit, and the sensitivity
+analysis refits across posterior draws of the partition.
+
+\begin{center}
+\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.30\linewidth}>{\raggedright\arraybackslash}p{0.13\linewidth}>{\raggedright\arraybackslash}p{0.47\linewidth}@{}}
+\toprule
+\textbf{Column} & \textbf{Role} & \textbf{Quantity}\\
+\doublerule
+\code{pair\_id}, \code{community\_i}, \code{community\_j} & index, grouping & \\
+\code{n\_coupling} & outcome & Works cited in common\\
+\code{R\_i}, \code{R\_j}, \code{kappa\_p} & exposure & Components of $E^{K}$\\
+\code{topical\_prox}, \code{disc\_distance}, \code{author\_overlap}, \code{venue\_overlap},
+  \code{cog\_*} & covariate & As above\\
+\code{literature\_i}, \code{literature\_j} & grouping & Block membership, for
+  $\alpha_{S,\ell}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Persistence of cited works}
+
+This is the Path~A persistence analysis of \S\ref{sec:pathb}, and its unit is a
+work--era: one row for each era in which a work was still at risk of ceasing to be cited,
+running from the era it was first cited until either it stops being cited or the corpus ends.
+Works still in circulation at the end are censored rather than treated as having survived
+indefinitely.
+
+\code{cog\_share\_citers} is the share of citing communities in that era classified as
+cognitively oriented, and it is the column that carries the substantive question: whether the
+field retains pharmacokinetic knowledge longer than cognitive knowledge. It is measured per
+era rather than once per work, because a work's audience changes.
+
+\begin{center}
+\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.30\linewidth}>{\raggedright\arraybackslash}p{0.13\linewidth}>{\raggedright\arraybackslash}p{0.47\linewidth}@{}}
+\toprule
+\textbf{Column} & \textbf{Role} & \textbf{Quantity}\\
+\doublerule
+\code{work\_id}, \code{era} & index & Work and year at risk\\
+\code{event}, \code{censored} & outcome & Ceased to be cited; still cited at 2020\\
+\code{cog\_share\_citers}, \code{journal}, \code{era\_first\_cited}, \code{n\_communities}
+ & covariate & Orientation of citers, venue, vintage, breadth of uptake\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% =====================================================================
+\section{Pipeline Requirements and Tests}
+\label{sec:pipeline}
+\seccap{What the code must produce, and what must hold if it is producing it correctly.}
+
+\subsection{Order of operations}
+
+The stages run in this order, and the order is not arbitrary -- each depends on the last:
+
+\begin{enumerate}[leftmargin=2em, itemsep=1pt]
+  \item Resolve the era files, normalizing three inconsistent directory layouts and two
+        partition naming conventions.
+  \item Build the era maps, checking that each network's vertices and its partition agree
+        in length rather than assuming it.
+  \item Build the tie layer: deduplicate the edge list, apply the intersection filter, and
+        aggregate once into a table at work resolution. This table is both the source of the
+        descriptive networks and the model frame for Model~II, so it is a deliverable rather
+        than an intermediate.
+  \item Determine which communities participate in any tie. This defines the labeling queue,
+        and it is what makes the next stage affordable.
+  \item Run Pajek to compute within-community degrees, for participating communities only.
+  \item Generate community labels, as a parallel queue against the local language model.
+  \item Assemble: join labels, write the networks, partitions, arc tables, and model frames.
+\end{enumerate}
+
+Steps 4 and 6 are in that order for a substantive reason. Labels are currently generated
+for every community in both eras, but only communities that participate in a tie ever reach
+the graph -- which means 67.6\% and 87.9\% of the labeling work is discarded on the two era
+pairs examined \meas{}. Computing the ties first removes most of the dominant cost.
+
+\subsection{New quantities the pipeline must produce}
+
+\begin{itemize}[leftmargin=2em, itemsep=1pt]
+  \item Exposure: citations emitted per community, distinct references cited per community,
+        and the pair-level concentration constant $\kappa_p$.
+  \item The risk set, with unrealized pairs represented explicitly rather than omitted.
+  \item Topical proximity between communities, from abstracts, keywords, and journals.
+  \item \textbf{Journal extraction.} The article-information step currently pulls titles,
+        abstracts, and keywords from the Web of Science records but not the source field.
+        Journal is needed three times over -- to establish disciplinary breadth, to measure
+        provenance separately from subject matter, and to supply the external partition for
+        RQ7. Neither route available in the node list is adequate: 83.7\% of node labels
+        are bare DOIs, and a DOI prefix names a publisher rather than a journal -- prefix
+        \code{10.1016} alone covers 25.7\% of the corpus -- while the remaining 16.3\%
+        carry abbreviated journal strings that split one journal across variants, giving
+        7{,}099 distinct tokens for 95{,}882 works \meas{}. The Web of Science source
+        field is already in the records and is the better instrument.
+  \item Author overlap between communities.
+  \item Both cognitive measures per community, and vintage per bridging work.
+\end{itemize}
+
+\subsection{Defects to repair}
+
+\begin{itemize}[leftmargin=2em, itemsep=1pt]
+  \item \textbf{Arbitrary attribution.} When a work is cited by several communities, the
+        current code credits it to whichever one happens to sort first in the edge list. This
+        deletes 15.9\% of ties on one era pair and 56.2\% on the next \meas{}. Because the
+        damage differs by pair, the pairs are not comparable, which is fatal for an analysis
+        whose point is comparison across years.
+  \item \textbf{Duplicated edges.} Each citation is stored between two and fourteen times,
+        non-uniformly \meas{}, so the fix is row deduplication rather than dividing by two.
+  \item \textbf{Prompts for small communities.} Communities with fewer than five members
+        receive prompts padded with the literal string \code{"NA"}, affecting 11.1\% of one
+        era's communities and 6.1\% of the next \meas{}. Since labels are how we recognize
+        what a literature is, this sits on the critical path.
+\end{itemize}
+
+\subsection{Tests}
+
+The tests below are grouped by what they protect.
+
+\paragraph{Inputs.} Every era resolves to an existing network and partition file; vertex
+count equals partition length; each era's vertex set matches the node list exactly (verified
+for three eras so far \meas{}); after deduplication the edge list has no repeated
+sender--target pair and 1{,}238{,}336 rows remain \meas{}.
+
+\paragraph{Determinism.} Shuffling the order of the edge list leaves every output
+bit-identical. This is the regression test for the arbitrary-attribution defect and the most
+important test in the suite.
+
+\paragraph{Consistency between resolutions.} Aggregating the work-level model frame over the
+works belonging to a community reproduces the community-pair tie counts exactly. This is
+what guarantees the two resolutions describe the same object.
+
+\paragraph{Conservation.} Fractional weights sum, per era pair, to the number of distinct
+bridging works; weights normalized within a community sum to one.
+
+\paragraph{Exposure.} $E^{K}$ equals $R_iR_j\kappa_p$ on a hand-built example with known
+reference lists; $\kappa_p$ equals $1/W$ exactly when every work is cited once.
+
+\paragraph{Independence of the proximity measure.} Topical proximity and disciplinary
+distance are computed by a routine that cannot see the edge list, enforced by a test rather
+than by convention.
+
+\paragraph{Prompts.} No prompt contains the literal string \code{"NA"}; every participating
+community receives a label.
+
+\paragraph{Known-answer fixtures.} The 2019--2020 pair reproduces 561 ties over 877 bridging
+works, with 151 of 394 citing and 234 of 794 cited communities participating \meas{}; the
+2018--2019 pair reproduces 251 ties over 126 bridging works \meas{}. A change to these
+numbers is a deliberate specification change and the fixture is updated in the same commit
+that causes it.
+
+These fixtures are development fixtures, and they are expected to change once. Eras 1--21
+carry partition files named \code{era<N>\_Community.clu} and eras 22--23 carry
+\code{era<N>\_testCommunity.clu}, and we have not established that those came from the same
+procedure at the same resolution. That question is not left open: \S\ref{sec:paths} settles
+it by regenerating every era's partition with CHAMP at a pooled $\gamma^{*}$, which makes
+community granularity comparable across eras by construction. The current partitions are what
+the Path~A orchestrator is developed and tested against; the fixture numbers above are
+rebuilt from the CHAMP partitions before any substantive result is reported, and no temporal
+claim in this document should be made from the current ones.
+
+
+
+\subsection{Model Validation and Predictive Checks}
+\label{sec:validation}
+
+The tests above check that the pipeline builds the right table. The checks below check that
+the model built on that table is worth believing. Both belong in the pipeline, because both
+have to run automatically: a check that is performed once by hand and then forgotten is not a
+check.
+
+The organizing idea is that a Bayesian model is a generative story -- it says how the data
+could have come about -- and a generative story can be run forward. If we run it forward
+and it produces data that look nothing like the caffeine literature, the story is wrong,
+whatever its coefficients say. Each of the checks below is a version of running the model
+forward and looking at what comes out.
+
+\paragraph{Prior predictive checks, run before the data are seen.} Every parameter in
+Models~I and~II carries a prior, and priors on the log or logit scale are notoriously easy to
+set badly -- a prior that looks modest as a number can imply absurd counts once exponentiated.
+So before fitting, we draw parameters from the priors alone, generate citation counts from
+them, and ask whether those counts are of a plausible order. Concretely: do the simulated
+counts stay within a few orders of magnitude of what a community emitting two thousand
+citations could produce, or does the prior routinely generate a community citing one work ten
+million times? Do the simulated hurdle probabilities span the full range rather than piling up
+at 0 or 1? A prior that fails this is replaced and the replacement documented. This is a test
+of the specification, and it can be run before the data exist.
+
+\paragraph{Posterior predictive checks, run after fitting.} Having fit the model, we draw new
+datasets from the posterior and compare them to the observed one. The comparison is on
+features we care about rather than on fit indices:
+
+\begin{itemize}[leftmargin=2em, itemsep=1pt]
+  \item the proportion of zeros, which the hurdle stage exists to get right;
+  \item the full distribution of nonzero counts, particularly the upper tail, since a few
+        works are cited very heavily and a model that cannot generate them is misspecified;
+  \item the distribution of community out-degree and in-degree in the reconstructed network;
+  \item the concentration of ties, the HHI of each community's outgoing weight, which is what
+        the tie weightings of \S\ref{sec:weightings} are built to describe.
+\end{itemize}
+
+\paragraph{Stratified posterior predictive checks.} An aggregate check can pass while the
+model is badly wrong in the region the argument depends on. Since our claims are about
+particular kinds of pair, we repeat the checks within strata: by topical proximity (does the
+model fit high-proximity pairs as well as low-proximity ones?), by community size, by
+cognitive orientation, by literature, and by era. The cognitive stratum matters most. If the
+model systematically over-predicts citation for cognitively oriented pairs, then every
+cognitively oriented pair will appear to have a shortfall, and RQ10's list will be an artifact
+of misfit rather than a finding. This check is the one that stands between the forgone-connection
+analysis and a fabricated result, and it should be reported whether or not it is flattering.
+
+\paragraph{Leave-one-out cross-validation.} Several modeling choices in this document are
+genuine alternatives rather than settled facts, and LOO -- estimated by Pareto-smoothed
+importance sampling, so that it does not require refitting -- gives a common scale on which to
+compare them by how well each predicts observations it did not see. The comparisons worth
+running are those where a scientific claim rides on the choice:
+
+\begin{itemize}[leftmargin=2em, itemsep=1pt]
+  \item hurdle against a plain negative binomial, testing whether the two-stage structure of
+        \S\ref{sec:modelII} earns its complexity;
+  \item with and without the work-level salience effect $u_h$, testing whether individual
+        works really do differ in the way \S\ref{sec:inference} assumes;
+  \item cognitive orientation by subject matter against orientation by disciplinary
+        provenance, which is a substantive question about which measure captures the
+        phenomenon and not merely a robustness check;
+  \item with and without the coupling term, and with coupling entered linearly against
+        entered as a spline, testing whether the relationship in RQ9 is monotone;
+  \item literature-level varying intercepts against none, testing whether the blocks of
+        \S\ref{sec:literatures} explain anything the covariates do not.
+\end{itemize}
+
+Two cautions. Any observation with a Pareto $\hat{k}$ above $0.7$ is refit exactly rather than
+approximated, and the count of such observations is reported -- with heavy-tailed citation
+counts there will be some. And LOO here is ordinary leave-one-out, which asks how well the
+model predicts a held-out \emph{row}, not a held-out era; it is not a test of forecasting
+into a future era, and we do not report it as one.
+
+\paragraph{Sensitivity analysis.} The forgone-connection list depends on four stated
+constants: $\Delta$, the cutoff on $F$, and the two quantile cuts on $K$ and $S$
+(\S\ref{sec:forgone}). We report how the list changes as each varies over a stated range,
+including which pairs enter and leave, and we report the same for the choice between the two
+cognitive measures. A result that survives only one setting of these constants is reported as
+such.
+
+\paragraph{What the pipeline must do with all of this.} Each check above is a function that
+returns a pass, a fail, or a number, and the fitting stage writes them to a report alongside
+the posterior. The prior predictive check runs before fitting and blocks it on failure. The
+posterior and stratified checks and the LOO comparisons run after fitting and are recorded
+whether or not they pass, so that a degradation between one fit and the next is visible in the
+diff rather than discovered later.
+
+\end{document}
