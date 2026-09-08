@@ -1,0 +1,20 @@
+name = "community_detection_tools"
+uuid = "7c89c14b-5865-4afa-b5b8-cbc8fb1ad93a"
+authors = ["jhm18 <jonathan.h.morgan@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
+DataFrames = "1.8.2"
+LinearAlgebra = "1.11.0"
+ProgressMeter = "1.11.0"
+Random = "1.11.0"
+SparseArrays = "1.11.0"
+Test = "1.11.0"

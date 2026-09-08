@@ -357,6 +357,17 @@ The existing partitions remain useful as \emph{development fixtures}: they let t
 orchestrator be built and tested against known outputs before the final partitions
 exist. They are not the partitions the inference will run on.
 
+One implementation detail of that plan has to be settled, and it is not a matter of taste.
+Under Path~A a work belongs to exactly one era, so the era networks have disjoint vertex
+sets and an edge-pooled corpus network is block diagonal. The CHAMP penalty term is computed
+against the whole graph's mass, so era $e$ in a pooled sweep sees an effective resolution of
+$\gamma\,m_e/m$ rather than $\gamma$ --- roughly a twelfth of the intended value with twelve
+eras of comparable size. A $\gamma^{*}$ estimated on the pooled graph is therefore inflated
+by about $m/m_e$ and does not transfer back to a single era. We estimate $\gamma^{*}$ instead
+from the per-era sweeps and apply the pooled value to every era, which inverts the procedure
+of the source manuscript for a reason specific to this construction: there the periods shared
+members, so the pooled graph described a real object.
+
 Path B is more than a refactor of the current pipeline: it requires rebuilding the
 networks, re-running community detection, and re-generating the community labels, and
 the memory demands are large enough that the construction is better done in Julia.
@@ -1965,7 +1976,7 @@ The tests below are grouped by what they protect.
 
 \paragraph{Inputs.} Every era resolves to an existing network and partition file; vertex
 count equals partition length; each era's vertex set matches the node list exactly (verified
-for three eras so far \meas{}); after deduplication the edge list has no repeated
+for all twelve eras of the integration window, in both directions \meas{}); after deduplication the edge list has no repeated
 sender--target pair and 1{,}238{,}336 rows remain \meas{}.
 
 \paragraph{Determinism.} Shuffling the order of the edge list leaves every output
@@ -1997,15 +2008,182 @@ that causes it.
 
 These fixtures are development fixtures, and they are expected to change once. Eras 1--21
 carry partition files named \code{era<N>\_Community.clu} and eras 22--23 carry
-\code{era<N>\_testCommunity.clu}, and we have not established that those came from the same
-procedure at the same resolution. That question is not left open: \S\ref{sec:paths} settles
+\code{era<N>\_testCommunity.clu}. That naming split is not, however, where the granularity
+actually breaks. Community counts run 474, 455, then \emph{1{,}126} across eras 17, 18 and
+19 \meas{}, and era 19 has fewer vertices than era 18. Size cannot produce that. The cause is
+connectivity rather than resolution: era 18's network has a giant component holding 74\% of
+its vertices and era 19's largest holds 5.4\% \meas{}, and community counts track component
+counts because modularity cannot merge across components. Checked directly, only 5 of era
+19's 1{,}112 components are subdivided at all, so 1{,}107 of its 1{,}126 ``communities'' are
+connected components \meas{}. That question is not left open: \S\ref{sec:paths} settles
 it by regenerating every era's partition with CHAMP at a pooled $\gamma^{*}$, which makes
 community granularity comparable across eras by construction. The current partitions are what
 the Path~A orchestrator is developed and tested against; the fixture numbers above are
 rebuilt from the CHAMP partitions before any substantive result is reported, and no temporal
 claim in this document should be made from the current ones.
 
+\subsection{Implementation Status}
 
+Recorded as of 8 September 2026, so that a reader can distinguish code that exists from intended work. Throughout the document, \meas{} marks a value measured from this corpus during implementation, rather than one inherited from a source or asserted by argument. The findings in the following subsection rest almost entirely on such measurements.
+
+\paragraph{Built and passing.} The Path~A foundation is written in R under
+\code{scripts/Path\_A/}: Pajek readers that return values rather than writing to the global
+environment, era-file resolution across the three directory layouts, era maps, and the tie
+layer. Its suite passes 38 checks. The known-answer fixtures reproduce 561 ties over 877
+bridging works for 2019--2020 and 251 over 126 for 2018--2019, with 151 of 394 citing and 234
+of 794 cited communities participating. These results confirm that the rewritten layer
+encodes the same both-periods reading as the original. Shuffling the edge list leaves bridging
+works, work-resolution ties, and descent weights bit-identical, so the arbitrary-attribution
+defect of \S\ref{sec:pipeline} is repaired and covered by a regression test.
+
+The community-detection stage is written in Julia under
+\code{community_detection_tools/}: Pajek format I/O, the Leiden stack, and CHAMP, behind
+one wrapper module. The Pajek suite passes 182 checks, including every era of the integration
+window; the Leiden suite passes 33 and the CHAMP suite 67.
+
+\paragraph{Written, not yet run.} Coupling and the exposure constants
+(\S\ref{sec:modelI}), built on sparse incidence matrices so that all three weightings follow
+from one multiplication. The hand-built fixtures pass; the corpus implementation remains
+untested.
+
+\paragraph{Not started.} Topical proximity, journal extraction, the cognitive measures, the
+labeling lane, and the orchestrator itself.
+
+% =====================================================================
+
+\subsection{A Network-Structure Finding That Bears on Path A}
+\label{sec:starfinding}
+
+\begin{quote}
+	\textbf{\itshape The era networks are already almost partitioned before community detection
+	runs. Birth-era assignment produces graphs dominated by disconnected article-plus-reference
+	stars because same-year citation is intrinsically rare. Modularity optimization therefore has
+	little substantive work to do, and the resolution parameter has correspondingly little to
+	decide.}
+\end{quote}
+
+This is a finding about the network construction, not about CHAMP. CHAMP is doing what it is
+designed to do; the difficulty lies in the graph it is being asked to partition.
+
+\paragraph{What an era network contains.} Era~12 is the 2009 slice. Its vertex set contains
+every work in the corpus carrying a 2009 imprint: 989 caffeine articles returned by the Web
+of Science search and 17{,}267 cited references that happen to have been published in 2009
+\meas{}. It is \emph{not} the set of works cited by the 2009 articles. A 2009 article's
+references from 2008 and earlier belong to earlier eras and contribute no era-12 arc. An arc
+exists only when one 2009 work cites another.
+
+\paragraph{What that produces.} Of those vertices, 965 emit at least one within-era arc and
+17{,}345 receive one, at a mean of 18.6 references per citing work. Of the works receiving a
+citation, 96.8% are cited exactly once \meas{}. The graph falls into 638 connected
+components, 494 of which consist of a single citing article and its reference list. In each
+of those 494 components, every vertex other than the citing article has degree exactly one
+and emits nothing: each is a leaf attached to that article and to nothing else \meas{}.
+Mean degree remains close to 2.0 in every era of the integration window.
+
+That leaf structure explains both why mean degree remains near two and why much of the
+partition is effectively predetermined. A disconnected star offers community detection
+almost nothing to separate.
+
+\paragraph{Why the construction produces it.} A work belongs to the era in which it was
+published, so an arc can exist within an era only when one work cites another work published
+in the same year. Most references predate the paper citing them, so most citations from a
+2009 article leave the era entirely. Two findings already recorded in this document follow
+from this construction rather than standing independently: 60.7% of era-23 communities
+contain exactly one article \meas{}, and only a small fraction of an era's emitted citations
+survive into the descent network, 0.54% for one of the two era pairs examined and 1.55% for
+the other \meas{}. Both values were measured under the pre-repair tie layer and are due for
+re-derivation.
+
+\paragraph{The consequence for resolution selection.} Modularity on these networks is high
+for a reason largely unrelated to mesoscopic organization. When communities coincide with
+components, nearly every edge is internal and the null-model penalty remains small, so $Q$
+approaches one arithmetically. Era~12 scores 0.9939, compared with 0.9881 for the partition
+that simply assigns each connected component its own label, a gain of only 0.0058 \meas{}.
+The modularity value is not mathematically trivial; its interpretation is.
+
+A CHAMP sweep on the same era makes the point directly. Across $\gamma$ from 0.1 to 1.8, an
+eighteenfold range, modularity changes by only 0.0086 and the community count by 29, about
+4.5% of a partition containing roughly 640 communities \meas{}. At the selected
+$\gamma^{*}=0.3429$, the sweep returns 649 communities from a network containing 638
+connected components. Even at the chosen resolution, the partition is therefore components
+plus eleven.
+
+The selection machinery is working correctly. $\gamma^{*}$ falls in the interior rather
+than against a sweep boundary, and six of eight partitions survive dominance analysis. But a
+nearly horizontal envelope will still yield a plausible value. The penalty term is small
+relative to the total edge weight, $\gamma P \approx 97$ against $2m \approx 35{,}878$
+\meas{}, so the candidate lines differ in slope without the envelope differing much in
+height. \emph{The elbow is geometrically real and substantively inconsequential.}
+
+\paragraph{What this does and does not change.} This finding does not invalidate CHAMP,
+which remains the appropriate procedure for making partitions comparable across eras. It
+does change the diagnostic criteria for deciding when a CHAMP-derived $\gamma^{*}$ is
+substantively interpretable, in two respects.
+
+First, the scale screen must distinguish three quantities that are easy to conflate: how
+large an era is, how much of it is connected, and whether its modularity envelope actually
+discriminates among candidate partitions. Vertex count cannot detect the problem because
+every era in the integration window exceeds 18{,}000 vertices and would clear any plausible
+size threshold. Giant-component share is a useful structural proxy because a resolution
+parameter can choose among partitions only \emph{within} a component; across the integration
+window, that share ranges from 4.8% to 88.3% \meas{}. The quantity of substantive interest,
+however, is the third, which the sweep measures directly through the range of modularity and
+community count across $\gamma$.
+
+Second, consider the size-invariance argument of \S\ref{sec:paths}. Its logic is that a
+$\gamma^{*}$ that does not drift as network size changes provides evidence of a common
+structural scale. That inference requires a condition that the source setting satisfied but
+ours may not:
+
+\begin{quote}
+	Stability of $\gamma^{*}$ across eras is evidence for a common mesoscopic scale \emph{only
+	when each era contains enough connected structure for the modularity envelope to
+	discriminate among plausible partitions}. Without that condition, invariance in
+	$\gamma^{*}$ is not evidence of scale invariance at all; it is evidence of flatness.
+\end{quote}
+
+These findings leave two design decisions open. The first is whether the birth-era
+construction that produces the sparsity should remain fixed. The second, if it does, is how
+the pipeline should distinguish eras in which resolution selection is informative from eras
+in which it is not.
+
+\begin{decision}{Whether birth-era assignment is negotiable}
+	This subsection has treated the sparsity as something to accommodate diagnostically. The
+	prior question is whether it should be accommodated at all. Path~A's birth-era rule was
+	adopted because the networks and partitions already existed (\S\ref{sec:paths}), and the
+	descent relation as specified depends on it: a bridging work must \emph{belong} to the
+	earlier era, which is a birth-era claim. Assigning era membership by citing year, by an
+	observation window, or by an overlapping rule would produce denser era networks with more
+	opportunity for community structure, but at the cost of redefining descent and moving toward
+	the Path~B construction.
+	
+	The distinction is important. The tie layer does not read the era networks; it operates on
+	the citation edge list and the era maps. The sparsity therefore does not directly affect the
+	descent or coupling calculations. It affects community detection, and consequently the
+	communities that serve as the unit of every model in this document.
+\end{decision}
+
+\begin{decision}{What the scale screen is, and what failing it means}
+	Three questions remain open and should be answered together because each constrains the
+	others.
+	
+	\emph{What is screened on.} Giant-component share is the natural structural proxy, but the
+	range of modularity across a sweep measures the quantity of interest directly. A threshold
+	specified in advance is preferable to one chosen after observing which eras it excludes. If
+	the threshold must instead be empirical, the document should say so explicitly.
+	
+	\emph{What CHAMP runs on.} The sweep currently operates on the entire disconnected era
+	graph. The alternative is to run it on the giant component alone. These choices need not
+	produce the same answer because the null model's $2m$ is computed over the graph supplied to
+	the procedure.
+	
+	\emph{What happens to an era that fails.} The possibilities are to assign it a
+	$\gamma^{*}$ with a warning, exclude it from the size-invariance analysis while still
+	partitioning it at the pooled resolution, or fall back to a fixed value. Of these, excluding
+	a failed era from the diagnostic while still partitioning it at the pooled $\gamma^{*}$
+	appears the most defensible, but it should be an explicit methodological choice rather than a
+	default.
+\end{decision}
 
 \subsection{Model Validation and Predictive Checks}
 \label{sec:validation}
