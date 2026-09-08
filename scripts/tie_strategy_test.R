@@ -2,9 +2,9 @@
 #	Jonathan H. Morgan
 #   1 September 2026
 
-##########################
-#####     Config      ####
-##########################
+#####################
+#   CONFIGURATION   #
+#####################
 
 #	Paths (edit these)
 	PROJECT_DIR   <- "/workspace/caffeine_citation"
@@ -35,9 +35,9 @@
 			 utils::packageVersion("dplyr"))
 	}
 
-####################
-####  Functions  ####
-####################
+#################
+#   FUNCTIONS   #
+#################
 
 #	Parse Pajek Vertices
 	read_pajek_vertices <- function(net_path) {
@@ -159,9 +159,9 @@
 						  .by = sender_community))
 	}
 
-##########################
-#####     Import      ####
-##########################
+###################
+#   IMPORT DATA   #
+###################
 
 	cat("Loading node list...\n")
 	nl_env <- new.env(); load(NODE_LIST_RDA, envir = nl_env)
@@ -184,9 +184,9 @@
 		sender_era <- distinct(sender_era, sender_id, .keep_all = TRUE)
 	}
 
-##############################
-####   Build Era Maps     ####
-##############################
+######################
+#   BUILD ERA MAPS   #
+######################
 
 	cat("Building era maps...\n")
 	map_prior <- build_era_map(node_list, NET_PRIOR, CLU_PRIOR, ERA_PRIOR)
@@ -196,9 +196,9 @@
 	cat("  era", ERA_CURR,  ":", nrow(map_curr),  "nodes,",
 		n_distinct(map_curr$community),  "communities\n\n")
 
-##############################
-####   Build Work Set     ####
-##############################
+######################
+#   BUILD WORK SET   #
+######################
 
 #	Attach sender era (left_join preserves edge-list order, which strategy A needs)
 	cit <- left_join(edges, sender_era, by = "sender_id", relationship = "many-to-one")
@@ -224,7 +224,7 @@
 	cat("  after both community joins:", nrow(work), "edges\n\n")
 
 ##################################
-####   Diagnostic: Dedup      ####
+#   DIAGNOSTICS: DEDUPLICATION   #
 ##################################
 
 	cat("=== Is the global target_id dedup lossy in practice? ===\n")
@@ -252,9 +252,9 @@
 	cat("  --> community-tie observations lost to the dedup:",
 		sum(per_target$n_citing_communities) - nrow(per_target), "\n\n")
 
-##########################################
-####   One Pass Serves Three Measures ####
-##########################################
+###################################
+#   CHECK EACH PROPOSED MEASURE   #
+###################################
 
 #	Citations from each citer community to each individual cited article
 	article_cell <- count(work, sender_community, target_community, target_id,
@@ -281,9 +281,9 @@
 		summarise(count = n(), .by = c(sender_community, target_community)) |>
 		normalize_arcs("count")
 
-##############################
-####    Comparison        ####
-##############################
+#########################
+#   COMPARISON CHECKS   #
+#########################
 
 	cat("=== Arc counts by strategy ===\n")
 	cat("  A current (global dedup) :", nrow(arcs_a), "arcs\n")
@@ -326,9 +326,9 @@
 		as.data.frame() |>
 		print(row.names = FALSE)
 
-##############################
-####    Write Outputs     ####
-##############################
+###################
+#  TEST OUTPUTS   #
+###################
 
 	dir.create(OUT_DIR, showWarnings = FALSE, recursive = TRUE)
 
