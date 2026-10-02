@@ -1,0 +1,10 @@
+*Vertices 5
+1 "NA" 0.0000 0.0000 0.5000 ic Blue bc White
+2 "10.1001/archneurpsyc.1932.02240060049003" 0.0000 0.0000 0.5000 ic Blue bc White
+3 "NA" 0.0000 0.0000 0.5000 ic Blue bc White
+4 "*A O A C, 1930, OFF TENT METH AN ASS, P151" 0.0000 0.0000 0.5000 ic Blue bc White
+5 "Smith RG, 1928, J PHARMACOL EXP THER, V33, P147" 0.0000 0.0000 0.5000 ic Blue bc White
+*Arcs
+1 4 1 c Gray
+2 5 1 c Gray
+3 5 1 c Gray

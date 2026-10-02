@@ -1,0 +1,5 @@
+*Vertices 2
+1 "10.1021/ja02229a019" 0.0000 0.0000 0.5000 ic Blue bc White
+2 "*SMITHS I, 1916, ANN REP SMITHS I, P416" 0.0000 0.0000 0.5000 ic Blue bc White
+*Arcs
+1 2 1 c Gray

@@ -1,0 +1,5 @@
+*Vertices 2
+1 "10.1021/ac60013a007" 0.0000 0.0000 0.5000 ic Blue bc White
+2 "KAY J, 1946, ANALYST, V71, P162, DOI 10.1039/an9467100162" 0.0000 0.0000 0.5000 ic Blue bc White
+*Arcs
+1 2 1 c Gray
