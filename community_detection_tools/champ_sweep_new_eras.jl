@@ -36,9 +36,13 @@
 	using Pkg
 	Pkg.activate("/workspace/caffeine_citation/community_detection_tools")
 
-#	Packages
-	using DataFrames
-	using community_detection_tools
+################
+#   PACKAGES   #
+################
+
+using DataFrames
+using Printf
+using community_detection_tools
 
 ##############
 #   CONFIG   #
@@ -323,9 +327,6 @@
 ############
 #   MAIN   #
 ############
-
-#	Printf for Era File Names
-	using Printf
 
 #	Refuse an Interactive Run
 	if isinteractive()

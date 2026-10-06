@@ -1,0 +1,2 @@
+network,n_vertices,n_arcs,n_dated,n_undated,n_citing,n_cited,n_both_degree,n_arcs_within_era,mean_degree,pct_arcs_cross_era
+full_network,589784,1238288,589512,272,34973,575244,20434,304602,4.199,75.4

@@ -1,65 +1,596 @@
-*Vertices 40
-1 "NA" 0.0000 0.0000 0.5000 ic Blue bc White
-2 "10.1085/jgp.47.1.151" 0.0000 0.0000 0.5000 ic Blue bc White
-3 "NA" 0.0000 0.0000 0.5000 ic Blue bc White
-4 "10.1126/science.140.3572.1226" 0.0000 0.0000 0.5000 ic Blue bc White
-5 "NA" 0.0000 0.0000 0.5000 ic Blue bc White
-6 "10.1016/0014-4827(62)90175-1" 0.0000 0.0000 0.5000 ic Blue bc White
-7 "NA" 0.0000 0.0000 0.5000 ic Blue bc White
-8 "NA" 0.0000 0.0000 0.5000 ic Blue bc White
-9 "NA" 0.0000 0.0000 0.5000 ic Blue bc White
-10 "10.1113/jphysiol.1962.sp006972" 0.0000 0.0000 0.5000 ic Blue bc White
-11 "NA" 0.0000 0.0000 0.5000 ic Blue bc White
-12 "NA" 0.0000 0.0000 0.5000 ic Blue bc White
-13 "10.1039/an9618600825" 0.0000 0.0000 0.5000 ic Blue bc White
-14 "10.1002/jps.3030491102" 0.0000 0.0000 0.5000 ic Blue bc White
-15 "NA" 0.0000 0.0000 0.5000 ic Blue bc White
-16 "10.1080/10671188.1960.10613108" 0.0000 0.0000 0.5000 ic Blue bc White
-17 "NA" 0.0000 0.0000 0.5000 ic Blue bc White
-18 "10.1107/S0365110X58001286" 0.0000 0.0000 0.5000 ic Blue bc White
-19 "10.1007/BF00639129" 0.0000 0.0000 0.5000 ic Blue bc White
-20 "NA" 0.0000 0.0000 0.5000 ic Blue bc White
-21 "NA" 0.0000 0.0000 0.5000 ic Blue bc White
-22 "*AM COLL SPORTS ME, 1958, REP COMM STUD US DRV" 0.0000 0.0000 0.5000 ic Blue bc White
-23 "ADRIAN RH, 1956, J PHYSIOL-LONDON, V133, P631, DOI 10.1113/jphysiol.1956.sp005615" 0.0000 0.0000 0.5000 ic Blue bc White
-24 "AXELSON J, 1954, ACTA PHYSIOL SCAND, V44, P55" 0.0000 0.0000 0.5000 ic Blue bc White
-25 "BAILEY EM, 1921, J ASS OFF AGR CHEM, V5, P288" 0.0000 0.0000 0.5000 ic Blue bc White
-26 "BERGER RJ, 1962, Q J EXP PSYCHOL, V14, P183, DOI 10.1080/17470216208416534" 0.0000 0.0000 0.5000 ic Blue bc White
-27 "BIANCHI CP, 1962, J PHARMACOL EXP THER, V138, P41" 0.0000 0.0000 0.5000 ic Blue bc White
-28 "BORKER E, 1959, J ASSOC OFF AGR CHEM, V42, P299" 0.0000 0.0000 0.5000 ic Blue bc White
-29 "BORKER E, 1960, J ASSOC OFF AGR CHEM, V43, P620" 0.0000 0.0000 0.5000 ic Blue bc White
-30 "BUJAS Z, 1955, Arh Hig Rada, V6, P205" 0.0000 0.0000 0.5000 ic Blue bc White
-31 "CRUICKSHANK DWJ, 1953, ACTA CRYSTALLOGR, V6, P698, DOI 10.1107/S0365110X53001976" 0.0000 0.0000 0.5000 ic Blue bc White
-32 "FROST DV, 1947, J AM CHEM SOC, V69, P1064, DOI 10.1021/ja01197a027" 0.0000 0.0000 0.5000 ic Blue bc White
-33 "GOODMAN, 1955, PHARMACOLOGICAL BASI" 0.0000 0.0000 0.5000 ic Blue bc White
-34 "GUTMAN AB, 1948, ADV PROTEIN CHEM, V4, P186" 0.0000 0.0000 0.5000 ic Blue bc White
-35 "LEAKE CD, 1958, AMPHETAMINES" 0.0000 0.0000 0.5000 ic Blue bc White
-36 "LULLMANN H, 1962, J PHARMACOL EXP THER, V137, P186" 0.0000 0.0000 0.5000 ic Blue bc White
-37 "NAGAI S, 1958, NATURWISSENSCHAFTEN, V45, P441, DOI 10.1007/BF00637284" 0.0000 0.0000 0.5000 ic Blue bc White
-38 "NAGAI S, 1959, SCIENCE, V130, P1188, DOI 10.1126/science.130.3383.1188-a" 0.0000 0.0000 0.5000 ic Blue bc White
-39 "RITCHIE JM, 1954, J PHYSIOL-LONDON, V126, P155, DOI 10.1113/jphysiol.1954.sp005200" 0.0000 0.0000 0.5000 ic Blue bc White
-40 "ROBERT A, 1958, P SOC EXP BIOL MED, V99, P443" 0.0000 0.0000 0.5000 ic Blue bc White
+*Vertices 300
+1 "28615" 0.0000 0.0000 0.5000 ic Blue bc White
+2 "28616" 0.0000 0.0000 0.5000 ic Blue bc White
+3 "28617" 0.0000 0.0000 0.5000 ic Blue bc White
+4 "28618" 0.0000 0.0000 0.5000 ic Blue bc White
+5 "28619" 0.0000 0.0000 0.5000 ic Blue bc White
+6 "28621" 0.0000 0.0000 0.5000 ic Blue bc White
+7 "28622" 0.0000 0.0000 0.5000 ic Blue bc White
+8 "28623" 0.0000 0.0000 0.5000 ic Blue bc White
+9 "28624" 0.0000 0.0000 0.5000 ic Blue bc White
+10 "28625" 0.0000 0.0000 0.5000 ic Blue bc White
+11 "28626" 0.0000 0.0000 0.5000 ic Blue bc White
+12 "28627" 0.0000 0.0000 0.5000 ic Blue bc White
+13 "28628" 0.0000 0.0000 0.5000 ic Blue bc White
+14 "28629" 0.0000 0.0000 0.5000 ic Blue bc White
+15 "28630" 0.0000 0.0000 0.5000 ic Blue bc White
+16 "28631" 0.0000 0.0000 0.5000 ic Blue bc White
+17 "28632" 0.0000 0.0000 0.5000 ic Blue bc White
+18 "28633" 0.0000 0.0000 0.5000 ic Blue bc White
+19 "28634" 0.0000 0.0000 0.5000 ic Blue bc White
+20 "28636" 0.0000 0.0000 0.5000 ic Blue bc White
+21 "28637" 0.0000 0.0000 0.5000 ic Blue bc White
+22 "28638" 0.0000 0.0000 0.5000 ic Blue bc White
+23 "28639" 0.0000 0.0000 0.5000 ic Blue bc White
+24 "28640" 0.0000 0.0000 0.5000 ic Blue bc White
+25 "28641" 0.0000 0.0000 0.5000 ic Blue bc White
+26 "28642" 0.0000 0.0000 0.5000 ic Blue bc White
+27 "28643" 0.0000 0.0000 0.5000 ic Blue bc White
+28 "28644" 0.0000 0.0000 0.5000 ic Blue bc White
+29 "28645" 0.0000 0.0000 0.5000 ic Blue bc White
+30 "28646" 0.0000 0.0000 0.5000 ic Blue bc White
+31 "28647" 0.0000 0.0000 0.5000 ic Blue bc White
+32 "28648" 0.0000 0.0000 0.5000 ic Blue bc White
+33 "28649" 0.0000 0.0000 0.5000 ic Blue bc White
+34 "28650" 0.0000 0.0000 0.5000 ic Blue bc White
+35 "28651" 0.0000 0.0000 0.5000 ic Blue bc White
+36 "28652" 0.0000 0.0000 0.5000 ic Blue bc White
+37 "28653" 0.0000 0.0000 0.5000 ic Blue bc White
+38 "28654" 0.0000 0.0000 0.5000 ic Blue bc White
+39 "28655" 0.0000 0.0000 0.5000 ic Blue bc White
+40 "28656" 0.0000 0.0000 0.5000 ic Blue bc White
+41 "28657" 0.0000 0.0000 0.5000 ic Blue bc White
+42 "28659" 0.0000 0.0000 0.5000 ic Blue bc White
+43 "28661" 0.0000 0.0000 0.5000 ic Blue bc White
+44 "28663" 0.0000 0.0000 0.5000 ic Blue bc White
+45 "28664" 0.0000 0.0000 0.5000 ic Blue bc White
+46 "28667" 0.0000 0.0000 0.5000 ic Blue bc White
+47 "28668" 0.0000 0.0000 0.5000 ic Blue bc White
+48 "28670" 0.0000 0.0000 0.5000 ic Blue bc White
+49 "28671" 0.0000 0.0000 0.5000 ic Blue bc White
+50 "28672" 0.0000 0.0000 0.5000 ic Blue bc White
+51 "28673" 0.0000 0.0000 0.5000 ic Blue bc White
+52 "28674" 0.0000 0.0000 0.5000 ic Blue bc White
+53 "28676" 0.0000 0.0000 0.5000 ic Blue bc White
+54 "28677" 0.0000 0.0000 0.5000 ic Blue bc White
+55 "28678" 0.0000 0.0000 0.5000 ic Blue bc White
+56 "28679" 0.0000 0.0000 0.5000 ic Blue bc White
+57 "28680" 0.0000 0.0000 0.5000 ic Blue bc White
+58 "28683" 0.0000 0.0000 0.5000 ic Blue bc White
+59 "28684" 0.0000 0.0000 0.5000 ic Blue bc White
+60 "28686" 0.0000 0.0000 0.5000 ic Blue bc White
+61 "28688" 0.0000 0.0000 0.5000 ic Blue bc White
+62 "28689" 0.0000 0.0000 0.5000 ic Blue bc White
+63 "28690" 0.0000 0.0000 0.5000 ic Blue bc White
+64 "28691" 0.0000 0.0000 0.5000 ic Blue bc White
+65 "28695" 0.0000 0.0000 0.5000 ic Blue bc White
+66 "28697" 0.0000 0.0000 0.5000 ic Blue bc White
+67 "28698" 0.0000 0.0000 0.5000 ic Blue bc White
+68 "28703" 0.0000 0.0000 0.5000 ic Blue bc White
+69 "28706" 0.0000 0.0000 0.5000 ic Blue bc White
+70 "38862" 0.0000 0.0000 0.5000 ic Blue bc White
+71 "61129" 0.0000 0.0000 0.5000 ic Blue bc White
+72 "91179" 0.0000 0.0000 0.5000 ic Blue bc White
+73 "91281" 0.0000 0.0000 0.5000 ic Blue bc White
+74 "137018" 0.0000 0.0000 0.5000 ic Blue bc White
+75 "150066" 0.0000 0.0000 0.5000 ic Blue bc White
+76 "160081" 0.0000 0.0000 0.5000 ic Blue bc White
+77 "163137" 0.0000 0.0000 0.5000 ic Blue bc White
+78 "165318" 0.0000 0.0000 0.5000 ic Blue bc White
+79 "187505" 0.0000 0.0000 0.5000 ic Blue bc White
+80 "237341" 0.0000 0.0000 0.5000 ic Blue bc White
+81 "257058" 0.0000 0.0000 0.5000 ic Blue bc White
+82 "288607" 0.0000 0.0000 0.5000 ic Blue bc White
+83 "289066" 0.0000 0.0000 0.5000 ic Blue bc White
+84 "301332" 0.0000 0.0000 0.5000 ic Blue bc White
+85 "309756" 0.0000 0.0000 0.5000 ic Blue bc White
+86 "312570" 0.0000 0.0000 0.5000 ic Blue bc White
+87 "316014" 0.0000 0.0000 0.5000 ic Blue bc White
+88 "317957" 0.0000 0.0000 0.5000 ic Blue bc White
+89 "336798" 0.0000 0.0000 0.5000 ic Blue bc White
+90 "339384" 0.0000 0.0000 0.5000 ic Blue bc White
+91 "343054" 0.0000 0.0000 0.5000 ic Blue bc White
+92 "344570" 0.0000 0.0000 0.5000 ic Blue bc White
+93 "347282" 0.0000 0.0000 0.5000 ic Blue bc White
+94 "362966" 0.0000 0.0000 0.5000 ic Blue bc White
+95 "378075" 0.0000 0.0000 0.5000 ic Blue bc White
+96 "382036" 0.0000 0.0000 0.5000 ic Blue bc White
+97 "384706" 0.0000 0.0000 0.5000 ic Blue bc White
+98 "384895" 0.0000 0.0000 0.5000 ic Blue bc White
+99 "386760" 0.0000 0.0000 0.5000 ic Blue bc White
+100 "400805" 0.0000 0.0000 0.5000 ic Blue bc White
+101 "407029" 0.0000 0.0000 0.5000 ic Blue bc White
+102 "414963" 0.0000 0.0000 0.5000 ic Blue bc White
+103 "426850" 0.0000 0.0000 0.5000 ic Blue bc White
+104 "437120" 0.0000 0.0000 0.5000 ic Blue bc White
+105 "438430" 0.0000 0.0000 0.5000 ic Blue bc White
+106 "438739" 0.0000 0.0000 0.5000 ic Blue bc White
+107 "442722" 0.0000 0.0000 0.5000 ic Blue bc White
+108 "442735" 0.0000 0.0000 0.5000 ic Blue bc White
+109 "444964" 0.0000 0.0000 0.5000 ic Blue bc White
+110 "446169" 0.0000 0.0000 0.5000 ic Blue bc White
+111 "453487" 0.0000 0.0000 0.5000 ic Blue bc White
+112 "457142" 0.0000 0.0000 0.5000 ic Blue bc White
+113 "457404" 0.0000 0.0000 0.5000 ic Blue bc White
+114 "459845" 0.0000 0.0000 0.5000 ic Blue bc White
+115 "460443" 0.0000 0.0000 0.5000 ic Blue bc White
+116 "460544" 0.0000 0.0000 0.5000 ic Blue bc White
+117 "473945" 0.0000 0.0000 0.5000 ic Blue bc White
+118 "474153" 0.0000 0.0000 0.5000 ic Blue bc White
+119 "475985" 0.0000 0.0000 0.5000 ic Blue bc White
+120 "477768" 0.0000 0.0000 0.5000 ic Blue bc White
+121 "478111" 0.0000 0.0000 0.5000 ic Blue bc White
+122 "478277" 0.0000 0.0000 0.5000 ic Blue bc White
+123 "478323" 0.0000 0.0000 0.5000 ic Blue bc White
+124 "479838" 0.0000 0.0000 0.5000 ic Blue bc White
+125 "480331" 0.0000 0.0000 0.5000 ic Blue bc White
+126 "480376" 0.0000 0.0000 0.5000 ic Blue bc White
+127 "480660" 0.0000 0.0000 0.5000 ic Blue bc White
+128 "480979" 0.0000 0.0000 0.5000 ic Blue bc White
+129 "480980" 0.0000 0.0000 0.5000 ic Blue bc White
+130 "480983" 0.0000 0.0000 0.5000 ic Blue bc White
+131 "481216" 0.0000 0.0000 0.5000 ic Blue bc White
+132 "481799" 0.0000 0.0000 0.5000 ic Blue bc White
+133 "481881" 0.0000 0.0000 0.5000 ic Blue bc White
+134 "481974" 0.0000 0.0000 0.5000 ic Blue bc White
+135 "482004" 0.0000 0.0000 0.5000 ic Blue bc White
+136 "482542" 0.0000 0.0000 0.5000 ic Blue bc White
+137 "482720" 0.0000 0.0000 0.5000 ic Blue bc White
+138 "482764" 0.0000 0.0000 0.5000 ic Blue bc White
+139 "482765" 0.0000 0.0000 0.5000 ic Blue bc White
+140 "482818" 0.0000 0.0000 0.5000 ic Blue bc White
+141 "482912" 0.0000 0.0000 0.5000 ic Blue bc White
+142 "482915" 0.0000 0.0000 0.5000 ic Blue bc White
+143 "483053" 0.0000 0.0000 0.5000 ic Blue bc White
+144 "483061" 0.0000 0.0000 0.5000 ic Blue bc White
+145 "483174" 0.0000 0.0000 0.5000 ic Blue bc White
+146 "483243" 0.0000 0.0000 0.5000 ic Blue bc White
+147 "483324" 0.0000 0.0000 0.5000 ic Blue bc White
+148 "483327" 0.0000 0.0000 0.5000 ic Blue bc White
+149 "483510" 0.0000 0.0000 0.5000 ic Blue bc White
+150 "483536" 0.0000 0.0000 0.5000 ic Blue bc White
+151 "483572" 0.0000 0.0000 0.5000 ic Blue bc White
+152 "483627" 0.0000 0.0000 0.5000 ic Blue bc White
+153 "483641" 0.0000 0.0000 0.5000 ic Blue bc White
+154 "483688" 0.0000 0.0000 0.5000 ic Blue bc White
+155 "483806" 0.0000 0.0000 0.5000 ic Blue bc White
+156 "483829" 0.0000 0.0000 0.5000 ic Blue bc White
+157 "483867" 0.0000 0.0000 0.5000 ic Blue bc White
+158 "483883" 0.0000 0.0000 0.5000 ic Blue bc White
+159 "483885" 0.0000 0.0000 0.5000 ic Blue bc White
+160 "483886" 0.0000 0.0000 0.5000 ic Blue bc White
+161 "483887" 0.0000 0.0000 0.5000 ic Blue bc White
+162 "483888" 0.0000 0.0000 0.5000 ic Blue bc White
+163 "483889" 0.0000 0.0000 0.5000 ic Blue bc White
+164 "483890" 0.0000 0.0000 0.5000 ic Blue bc White
+165 "483892" 0.0000 0.0000 0.5000 ic Blue bc White
+166 "483893" 0.0000 0.0000 0.5000 ic Blue bc White
+167 "483895" 0.0000 0.0000 0.5000 ic Blue bc White
+168 "483896" 0.0000 0.0000 0.5000 ic Blue bc White
+169 "483909" 0.0000 0.0000 0.5000 ic Blue bc White
+170 "483912" 0.0000 0.0000 0.5000 ic Blue bc White
+171 "483913" 0.0000 0.0000 0.5000 ic Blue bc White
+172 "483914" 0.0000 0.0000 0.5000 ic Blue bc White
+173 "483918" 0.0000 0.0000 0.5000 ic Blue bc White
+174 "483919" 0.0000 0.0000 0.5000 ic Blue bc White
+175 "483920" 0.0000 0.0000 0.5000 ic Blue bc White
+176 "483921" 0.0000 0.0000 0.5000 ic Blue bc White
+177 "483925" 0.0000 0.0000 0.5000 ic Blue bc White
+178 "483927" 0.0000 0.0000 0.5000 ic Blue bc White
+179 "483928" 0.0000 0.0000 0.5000 ic Blue bc White
+180 "483929" 0.0000 0.0000 0.5000 ic Blue bc White
+181 "483930" 0.0000 0.0000 0.5000 ic Blue bc White
+182 "483931" 0.0000 0.0000 0.5000 ic Blue bc White
+183 "483932" 0.0000 0.0000 0.5000 ic Blue bc White
+184 "483933" 0.0000 0.0000 0.5000 ic Blue bc White
+185 "483934" 0.0000 0.0000 0.5000 ic Blue bc White
+186 "483936" 0.0000 0.0000 0.5000 ic Blue bc White
+187 "483937" 0.0000 0.0000 0.5000 ic Blue bc White
+188 "483940" 0.0000 0.0000 0.5000 ic Blue bc White
+189 "483941" 0.0000 0.0000 0.5000 ic Blue bc White
+190 "483943" 0.0000 0.0000 0.5000 ic Blue bc White
+191 "483944" 0.0000 0.0000 0.5000 ic Blue bc White
+192 "483945" 0.0000 0.0000 0.5000 ic Blue bc White
+193 "483946" 0.0000 0.0000 0.5000 ic Blue bc White
+194 "483951" 0.0000 0.0000 0.5000 ic Blue bc White
+195 "483953" 0.0000 0.0000 0.5000 ic Blue bc White
+196 "483955" 0.0000 0.0000 0.5000 ic Blue bc White
+197 "483959" 0.0000 0.0000 0.5000 ic Blue bc White
+198 "483965" 0.0000 0.0000 0.5000 ic Blue bc White
+199 "483966" 0.0000 0.0000 0.5000 ic Blue bc White
+200 "483967" 0.0000 0.0000 0.5000 ic Blue bc White
+201 "483973" 0.0000 0.0000 0.5000 ic Blue bc White
+202 "483974" 0.0000 0.0000 0.5000 ic Blue bc White
+203 "483975" 0.0000 0.0000 0.5000 ic Blue bc White
+204 "483980" 0.0000 0.0000 0.5000 ic Blue bc White
+205 "483982" 0.0000 0.0000 0.5000 ic Blue bc White
+206 "483985" 0.0000 0.0000 0.5000 ic Blue bc White
+207 "483987" 0.0000 0.0000 0.5000 ic Blue bc White
+208 "483988" 0.0000 0.0000 0.5000 ic Blue bc White
+209 "483989" 0.0000 0.0000 0.5000 ic Blue bc White
+210 "483990" 0.0000 0.0000 0.5000 ic Blue bc White
+211 "483992" 0.0000 0.0000 0.5000 ic Blue bc White
+212 "483993" 0.0000 0.0000 0.5000 ic Blue bc White
+213 "483995" 0.0000 0.0000 0.5000 ic Blue bc White
+214 "483996" 0.0000 0.0000 0.5000 ic Blue bc White
+215 "483997" 0.0000 0.0000 0.5000 ic Blue bc White
+216 "483999" 0.0000 0.0000 0.5000 ic Blue bc White
+217 "484005" 0.0000 0.0000 0.5000 ic Blue bc White
+218 "484011" 0.0000 0.0000 0.5000 ic Blue bc White
+219 "484012" 0.0000 0.0000 0.5000 ic Blue bc White
+220 "484014" 0.0000 0.0000 0.5000 ic Blue bc White
+221 "484016" 0.0000 0.0000 0.5000 ic Blue bc White
+222 "484017" 0.0000 0.0000 0.5000 ic Blue bc White
+223 "484018" 0.0000 0.0000 0.5000 ic Blue bc White
+224 "484019" 0.0000 0.0000 0.5000 ic Blue bc White
+225 "484020" 0.0000 0.0000 0.5000 ic Blue bc White
+226 "484021" 0.0000 0.0000 0.5000 ic Blue bc White
+227 "484022" 0.0000 0.0000 0.5000 ic Blue bc White
+228 "484024" 0.0000 0.0000 0.5000 ic Blue bc White
+229 "484025" 0.0000 0.0000 0.5000 ic Blue bc White
+230 "484026" 0.0000 0.0000 0.5000 ic Blue bc White
+231 "484039" 0.0000 0.0000 0.5000 ic Blue bc White
+232 "484040" 0.0000 0.0000 0.5000 ic Blue bc White
+233 "484041" 0.0000 0.0000 0.5000 ic Blue bc White
+234 "484042" 0.0000 0.0000 0.5000 ic Blue bc White
+235 "484043" 0.0000 0.0000 0.5000 ic Blue bc White
+236 "484044" 0.0000 0.0000 0.5000 ic Blue bc White
+237 "484045" 0.0000 0.0000 0.5000 ic Blue bc White
+238 "484046" 0.0000 0.0000 0.5000 ic Blue bc White
+239 "484047" 0.0000 0.0000 0.5000 ic Blue bc White
+240 "484048" 0.0000 0.0000 0.5000 ic Blue bc White
+241 "484049" 0.0000 0.0000 0.5000 ic Blue bc White
+242 "484052" 0.0000 0.0000 0.5000 ic Blue bc White
+243 "484053" 0.0000 0.0000 0.5000 ic Blue bc White
+244 "484058" 0.0000 0.0000 0.5000 ic Blue bc White
+245 "484066" 0.0000 0.0000 0.5000 ic Blue bc White
+246 "484069" 0.0000 0.0000 0.5000 ic Blue bc White
+247 "484070" 0.0000 0.0000 0.5000 ic Blue bc White
+248 "484071" 0.0000 0.0000 0.5000 ic Blue bc White
+249 "484073" 0.0000 0.0000 0.5000 ic Blue bc White
+250 "484074" 0.0000 0.0000 0.5000 ic Blue bc White
+251 "484075" 0.0000 0.0000 0.5000 ic Blue bc White
+252 "484078" 0.0000 0.0000 0.5000 ic Blue bc White
+253 "484080" 0.0000 0.0000 0.5000 ic Blue bc White
+254 "484082" 0.0000 0.0000 0.5000 ic Blue bc White
+255 "484089" 0.0000 0.0000 0.5000 ic Blue bc White
+256 "484093" 0.0000 0.0000 0.5000 ic Blue bc White
+257 "484094" 0.0000 0.0000 0.5000 ic Blue bc White
+258 "484096" 0.0000 0.0000 0.5000 ic Blue bc White
+259 "484098" 0.0000 0.0000 0.5000 ic Blue bc White
+260 "484099" 0.0000 0.0000 0.5000 ic Blue bc White
+261 "484101" 0.0000 0.0000 0.5000 ic Blue bc White
+262 "484103" 0.0000 0.0000 0.5000 ic Blue bc White
+263 "484104" 0.0000 0.0000 0.5000 ic Blue bc White
+264 "484106" 0.0000 0.0000 0.5000 ic Blue bc White
+265 "484107" 0.0000 0.0000 0.5000 ic Blue bc White
+266 "484109" 0.0000 0.0000 0.5000 ic Blue bc White
+267 "484116" 0.0000 0.0000 0.5000 ic Blue bc White
+268 "484120" 0.0000 0.0000 0.5000 ic Blue bc White
+269 "484122" 0.0000 0.0000 0.5000 ic Blue bc White
+270 "484126" 0.0000 0.0000 0.5000 ic Blue bc White
+271 "484133" 0.0000 0.0000 0.5000 ic Blue bc White
+272 "484136" 0.0000 0.0000 0.5000 ic Blue bc White
+273 "484138" 0.0000 0.0000 0.5000 ic Blue bc White
+274 "484142" 0.0000 0.0000 0.5000 ic Blue bc White
+275 "484155" 0.0000 0.0000 0.5000 ic Blue bc White
+276 "484159" 0.0000 0.0000 0.5000 ic Blue bc White
+277 "484160" 0.0000 0.0000 0.5000 ic Blue bc White
+278 "484162" 0.0000 0.0000 0.5000 ic Blue bc White
+279 "484163" 0.0000 0.0000 0.5000 ic Blue bc White
+280 "484164" 0.0000 0.0000 0.5000 ic Blue bc White
+281 "484165" 0.0000 0.0000 0.5000 ic Blue bc White
+282 "484166" 0.0000 0.0000 0.5000 ic Blue bc White
+283 "484168" 0.0000 0.0000 0.5000 ic Blue bc White
+284 "484169" 0.0000 0.0000 0.5000 ic Blue bc White
+285 "484171" 0.0000 0.0000 0.5000 ic Blue bc White
+286 "484178" 0.0000 0.0000 0.5000 ic Blue bc White
+287 "484179" 0.0000 0.0000 0.5000 ic Blue bc White
+288 "484180" 0.0000 0.0000 0.5000 ic Blue bc White
+289 "484187" 0.0000 0.0000 0.5000 ic Blue bc White
+290 "484189" 0.0000 0.0000 0.5000 ic Blue bc White
+291 "484192" 0.0000 0.0000 0.5000 ic Blue bc White
+292 "484193" 0.0000 0.0000 0.5000 ic Blue bc White
+293 "484194" 0.0000 0.0000 0.5000 ic Blue bc White
+294 "484203" 0.0000 0.0000 0.5000 ic Blue bc White
+295 "484211" 0.0000 0.0000 0.5000 ic Blue bc White
+296 "484218" 0.0000 0.0000 0.5000 ic Blue bc White
+297 "484242" 0.0000 0.0000 0.5000 ic Blue bc White
+298 "484257" 0.0000 0.0000 0.5000 ic Blue bc White
+299 "484259" 0.0000 0.0000 0.5000 ic Blue bc White
+300 "484260" 0.0000 0.0000 0.5000 ic Blue bc White
 *Arcs
-1 36 1 c Gray
-2 27 1 c Gray
-3 28 1 c Gray
-3 29 1 c Gray
-4 26 1 c Gray
-5 40 1 c Gray
-6 38 1 c Gray
-7 39 1 c Gray
-8 24 1 c Gray
-9 39 1 c Gray
-10 39 1 c Gray
-11 30 1 c Gray
-11 35 1 c Gray
-12 23 1 c Gray
-13 29 1 c Gray
-14 32 1 c Gray
-15 28 1 c Gray
-16 22 1 c Gray
-17 34 1 c Gray
-18 31 1 c Gray
-19 37 1 c Gray
-20 33 1 c Gray
-21 25 1 c Gray
+1 45 1 c Gray
+1 94 1 c Gray
+1 109 1 c Gray
+1 116 1 c Gray
+1 149 1 c Gray
+1 158 1 c Gray
+1 159 1 c Gray
+1 160 1 c Gray
+1 161 1 c Gray
+1 162 1 c Gray
+1 163 1 c Gray
+1 164 1 c Gray
+2 165 1 c Gray
+2 166 1 c Gray
+3 167 1 c Gray
+3 168 1 c Gray
+4 70 1 c Gray
+4 98 1 c Gray
+4 131 1 c Gray
+5 111 1 c Gray
+6 169 1 c Gray
+6 170 1 c Gray
+6 171 1 c Gray
+6 172 1 c Gray
+7 45 1 c Gray
+7 73 1 c Gray
+7 76 1 c Gray
+7 81 1 c Gray
+7 84 1 c Gray
+7 90 1 c Gray
+7 95 1 c Gray
+7 102 1 c Gray
+7 116 1 c Gray
+7 117 1 c Gray
+7 121 1 c Gray
+7 126 1 c Gray
+7 132 1 c Gray
+7 136 1 c Gray
+7 137 1 c Gray
+7 138 1 c Gray
+7 146 1 c Gray
+7 155 1 c Gray
+7 173 1 c Gray
+7 174 1 c Gray
+7 175 1 c Gray
+7 176 1 c Gray
+7 177 1 c Gray
+7 178 1 c Gray
+7 179 1 c Gray
+7 180 1 c Gray
+7 181 1 c Gray
+7 182 1 c Gray
+7 183 1 c Gray
+7 184 1 c Gray
+7 185 1 c Gray
+7 186 1 c Gray
+7 187 1 c Gray
+7 188 1 c Gray
+7 189 1 c Gray
+7 190 1 c Gray
+7 191 1 c Gray
+7 192 1 c Gray
+7 193 1 c Gray
+8 40 1 c Gray
+8 110 1 c Gray
+8 115 1 c Gray
+9 115 1 c Gray
+10 134 1 c Gray
+10 194 1 c Gray
+11 88 1 c Gray
+11 195 1 c Gray
+11 196 1 c Gray
+12 120 1 c Gray
+12 197 1 c Gray
+13 120 1 c Gray
+14 98 1 c Gray
+14 127 1 c Gray
+14 198 1 c Gray
+14 199 1 c Gray
+15 200 1 c Gray
+16 151 1 c Gray
+16 201 1 c Gray
+16 202 1 c Gray
+17 120 1 c Gray
+18 203 1 c Gray
+18 204 1 c Gray
+18 205 1 c Gray
+19 118 1 c Gray
+19 206 1 c Gray
+20 78 1 c Gray
+20 154 1 c Gray
+20 207 1 c Gray
+20 208 1 c Gray
+20 209 1 c Gray
+21 210 1 c Gray
+21 211 1 c Gray
+21 212 1 c Gray
+21 213 1 c Gray
+21 214 1 c Gray
+21 215 1 c Gray
+21 216 1 c Gray
+22 73 1 c Gray
+22 132 1 c Gray
+22 217 1 c Gray
+23 85 1 c Gray
+23 92 1 c Gray
+23 218 1 c Gray
+23 219 1 c Gray
+23 220 1 c Gray
+24 45 1 c Gray
+24 73 1 c Gray
+24 79 1 c Gray
+24 85 1 c Gray
+24 94 1 c Gray
+24 97 1 c Gray
+24 135 1 c Gray
+24 143 1 c Gray
+24 184 1 c Gray
+24 221 1 c Gray
+24 222 1 c Gray
+24 223 1 c Gray
+24 224 1 c Gray
+24 225 1 c Gray
+24 226 1 c Gray
+24 227 1 c Gray
+24 228 1 c Gray
+25 47 1 c Gray
+25 124 1 c Gray
+25 128 1 c Gray
+25 130 1 c Gray
+25 147 1 c Gray
+25 148 1 c Gray
+25 229 1 c Gray
+26 230 1 c Gray
+27 231 1 c Gray
+27 232 1 c Gray
+27 233 1 c Gray
+28 234 1 c Gray
+28 235 1 c Gray
+28 236 1 c Gray
+28 237 1 c Gray
+28 238 1 c Gray
+28 239 1 c Gray
+29 51 1 c Gray
+29 240 1 c Gray
+29 241 1 c Gray
+30 157 1 c Gray
+30 242 1 c Gray
+30 243 1 c Gray
+30 244 1 c Gray
+31 45 1 c Gray
+31 73 1 c Gray
+31 85 1 c Gray
+31 97 1 c Gray
+31 99 1 c Gray
+31 101 1 c Gray
+31 113 1 c Gray
+31 116 1 c Gray
+31 140 1 c Gray
+32 69 1 c Gray
+33 69 1 c Gray
+34 58 1 c Gray
+34 80 1 c Gray
+34 82 1 c Gray
+34 83 1 c Gray
+34 86 1 c Gray
+34 87 1 c Gray
+34 89 1 c Gray
+34 93 1 c Gray
+34 100 1 c Gray
+34 104 1 c Gray
+34 107 1 c Gray
+34 108 1 c Gray
+34 119 1 c Gray
+34 145 1 c Gray
+34 153 1 c Gray
+34 245 1 c Gray
+34 246 1 c Gray
+34 247 1 c Gray
+34 248 1 c Gray
+34 249 1 c Gray
+34 250 1 c Gray
+34 251 1 c Gray
+34 252 1 c Gray
+34 253 1 c Gray
+34 254 1 c Gray
+34 255 1 c Gray
+35 45 1 c Gray
+35 73 1 c Gray
+35 92 1 c Gray
+35 102 1 c Gray
+35 116 1 c Gray
+35 256 1 c Gray
+35 257 1 c Gray
+35 258 1 c Gray
+35 259 1 c Gray
+35 260 1 c Gray
+35 261 1 c Gray
+36 262 1 c Gray
+36 263 1 c Gray
+37 71 1 c Gray
+37 112 1 c Gray
+37 120 1 c Gray
+37 123 1 c Gray
+37 139 1 c Gray
+38 103 1 c Gray
+38 112 1 c Gray
+38 120 1 c Gray
+38 264 1 c Gray
+38 265 1 c Gray
+38 266 1 c Gray
+39 73 1 c Gray
+39 267 1 c Gray
+39 268 1 c Gray
+39 269 1 c Gray
+39 270 1 c Gray
+41 68 1 c Gray
+41 91 1 c Gray
+41 105 1 c Gray
+41 240 1 c Gray
+41 271 1 c Gray
+41 272 1 c Gray
+41 273 1 c Gray
+42 274 1 c Gray
+43 77 1 c Gray
+44 141 1 c Gray
+44 142 1 c Gray
+45 72 1 c Gray
+45 73 1 c Gray
+45 97 1 c Gray
+45 102 1 c Gray
+45 106 1 c Gray
+45 113 1 c Gray
+45 116 1 c Gray
+45 121 1 c Gray
+45 133 1 c Gray
+45 275 1 c Gray
+46 114 1 c Gray
+46 156 1 c Gray
+46 276 1 c Gray
+46 277 1 c Gray
+47 122 1 c Gray
+47 124 1 c Gray
+47 128 1 c Gray
+47 129 1 c Gray
+47 144 1 c Gray
+47 152 1 c Gray
+47 278 1 c Gray
+47 279 1 c Gray
+47 280 1 c Gray
+47 281 1 c Gray
+47 282 1 c Gray
+47 283 1 c Gray
+47 284 1 c Gray
+48 63 1 c Gray
+49 285 1 c Gray
+50 75 1 c Gray
+50 96 1 c Gray
+51 68 1 c Gray
+51 240 1 c Gray
+52 65 1 c Gray
+52 69 1 c Gray
+53 73 1 c Gray
+53 101 1 c Gray
+53 132 1 c Gray
+53 275 1 c Gray
+53 286 1 c Gray
+53 287 1 c Gray
+53 288 1 c Gray
+54 289 1 c Gray
+54 290 1 c Gray
+55 83 1 c Gray
+55 89 1 c Gray
+56 61 1 c Gray
+56 62 1 c Gray
+56 291 1 c Gray
+56 292 1 c Gray
+56 293 1 c Gray
+57 150 1 c Gray
+57 294 1 c Gray
+58 295 1 c Gray
+59 296 1 c Gray
+60 69 1 c Gray
+61 292 1 c Gray
+62 61 1 c Gray
+62 291 1 c Gray
+62 292 1 c Gray
+63 74 1 c Gray
+64 297 1 c Gray
+65 69 1 c Gray
+66 298 1 c Gray
+67 125 1 c Gray
+67 299 1 c Gray
+67 300 1 c Gray

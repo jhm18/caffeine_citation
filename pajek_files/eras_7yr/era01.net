@@ -1,0 +1,5 @@
+*Vertices 2
+1 "28893" 0.0000 0.0000 0.5000 ic Blue bc White
+2 "485101" 0.0000 0.0000 0.5000 ic Blue bc White
+*Arcs
+1 2 1 c Gray

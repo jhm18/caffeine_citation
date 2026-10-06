@@ -1,0 +1,85 @@
+*Vertices 45
+1 "28814" 0.0000 0.0000 0.5000 ic Blue bc White
+2 "28815" 0.0000 0.0000 0.5000 ic Blue bc White
+3 "28816" 0.0000 0.0000 0.5000 ic Blue bc White
+4 "28817" 0.0000 0.0000 0.5000 ic Blue bc White
+5 "28818" 0.0000 0.0000 0.5000 ic Blue bc White
+6 "28819" 0.0000 0.0000 0.5000 ic Blue bc White
+7 "28821" 0.0000 0.0000 0.5000 ic Blue bc White
+8 "28822" 0.0000 0.0000 0.5000 ic Blue bc White
+9 "28823" 0.0000 0.0000 0.5000 ic Blue bc White
+10 "28825" 0.0000 0.0000 0.5000 ic Blue bc White
+11 "28829" 0.0000 0.0000 0.5000 ic Blue bc White
+12 "62673" 0.0000 0.0000 0.5000 ic Blue bc White
+13 "122013" 0.0000 0.0000 0.5000 ic Blue bc White
+14 "484061" 0.0000 0.0000 0.5000 ic Blue bc White
+15 "484062" 0.0000 0.0000 0.5000 ic Blue bc White
+16 "484086" 0.0000 0.0000 0.5000 ic Blue bc White
+17 "484702" 0.0000 0.0000 0.5000 ic Blue bc White
+18 "484735" 0.0000 0.0000 0.5000 ic Blue bc White
+19 "484737" 0.0000 0.0000 0.5000 ic Blue bc White
+20 "484738" 0.0000 0.0000 0.5000 ic Blue bc White
+21 "484739" 0.0000 0.0000 0.5000 ic Blue bc White
+22 "484742" 0.0000 0.0000 0.5000 ic Blue bc White
+23 "484743" 0.0000 0.0000 0.5000 ic Blue bc White
+24 "484744" 0.0000 0.0000 0.5000 ic Blue bc White
+25 "484746" 0.0000 0.0000 0.5000 ic Blue bc White
+26 "484747" 0.0000 0.0000 0.5000 ic Blue bc White
+27 "484748" 0.0000 0.0000 0.5000 ic Blue bc White
+28 "484749" 0.0000 0.0000 0.5000 ic Blue bc White
+29 "484751" 0.0000 0.0000 0.5000 ic Blue bc White
+30 "484754" 0.0000 0.0000 0.5000 ic Blue bc White
+31 "484756" 0.0000 0.0000 0.5000 ic Blue bc White
+32 "484757" 0.0000 0.0000 0.5000 ic Blue bc White
+33 "484763" 0.0000 0.0000 0.5000 ic Blue bc White
+34 "484766" 0.0000 0.0000 0.5000 ic Blue bc White
+35 "484768" 0.0000 0.0000 0.5000 ic Blue bc White
+36 "484769" 0.0000 0.0000 0.5000 ic Blue bc White
+37 "484770" 0.0000 0.0000 0.5000 ic Blue bc White
+38 "484771" 0.0000 0.0000 0.5000 ic Blue bc White
+39 "484772" 0.0000 0.0000 0.5000 ic Blue bc White
+40 "484789" 0.0000 0.0000 0.5000 ic Blue bc White
+41 "484791" 0.0000 0.0000 0.5000 ic Blue bc White
+42 "484792" 0.0000 0.0000 0.5000 ic Blue bc White
+43 "484796" 0.0000 0.0000 0.5000 ic Blue bc White
+44 "484797" 0.0000 0.0000 0.5000 ic Blue bc White
+45 "484798" 0.0000 0.0000 0.5000 ic Blue bc White
+*Arcs
+1 12 1 c Gray
+1 19 1 c Gray
+1 20 1 c Gray
+1 21 1 c Gray
+1 22 1 c Gray
+1 23 1 c Gray
+2 24 1 c Gray
+2 25 1 c Gray
+2 26 1 c Gray
+2 27 1 c Gray
+2 28 1 c Gray
+3 7 1 c Gray
+3 29 1 c Gray
+3 30 1 c Gray
+3 31 1 c Gray
+3 32 1 c Gray
+4 20 1 c Gray
+5 13 1 c Gray
+5 18 1 c Gray
+5 33 1 c Gray
+5 34 1 c Gray
+5 35 1 c Gray
+5 36 1 c Gray
+6 14 1 c Gray
+6 15 1 c Gray
+6 37 1 c Gray
+6 38 1 c Gray
+6 39 1 c Gray
+7 31 1 c Gray
+8 40 1 c Gray
+9 11 1 c Gray
+9 16 1 c Gray
+9 17 1 c Gray
+9 41 1 c Gray
+9 42 1 c Gray
+10 43 1 c Gray
+10 44 1 c Gray
+10 45 1 c Gray

@@ -1,0 +1,24 @@
+*Vertices 13
+1 "28887" 0.0000 0.0000 0.5000 ic Blue bc White
+2 "28888" 0.0000 0.0000 0.5000 ic Blue bc White
+3 "28889" 0.0000 0.0000 0.5000 ic Blue bc White
+4 "28890" 0.0000 0.0000 0.5000 ic Blue bc White
+5 "28891" 0.0000 0.0000 0.5000 ic Blue bc White
+6 "485081" 0.0000 0.0000 0.5000 ic Blue bc White
+7 "485082" 0.0000 0.0000 0.5000 ic Blue bc White
+8 "485088" 0.0000 0.0000 0.5000 ic Blue bc White
+9 "485089" 0.0000 0.0000 0.5000 ic Blue bc White
+10 "485091" 0.0000 0.0000 0.5000 ic Blue bc White
+11 "485096" 0.0000 0.0000 0.5000 ic Blue bc White
+12 "485097" 0.0000 0.0000 0.5000 ic Blue bc White
+13 "485099" 0.0000 0.0000 0.5000 ic Blue bc White
+*Arcs
+1 6 1 c Gray
+1 7 1 c Gray
+2 4 1 c Gray
+2 8 1 c Gray
+2 9 1 c Gray
+3 10 1 c Gray
+4 11 1 c Gray
+4 12 1 c Gray
+5 13 1 c Gray

@@ -1,0 +1,24 @@
+check,expected,observed,pass
+node keys are unique,0,0,TRUE
+node ids are unique,0,0,TRUE
+every arc endpoint is a node,0,0,TRUE
+no duplicate arcs,0,0,TRUE
+no self-loops,0,0,TRUE
+nodes resolve into both roles,> 0,20438,TRUE
+nodes carry both in- and out-degree,> 0,20434,TRUE
+sum of out-degree equals arcs,1238288,1238288,TRUE
+sum of in-degree equals arcs,1238288,1238288,TRUE
+total degree is the sum of the two,0,0,TRUE
+era vertices lie inside their span,0,0,TRUE
+audit in-span arcs equal era arcs,304602,304602,TRUE
+complete eras holding both-degree nodes,> 0 of 17,14,TRUE
+full network vertices equal the node list,589784,589784,TRUE
+full network arcs equal the edge list,1238288,1238288,TRUE
+full network within-era arcs equal era arcs,304602,304602,TRUE
+cross-era counts sum to arcs emitted,TRUE,TRUE,TRUE
+no era cites forward more than it cites within,informational,0 era(s),TRUE
+node out-counts sum to arcs,1238288,1238288,TRUE
+node in-counts sum to arcs,1238288,1238288,TRUE
+node ids preserved from the old list,informational,589784 of 589784 (100%),TRUE
+era arcs are invariant to input order,identical,TRUE,TRUE
+cited works dated after their first citation,<= 0.5% of 554739,166 (0.03%),TRUE
