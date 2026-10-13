@@ -160,19 +160,27 @@ community detection; Bayesian multilevel models; caffeine; cognitive science}
 \vspace{1.5em}
 \begin{adjustwidth}{1em}{1em}
 \rule{\linewidth}{1.1pt}\par\vspace{0.4em}
-\noindent\textbf{Status note, 22 September 2026 --- start here when picking this work back up.}
+\noindent\textbf{Status note, 13 October 2026 --- start here when picking this work back up.}
 \par\vspace{0.3em}\small
-The community-detection stage is blocked, and the block is a construction question rather
-than a coding one. Two complete CHAMP sweeps over the integration window show that the
-Path~A era networks carry no detectable community scale: they are mostly disconnected stars
-of one article and the works it cites, the within-era rule discards roughly 70\% of the
-citation record, and at the selected resolutions the partition CHAMP returns is the
-network's own component structure. The evidence, the three options for rebuilding the
-construction, and the seven diagnostic checks (C1--C7) that would decide between them are
-all in \S\ref{sec:scalefinding}, at the end of \S\ref{sec:pipeline}. \emph{Nothing
-downstream of community detection should be built until that decision is made}, because the
-community is the unit of every model here. The tie layer is unaffected: it reads the edge
-list and the era maps, not the era networks.
+\emph{The construction defect is repaired; the community stage is unblocked.} The era
+networks had keyed citing articles and cited references in two identifier spaces that never
+met, so no work appeared in both roles and no era network held a path of length two. The
+rebuild (\S\ref{sec:rebuild}) resolves both roles into the one canonical key space the 2023
+pipeline used, dates every work by its own publication year, and writes the whole-corpus
+network alongside the era networks. It passes 23 checks, and 14 of the 17 complete eras now
+contain article-to-article citation. The analytic range is eras 11 to 17, 1971 to 2019.
+
+\emph{What still needs doing.} The CHAMP sweeps have not been rerun on the rebuilt networks,
+so the resolution question of \S\ref{sec:scalefinding} is open on better data rather than
+settled; C5 to C7 there remain. \S\ref{sec:scalefinding} describes the networks as they were
+before the rebuild and should be read as the record of a defect, not of the current
+construction.
+
+\emph{What to carry into interpretation.} The era networks hold 34.6\% of the corpus's works
+and 24.6\% of its citations \meas{}. What falls outside is mostly recent, thinly cited work
+one era away rather than citation to canon, and descent is built from the full edge list, so
+those ties are not lost --- but the communities themselves are induced from a quarter of the
+record. \S\ref{sec:rebuild} gives the measurements.
 \par\vspace{0.4em}\noindent\rule{\linewidth}{1.1pt}
 \end{adjustwidth}
 
@@ -330,12 +338,13 @@ A work belongs to the era in which it was published. Each era's network therefor
 contains that year's articles and the references entering the literature with them, and
 no work appears in two eras.
 
-\checknote{C1: confirm whether cited works are dated by first citation rather than publication. \S\ref{sec:scalefinding}}\emph{This description may not match what the data hold.} Cited works in the node list
-appear to carry the year in which they were first cited rather than the year they were
-published, which would make an era the year's articles together with the references none of
-them had cited before. The evidence is in \S\ref{sec:scalefinding} and the check that would
-settle it is C1 there. Until it is settled, read ``published in'' in this subsection as
-provisional.
+\checknote{C1 resolved: the 2024 node list dated cited works by the citing article's year; the rebuild dates them by their own. \S\ref{sec:rebuild}}\emph{This description now holds, but it did not before October 2026.} In
+\code{citation\_node\_list\_3Oct2024.Rda} a cited work carries the year of the article citing
+it, because \code{Rank\_Thinning\_Function.R} joined the citing article's \code{time\_id} onto
+both the source and the target column; the duplicate filter then kept whichever citing row
+appeared first in the file rather than the earliest year. The rebuilt construction
+(\S\ref{sec:rebuild}) dates every work by its own publication year, parsed from the CR
+string for cited works, and records the citing year separately as \code{year\_first\_cited}.
 
 This construction supports questions about the \emph{relationships between} communities
 in successive years:
@@ -395,7 +404,7 @@ The existing partitions remain useful as \emph{development fixtures}: they let t
 orchestrator be built and tested against known outputs before the final partitions
 exist. They are not the partitions the inference will run on.
 
-\question{Pooled $\gamma^{*}$ cannot be estimated from the Path~A networks. \S\ref{sec:scalefinding}}\emph{The plan described in the rest of this subsection is on hold.} Two CHAMP sweeps over
+\question{Pooled $\gamma^{*}$: not estimable on the old networks; the sweep has not been rerun on the rebuilt ones. \S\ref{sec:rebuild}}\emph{The plan described in the rest of this subsection is on hold.} Two CHAMP sweeps over
 the integration window show that a pooled $\gamma^{*}$ cannot be estimated from the Path~A
 era networks by either of CHAMP's selection criteria, and that the size-invariance argument
 below cannot be tested on them. See \S\ref{sec:scalefinding}.
@@ -2114,6 +2123,15 @@ labeling lane, and the orchestrator itself.
 \label{sec:scalefinding}
 \label{sec:starfinding}
 
+\emph{Superseded in part.} Everything below describes the networks built before October
+2026, whose construction is now known to have been defective in two ways: citing articles
+and cited references were keyed in separate identifier spaces, and cited works were dated by
+the year they were cited rather than the year they were published. \S\ref{sec:rebuild}
+records the rebuild and what it changed. The resolution findings here have not been
+re-measured on the rebuilt networks, so they stand as a description of a defect rather than
+of the current construction; the sweep machinery, the diagnostics C5 to C7, and the
+reasoning about what a flat modularity envelope means all carry over unchanged.
+
 \begin{quote}
 	\textbf{\itshape The Path~A era networks are almost partitioned before community detection
 	runs. They consist largely of disconnected stars, each one article and the references it
@@ -2129,7 +2147,7 @@ This subsection records what has been measured, states the construction question
 measurements raise, and lists the diagnostic checks that would answer it. None of it is
 resolved. It is written so that the work can be resumed from a cold start.
 
-\blocker{Choose the construction the community stage runs on (decision box at the end of this subsection). Run checks C1--C4 first. Until this is settled, nothing downstream of community detection should be built, because the community is the unit of every model in this document.}
+\blocker{Rerun the CHAMP sweeps on the rebuilt era networks (\S\ref{sec:rebuild}), eras 11--17. The construction question is answered; the resolution question is not.}
 
 \paragraph{What an era network contains.} Era~12 is the 2009 slice. It holds 18{,}256
 vertices: 989 caffeine articles returned by the Web of Science search and 17{,}267 cited
@@ -2262,23 +2280,23 @@ None of these has been done. C1 through C4 are estimable from the edge list and 
 about an hour and require no community detection.
 
 \begin{enumerate}[leftmargin=2.2em, itemsep=2pt]
-	\item \textbf{C1. The dating rule.} \checknote{C1: target year vs.\ earliest citing year, from the edge list.} Join each cited work's recorded year to the earliest
+	\item \textbf{C1. The dating rule.} \checknote{C1 DONE: cited works carried the citing article's year; the rebuild dates them by their own.} Join each cited work's recorded year to the earliest
 	      year among the articles citing it in the edge list, and count how often the two agree.
 	      Near-universal agreement confirms first-citation dating, which would mean
 	      \S\ref{sec:paths} describes Path~A incorrectly and that the both-periods reading of
 	      descent needs restating.
-	\item \textbf{C2. The citation-lag distribution.} \checknote{C2: citation lag; needs publication years parsed from labels.} How many years separate a citing article
+	\item \textbf{C2. The citation-lag distribution.} \checknote{C2 DONE: median lag 7 years; backward ties reach a mean of 1.5--1.9 eras. \S\ref{sec:rebuild}} How many years separate a citing article
 	      from the work it cites. This requires true publication years for cited works, which are
 	      not in the node list if C1 confirms first-citation dating; they can be parsed from the
 	      labels of the non-DOI entries, which carry the form
 	      \code{author\_year\_journal}. The lag distribution determines what any window width can
 	      recover.
-	\item \textbf{C3. The window-width curve.} \checknote{C3: arcs inside a window, giant share and mean degree, for widths 1--12 years.} For widths of one through twelve years, the share
+	\item \textbf{C3. The window-width curve.} \checknote{C3 PART: a fixed 7-year tiling retains 24.6\% of arcs, about half of a sliding window. Giant share still unmeasured.} For widths of one through twelve years, the share
 	      of arcs falling inside a window, the giant-component share, mean degree, and the
 	      component-size profile. This is the measurement that turns the choice of era width from
 	      a guess into a finding. If most of the available connectivity arrives by three years,
 	      the cost of a five-year window is not worth paying.
-	\item \textbf{C4. The whole-corpus graph.} \checknote{C4: components and degree distribution of the full corpus network.} Component profile and degree distribution of the
+	\item \textbf{C4. The whole-corpus graph.} \checknote{C4 PART: the full network is now built; its component profile is still unmeasured.} Component profile and degree distribution of the
 	      full 590{,}170-vertex, 1{,}238{,}000-arc network. This is the ceiling any windowing can
 	      approach, and it is what a single-partition construction would run on.
 	\item \textbf{C5. Directed Leiden at corpus scale.} \checknote{C5: fix the incoming-arc scan, or run undirected, before any corpus-scale detection.} \code{delta\_modularity\_directed\_best!}
@@ -2352,6 +2370,162 @@ about an hour and require no community detection.
 	it from the size-invariance analysis while still partitioning it at the pooled resolution, or
 	fall back to a fixed value. The second appears most defensible, but it should be an explicit
 	methodological choice rather than a default.
+\end{decision}
+
+% =====================================================================
+\subsection{The Rebuilt Construction, and What Lies Outside an Era}
+\label{sec:rebuild}
+
+\begin{quote}
+	\textbf{\itshape The construction has been rebuilt on one canonical key space and on
+	publication-year dating, and the defect the previous subsection describes is repaired:
+	works now appear in both roles, era networks contain article-to-article citation, and mean
+	degree sits near three rather than two. What a seven-year window still leaves outside is
+	large --- three quarters of the citations an era emits --- but it is not what we assumed.
+	It is mostly recent, thinly cited work one era away, not citation to canon. Since descent
+	is built from the edge list rather than from the era networks, those ties are not lost to
+	the analysis; what the window shapes is the definition of a community, not the relations
+	between communities.}
+\end{quote}
+
+\paragraph{What was wrong, and what fixed it.} The era networks keyed citing articles on
+their DOI and cited references on the raw Web of Science CR string. Those two identifier
+spaces never intersect, so a caffeine article cited by another caffeine article became two
+vertices: no vertex carried both in- and out-degree, and no era network contained a path of
+length two \meas{}. The 2023 pipeline had not made that mistake --- it resolved both roles
+into one key space, a normalized DOI or an \code{author\_year\_journal} triple --- and the
+rebuild restores that step. Separately, cited works now carry their own publication year,
+parsed from the CR string, rather than the year of the article citing them.
+
+\paragraph{The corpus after the rebuild.} 589{,}784 works and 1{,}238{,}288 distinct
+citations \meas{}, with every node id preserved from
+\code{citation\_node\_list\_3Oct2024.Rda}, so the legacy partitions and the known-answer
+fixtures remain joinable. The 386-work difference from the old list is the merging of
+labels that differed only in the case of a DOI. Of those works, 20{,}438 appear both as a
+citing article and as a cited reference \meas{} --- 58.2\% of the 35{,}103 caffeine articles
+are themselves cited by another caffeine article.
+
+\paragraph{The era networks.} Seven-year eras, each work placed by its own publication year,
+an arc kept only when both endpoints fall inside the window.
+
+\begin{center}
+\small
+\begin{tabular}{rrrrrrrr}
+\toprule
+Era & Years & Vertices & Arcs & Citing & Both degrees & Art.--art. arcs & Mean degree \\
+\midrule
+11 & 1971--77 & 2{,}629 & 3{,}889 & 518 & 179 & 309 & 2.96 \\
+12 & 1978--84 & 4{,}268 & 6{,}361 & 897 & 297 & 348 & 2.98 \\
+13 & 1985--91 & 10{,}479 & 15{,}637 & 1{,}627 & 484 & 523 & 2.98 \\
+14 & 1992--98 & 27{,}380 & 44{,}575 & 4{,}244 & 1{,}345 & 2{,}039 & 3.26 \\
+15 & 1999--2005 & 32{,}848 & 49{,}263 & 4{,}626 & 1{,}676 & 2{,}681 & 3.00 \\
+16 & 2006--12 & 45{,}508 & 67{,}081 & 5{,}891 & 2{,}516 & 4{,}970 & 2.95 \\
+17 & 2013--19 & 76{,}070 & 113{,}008 & 9{,}080 & 4{,}185 & 10{,}794 & 2.97 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent All values are measured \meas{}. Era~11 is where mean degree reaches its plateau
+and where the share of citing articles that are themselves cited within the era rises to
+35\%; by era~17 that share is 46\%. Eras 1 to 10 are too small to carry structure --- three
+of them contain no such work at all --- and era~18 spans only 2020--2021. The analytic range
+is therefore eras 11 to 17: seven eras and six consecutive pairs.
+
+For scale against the earlier construction: old era~12, a single year, held 76 vertices with
+both degrees and old era~23 held 244. New era~17 holds 4{,}185, about 598 per year, and
+10{,}794 article-to-article arcs where the previous seven-year files had none \meas{}.
+
+\paragraph{What the window leaves outside.} Coverage is narrower than the era tables suggest.
+The era networks hold 204{,}042 vertices, 34.6\% of the corpus, and 304{,}602 arcs, 24.6\% of
+the citation record \meas{}. A work belongs to one era only, so that is the whole coverage
+rather than a per-era figure.
+
+The retention figure deserves a note, because it sits against the 52\% that the interval
+analysis reported for a seven-year window. Both are right: a \emph{sliding} window keeps any
+pair of works published within seven years of each other, while a fixed tiling also requires
+both to fall on the same side of a boundary. The ratio, 24.6 against 52, is 0.47 --- a fixed
+tiling keeps about half of what a sliding window of the same width would.
+
+\paragraph{What those outside ties are made of.} We expected the discarded ties to be
+citation to foundational work, which a study of ongoing integration has reason to exclude.
+Three measurements over the 833{,}949 backward ties emitted by eras 11 to 17 say otherwise
+\meas{}.
+
+\begin{center}
+\small
+\begin{tabular}{rrrrrr}
+\toprule
+Era distance & Years & Arcs & Share & Gini over targets & Targets cited once \\
+\midrule
+1 & 7 & 464{,}691 & 55.7\% & 0.423 & 31.7\% \\
+2 & 14 & 212{,}432 & 25.5\% & 0.393 & 29.9\% \\
+3 & 21 & 84{,}612 & 10.2\% & 0.353 & 30.2\% \\
+4 & 28 & 37{,}812 & 4.5\% & 0.342 & 30.4\% \\
+5 & 35 & 17{,}273 & 2.1\% & 0.331 & 32.6\% \\
+$\geq$6 & 42+ & 17{,}129 & 2.1\% & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent \emph{Distance.} Backward ties are near, not far: 55.7\% reach exactly one era
+back and 81.2\% fall within two. Only 18.8\% reach three eras or more, which is where
+citation to canon would live.
+
+\emph{Concentration.} Canonical citation should land repeatedly on a few works, so
+concentration should rise with distance. It falls. The Gini over targets drops from 0.423 at
+distance one to 0.262 at distance nine, and the share of ties landing on a target that
+receives only one tie at that distance rises from 39.6\% to 58.5\% \meas{}. The further back
+a tie reaches, the more thinly it spreads.
+
+\emph{Works cited once.} 31.7\% of distance-one backward ties land on a work cited exactly
+once in the entire corpus --- about 147{,}000 arcs \meas{}. A work cited once cannot be
+canonical, and this measure needs no threshold.
+
+A canonical layer does exist, and it is recognisable: the heaviest targets are Fredholm's
+1999 adenosine review with 1{,}067 backward ties, and then method papers --- Lowry 1951 at a
+mean distance of 6.4 eras across 7 citing eras, Bradford 1976, Laemmli 1970, Grynkiewicz
+1985 \meas{}. But it is thin. The heaviest 5\% of targets absorb a third of the ties at
+distance one; the rest of the mass is elsewhere.
+
+\paragraph{Why this matters less than it appears, and where it matters.} A distance-one
+backward tie is a citation from era~$t$ to a work belonging to era~$t-1$. That is the descent
+relation of \S\ref{sec:objects}, and the tie layer builds it from the citation edge list and
+the era maps, never from the era networks (\S\ref{sec:pipeline}). The 464{,}691 arcs at
+distance one are therefore present in the analysis as its primary signal, not discarded.
+
+What the window shapes is the \emph{definition of a community}. Communities are induced from
+a within-window slice that over-represents the recent, self-citing core of each period, and
+every model in this document takes the community as its unit. So the caveat is real but
+specific: the relations we measure rest on the whole citation record, while the objects
+between which we measure them are built from a quarter of it.
+
+\paragraph{One trend to carry into interpretation.} The distance-one share of backward ties
+falls steadily across the window --- 69.3\% in era~11 to 51.4\% in era~17 --- while the share
+of those ties landing on works cited once rises from 28.9\% to 36.0\% \meas{}. As the
+literature accumulates, each period reaches further back and onto thinner material. Two
+consequences for reading the models. A trend in any community-level quantity across eras is
+partly a trend in what the window captures, so era effects and drift terms should be
+interpreted against this. And the cross-era share, which the construction now records per
+work as \code{pct\_out\_cross\_era}, is a genuine covariate rather than a diagnostic: it
+measures how far outside its own period a work reaches, and it varies systematically with
+era.
+
+\begin{decision}{Whether the window should be fixed, sliding, or supplemented}
+	The measurements above establish what a fixed seven-year tiling costs: roughly half the
+	ties a sliding window of the same width would keep, and the loss falls mostly on recent,
+	thinly cited work one era away rather than on canon. Three responses are open, and the
+	choice should be made before the communities are fixed rather than after.
+
+	\emph{Accept the tiling.} Eras stay disjoint, descent keeps its current meaning, and the
+	bias is documented and carried as a covariate. This is the current plan.
+
+	\emph{Overlapping windows.} More of the near ties enter the community definition, at the
+	cost of disjointness --- which the descent relation depends on, and which moves the
+	construction toward Path~B.
+
+	\emph{Lean on the full network.} The whole-corpus network is now built alongside the era
+	networks, over the same node ids. Communities detected there would rest on the entire
+	citation record, at the cost of time-varying community structure.
 \end{decision}
 
 \subsection{Model Validation and Predictive Checks}

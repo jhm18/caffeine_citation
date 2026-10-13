@@ -204,6 +204,142 @@ module community_detection_tools
 			return String(path)
 	end
 
+#	Profile One Era Network Without Sweeping It
+	function profile_era_network(net_file::AbstractString; min_component_size::Int = 4)
+		"""
+		Args:
+			net_file::AbstractString: path to an era .net file (directed, *Arcs)
+			min_component_size::Int: smallest weak component a sweep would keep (default = 4)
+		Returns:
+			NamedTuple: one row of structural counts, no community detection
+		Notes:
+			The viability screen needs what a file header cannot supply. Vertex and
+			arc counts say nothing about whether a resolution parameter has anything
+			to choose among, because gamma can only separate partitions WITHIN a
+			connected component: a network of 3,001 vertices in 260 fragments clears
+			any arc threshold while offering nothing to detect.
+
+			Everything here is linear in the arcs, so profiling every era costs
+			seconds and can be run before committing to a sweep that costs an hour.
+
+			n_both_degree counts vertices that both cite and are cited inside the
+			era. Under the construction this module was first written against that
+			count was zero by design, because citing articles and cited references
+			were keyed in separate identifier spaces; it is the number to check first
+			when a rebuilt network arrives.
+		"""
+
+		#	Validation
+			if min_component_size < 1
+				throw(ArgumentError("profile_era_network: min_component_size must be ≥ 1"))
+			end
+
+		#	Read the Network
+			nodes, edges = read_net(net_file)
+			n = nrow(nodes)
+			if nrow(edges) > 0 && !occursin(r"^\*arcs"i, edges.tie_type[1])
+				throw(ArgumentError("profile_era_network: $net_file is not a directed (*Arcs) network"))
+			end
+
+		#	Distinct Arcs
+			arcs = unique(DataFrame(src = edges.person_i, dst = edges.person_j))
+			n_duplicate_arcs = nrow(edges) - nrow(arcs)
+			n_self_loops = count(arcs.src .== arcs.dst)
+
+		#	Early return
+			if nrow(arcs) == 0
+				return (net_file = String(net_file), n_vertices = n, n_arcs = 0,
+						n_duplicate_arcs = n_duplicate_arcs, n_self_loops = 0,
+						n_components = n, giant_component_size = (n == 0 ? 0 : 1),
+						giant_component_share = (n == 0 ? 0.0 : 1.0 / n),
+						n_kept_vertices = 0, n_kept_arcs = 0, n_kept_components = 0,
+						n_citing = 0, n_cited = 0, n_both_degree = 0,
+						n_arcs_two_step = 0, mean_degree = 0.0)
+			end
+
+		#	Components
+			comp, sizes = _weak_components(n, arcs.src, arcs.dst)
+			keep_v = sizes[comp] .>= min_component_size
+			kept_arcs = count(keep_v[arcs.src])
+
+		#	Degrees
+			outdeg = zeros(Int, n)
+			indeg  = zeros(Int, n)
+			@inbounds for k in 1:nrow(arcs)
+				outdeg[arcs.src[k]] += 1
+				indeg[arcs.dst[k]]  += 1
+			end
+			both = count(i -> outdeg[i] > 0 && indeg[i] > 0, 1:n)
+
+		#	Arcs Whose Target Also Cites
+		#	A network with none of these has depth one: every arc runs from a vertex
+		#	that only cites to a vertex that is only cited, and no path of length two
+		#	exists anywhere in it.
+			two_step = count(k -> outdeg[arcs.dst[k]] > 0, 1:nrow(arcs))
+
+		#	Assembling Result
+			return (net_file              = String(net_file),
+					n_vertices            = n,
+					n_arcs                = nrow(arcs),
+					n_duplicate_arcs      = n_duplicate_arcs,
+					n_self_loops          = n_self_loops,
+					n_components          = length(sizes),
+					giant_component_size  = maximum(sizes),
+					giant_component_share = maximum(sizes) / n,
+					n_kept_vertices       = count(keep_v),
+					n_kept_arcs           = kept_arcs,
+					n_kept_components     = count(>=(min_component_size), sizes),
+					n_citing              = count(>(0), outdeg),
+					n_cited               = count(>(0), indeg),
+					n_both_degree         = both,
+					n_arcs_two_step       = two_step,
+					mean_degree           = 2 * nrow(arcs) / n)
+	end
+	@doc raw"""
+	**Description**
+	Report the structure of one era network without running community detection:
+	component profile, giant-component share, the citing and cited counts, and the
+	two quantities that say whether the network has depth at all.
+
+	**Usage**
+	`profile_era_network(net_file; min_component_size=4)`
+
+	**Arguments**
+	- `net_file::AbstractString`: Path to a directed (`*Arcs`) Pajek network.
+	- `min_component_size::Int`: Smallest weak component a sweep would keep
+	  (default `4`), used only to report what a sweep would retain.
+
+	**Details**
+	Built for the viability screen. A `.net` header gives vertices and arcs, and
+	neither tells you whether a resolution parameter has anything to decide: gamma
+	separates partitions only within a connected component, so a large network in
+	many fragments offers nothing to detect. `giant_component_share` is the quantity
+	to screen on, and it costs one pass over the arcs rather than an hour of sweeping.
+
+	Two fields describe depth. `n_both_degree` counts vertices that both cite and
+	are cited inside the era. `n_arcs_two_step` counts arcs whose target itself
+	cites something, so a network where it is zero has no path of length two
+	anywhere: every arc runs from a pure citer to a pure cited work.
+
+	**Value**
+	A `NamedTuple` carrying `n_vertices`, `n_arcs`, `n_duplicate_arcs`,
+	`n_self_loops`, `n_components`, `giant_component_size`,
+	`giant_component_share`, `n_kept_vertices`, `n_kept_arcs`,
+	`n_kept_components`, `n_citing`, `n_cited`, `n_both_degree`,
+	`n_arcs_two_step` and `mean_degree`.
+
+	**Examples**
+	```julia
+		#	Screen one era before committing to a sweep
+			p = profile_era_network("pajek_files/eras_7yr/era17.net")
+			p.giant_component_share
+			p.n_both_degree
+	```
+
+	**See Also**
+	`champ_era_sweep`, `write_champ_summary`
+	""" profile_era_network
+
 #	CHAMP Sweep for One Era Network
 	function champ_era_sweep(net_file::AbstractString;
 	                         min_component_size::Int = 4,
@@ -570,11 +706,12 @@ module community_detection_tools
 		   read_clu,
 		   write_clu,
 		   read_vec,
-		   write_vec,   
+		   write_vec,
            calculate_modularity,
            leiden_community_detection,
            champ_community_detection,
 		   adjusted_rand_index,
+		   profile_era_network,
 		   champ_era_sweep,
 		   write_champ_sweep,
 		   write_champ_summary

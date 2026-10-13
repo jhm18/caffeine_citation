@@ -1,35 +1,59 @@
-#	champ_sweep_new_eras.jl -- CHAMP Sweeps for 7-Year Era Networks
+#	champ_sweep_new_eras.jl -- CHAMP Sweeps for the Rebuilt 7-Year Era Networks
 #	Jonathan H. Morgan, Ph.D. & Sarah Delmar, Ph.D.
-#	2 October 2026
+#	13 October 2026
 #
-#	WHAT THIS DOES. Profiles and sweeps the 7-year era networks produced by
+#	WHAT THIS DOES. Profiles and sweeps the 7-year era networks written by
 #	PathA_Revised_Eras.R. Two stages:
 #
-#		1. PROFILING. Reports vertex count, arc count, and component structure for
-#		   every era, so the analyst can see which eras carry enough structure for
-#		   community detection before the sweep runs.
+#		1. PROFILING. Calls profile_era_network on every era file and reports
+#		   components, giant-component share, the citing and cited counts, and the
+#		   two depth measures. Costs seconds, and is what the viability screen is
+#		   decided from.
 #
-#		2. CHAMP SWEEP. Runs champ_era_sweep on each era whose largest component
-#		   meets a minimum size threshold, and writes .clu partitions to the output
-#		   directory.
+#		2. CHAMP SWEEP. Runs champ_era_sweep on each viable era and writes its hull
+#		   coefficients, its diagnostics, and its partition at that era's own gamma.
 #
-#	Settings: directed, unweighted, weak components of fewer than four vertices
-#	dropped before the sweep, 5 Leiden runs per gamma.
+#	WHAT CHANGED FROM THE PREVIOUS VERSION.
+#
+#		a.	THE VIABILITY SCREEN MEASURES CONNECTIVITY, NOT VOLUME. The old rule
+#			skipped an era with fewer than 50 arcs. That admits an era like the
+#			2020-2021 tail -- 3,001 vertices and 2,598 arcs in 260 fragments, a 13%
+#			giant component -- which clears any arc threshold while offering a
+#			resolution parameter nothing to choose among, since gamma separates
+#			partitions only WITHIN a component. The screen is now a floor on the
+#			giant component, in vertices and in share.
+#
+#		b.	PROFILING USES THE MODULE. The old profiler counted arc lines in the
+#			file and read the vertex count from the header, which cannot see
+#			components at all. profile_era_network reads the network properly and
+#			returns the structure.
+#
+#		c.	THE DEFAULT RANGE IS ERAS 11 TO 17. Mean degree reaches its plateau at
+#			era 11 (2.96) and stays near 3.0 through era 17; the share of citing
+#			articles that are themselves cited within the era rises from 24% at era
+#			10 to 35% at era 11 and 46% by era 17. Eras 1 to 10 are too small to
+#			carry structure and era 18 spans only 2020-2021. All eras are still
+#			profiled, so the boundary stays empirical.
+#
+#		d.	THE OUTPUT DIRECTORY IS TAGGED BY THE GRID. Two sweeps on different
+#			windows cannot write over each other, which they could when the
+#			directory was fixed.
 #
 #	Run inside the container with threads:
 #		julia --threads auto community_detection_tools/champ_sweep_new_eras.jl
 #
-#	Profile only (no sweep):
+#	Profile only, no sweep:
 #		julia community_detection_tools/champ_sweep_new_eras.jl --profile-only
 #
-#	Specific eras:
-#		julia --threads auto community_detection_tools/champ_sweep_new_eras.jl 15 16 17
+#	Specific eras, screen or no screen:
+#		julia --threads auto community_detection_tools/champ_sweep_new_eras.jl 11 17
+#		julia --threads auto community_detection_tools/champ_sweep_new_eras.jl --force 10 18
 #
-#	Outputs, in pajek_files/new_champ_sweep/:
+#	Outputs, in pajek_files/champ_sweep_7yr/gamma_<min>_<max>_n<points>/:
 #		era<NN>_sweep.tsv           one row per gamma
 #		era<NN>_local_gamma.clu     the partition at era N's own gamma
 #		champ_sweep_summary.tsv     one row per era of diagnostics
-#		era_profiles.tsv            vertex/arc/component counts for all eras
+#		era_profiles.tsv            structure of every era, swept or not
 #		sweep.lock                  present only while a run is writing
 
 #	Activating the Environment
@@ -51,112 +75,138 @@ using community_detection_tools
 #	Project Layout
 	const PROJECT_DIR = get(ENV, "CAFFEINE_DIR", "/workspace/caffeine_citation")
 	const PAJEK_DIR   = joinpath(PROJECT_DIR, "pajek_files", "eras_7yr")
-	const OUT_DIR     = joinpath(PROJECT_DIR, "pajek_files", "new_champ_sweep")
-	const LOCK_FILE   = joinpath(OUT_DIR, "sweep.lock")
 
-#	Era Range (18 eras from 7-year tiling of 1901-2021)
-	const N_ERAS = 18
+#	Era Range
+	const N_ERAS        = 18
+	const ANALYTIC_ERAS = 11:17
 
 #	Sweep Settings
 	const MIN_COMPONENT_SIZE = 4
-	const MIN_VIABLE_ARCS    = 50
 	const RESOLUTION_RANGE   = (0.01, 1.0)
 	const N_RESOLUTIONS      = 40
 	const N_RUNS_PER_GAMMA   = 5
 
-################
-#   PROFILING  #
-################
+#	Viability Screen
+#	A resolution parameter can only choose among partitions within a connected
+#	component, so both the size of the largest component and its share of the
+#	network have to clear a floor. Era 18 fails on both counts while holding more
+#	arcs than era 10, which is the case the old arc threshold could not see.
+	const MIN_GIANT_VERTICES = 500
+	const MIN_GIANT_SHARE    = 0.50
 
-#	Helper Function for profile_eras: Count Arcs in a .net File
-	function _count_arcs(lines::Vector{String})
-		"""
-		Args:
-			lines::Vector{String}: raw lines from a .net file
-		Returns:
-			Int: number of arc lines after the *Arcs header
-		Notes:
-			Counts non-empty lines between *Arcs and the next section header or EOF.
-		"""
+#	Output Directory, One per Window
+	const GRID_TAG  = "gamma_$(RESOLUTION_RANGE[1])_$(RESOLUTION_RANGE[2])_n$(N_RESOLUTIONS)"
+	const OUT_DIR   = joinpath(PROJECT_DIR, "pajek_files", "champ_sweep_7yr", GRID_TAG)
+	const LOCK_FILE = joinpath(OUT_DIR, "sweep.lock")
 
-		#	Locate the *Arcs Section
-			arc_start = 0
-			for i in eachindex(lines)
-				if occursin(r"^\*[Aa]rcs", lines[i])
-					arc_start = i
-					break
-				end
-			end
-			if arc_start == 0
-				return 0
-			end
+#################
+#   PROFILING   #
+#################
 
-		#	Count Arc Lines
-			n_arcs = 0
-			for i in (arc_start + 1):length(lines)
-				ln = strip(lines[i])
-				if startswith(ln, '*')
-					break
-				end
-				if !isempty(ln)
-					n_arcs += 1
-				end
-			end
-
-		#	Assembling Result
-			return n_arcs
-	end
-
-#	Profile All Era Networks
-	function profile_eras(pajek_dir::AbstractString, n_eras::Int)
+#	Helper Function for profile_eras: Resolve Era Network Path
+	function resolve_new_era_net(pajek_dir::AbstractString, era::Int)
 		"""
 		Args:
 			pajek_dir::AbstractString: directory containing era<NN>.net files
-			n_eras::Int: number of eras to profile
+			era::Int: era number
 		Returns:
-			DataFrame: one row per era with columns era, net_file, n_vertices,
-			           n_arcs, file_exists
+			String: path to the era's .net file, or "" when absent
 		Notes:
-			Reads each .net file header for vertex count and counts arc lines.
-			Eras without a .net file are reported with zeros.
+			The rebuilt eras use a flat naming convention: era<NN>.net in a single
+			directory, two digits so a lexical listing sorts correctly.
+		"""
+
+		#	Build Path
+			path = joinpath(pajek_dir, @sprintf("era%02d.net", era))
+
+		#	Assembling Result
+			return isfile(path) ? path : ""
+	end
+
+#	Profile All Era Networks
+	function profile_eras(pajek_dir::AbstractString, n_eras::Int;
+						  min_component_size::Int = MIN_COMPONENT_SIZE)
+		"""
+		Args:
+			pajek_dir::AbstractString: directory containing era<NN>.net files
+			n_eras::Int: highest era number to look for
+			min_component_size::Int: component floor a sweep would apply
+		Returns:
+			DataFrame: one row per era, whether or not a file exists
+		Notes:
+			profile_era_network does the reading, so this function only has to walk
+			the eras and record a row of zeros where a file is absent. An era that
+			throws while being read is recorded as absent rather than halting the
+			profile, since a run should be able to report on seventeen good eras
+			when one file is malformed.
+
+			Rows are stacked one at a time rather than passed to DataFrame as a
+			vector, because the vector's element type is abstract and column
+			inference from an abstract row vector is not reliable.
 		"""
 
 		#	Iterating Over Eras
 			rows = NamedTuple[]
 			for e in 1:n_eras
-				net_file = joinpath(pajek_dir, @sprintf("era%02d.net", e))
+				net_file = resolve_new_era_net(pajek_dir, e)
 
-				if !isfile(net_file)
-					push!(rows, (era = e, net_file = net_file,
-						n_vertices = 0, n_arcs = 0, file_exists = false))
-					continue
-				end
-
-				#	Read File
-					lines = readlines(net_file)
-
-				#	Parse Vertex Count from Header
-					n_vertices = 0
-					for ln in lines
-						m = match(r"^\*[Vv]ertices\s+(\d+)", ln)
-						if m !== nothing
-							n_vertices = parse(Int, m.captures[1])
-							break
-						end
+				#	No file
+					if isempty(net_file)
+						push!(rows, (era = e, file_exists = false,
+									 net_file = joinpath(pajek_dir, @sprintf("era%02d.net", e)),
+									 n_vertices = 0, n_arcs = 0, n_duplicate_arcs = 0,
+									 n_self_loops = 0, n_components = 0,
+									 giant_component_size = 0, giant_component_share = 0.0,
+									 n_kept_vertices = 0, n_kept_arcs = 0,
+									 n_kept_components = 0, n_citing = 0, n_cited = 0,
+									 n_both_degree = 0, n_arcs_two_step = 0,
+									 mean_degree = 0.0))
+						continue
 					end
 
-				#	Count Arcs
-					n_arcs = _count_arcs(lines)
-
-				push!(rows, (era = e, net_file = net_file,
-					n_vertices = n_vertices, n_arcs = n_arcs, file_exists = true))
+				#	Profile
+					try
+						p = profile_era_network(net_file;
+												min_component_size = min_component_size)
+						push!(rows, merge((era = e, file_exists = true), p))
+					catch err
+						@error "Era $e: could not be profiled" net_file exception = err
+						push!(rows, (era = e, file_exists = false, net_file = net_file,
+									 n_vertices = 0, n_arcs = 0, n_duplicate_arcs = 0,
+									 n_self_loops = 0, n_components = 0,
+									 giant_component_size = 0, giant_component_share = 0.0,
+									 n_kept_vertices = 0, n_kept_arcs = 0,
+									 n_kept_components = 0, n_citing = 0, n_cited = 0,
+									 n_both_degree = 0, n_arcs_two_step = 0,
+									 mean_degree = 0.0))
+					end
 			end
 
 		#	Assembling Result
-			return DataFrame(rows)
+			return vcat([DataFrame([r]) for r in rows]...)
 	end
 
-#	Helper Function for profile_eras: Write Profile Table
+#	Helper Function for profile_eras: Viability of One Profile Row
+	function is_viable(row)
+		"""
+		Args:
+			row: one row of the profile table
+		Returns:
+			Bool: whether the era has enough connected structure to sweep
+		Notes:
+			Both tests matter. The share alone would admit a tiny era whose handful
+			of vertices happen to be connected; the size alone would admit a large
+			era that is mostly fragments.
+		"""
+
+		#	Assembling Result
+			return row.file_exists &&
+				   row.n_arcs > 0 &&
+				   row.giant_component_size >= MIN_GIANT_VERTICES &&
+				   row.giant_component_share >= MIN_GIANT_SHARE
+	end
+
+#	Write the Profile Table
 	function write_profiles(profiles::DataFrame, directory::AbstractString)
 		"""
 		Args:
@@ -165,7 +215,8 @@ using community_detection_tools
 		Returns:
 			String: path written
 		Notes:
-			Tab-separated, one row per era.
+			Written whether or not a sweep follows, so a profile-only run leaves the
+			same record a full run would.
 		"""
 
 		#	Write
@@ -194,8 +245,10 @@ using community_detection_tools
 		Returns:
 			Nothing
 		Notes:
-			Prevents concurrent sweeps from overwriting each other's output.
-			A stale lock from a dead process is replaced with a warning.
+			Prevents concurrent sweeps from overwriting each other's output, which
+			happened once: a second run started from the VS Code REPL finished later
+			and wrote its own summary over the good one. A stale lock from a dead
+			process is replaced with a warning.
 		"""
 
 		#	Check for a Live Lock
@@ -216,77 +269,51 @@ using community_detection_tools
 			return nothing
 	end
 
-#	Helper Function for run_new_era_sweeps: Resolve Era Network Path
-	function resolve_new_era_net(pajek_dir::AbstractString, era::Int)
-		"""
-		Args:
-			pajek_dir::AbstractString: directory containing era<NN>.net files
-			era::Int: era number (1-18)
-		Returns:
-			String: path to the era's .net file, or "" when absent
-		Notes:
-			New eras use a flat naming convention: era<NN>.net in a single directory.
-		"""
-
-		#	Build Path
-			path = joinpath(pajek_dir, @sprintf("era%02d.net", era))
-
-		#	Assembling Result
-			return isfile(path) ? path : ""
-	end
-
 ########################
 #   SWEEP EXECUTION    #
 ########################
 
-#	Sweep Viable Eras
+#	Sweep the Requested Eras
 	function run_new_era_sweeps(eras::Vector{Int}, profiles::DataFrame,
 								summary_name::AbstractString)
 		"""
 		Args:
-			eras::Vector{Int}: eras to sweep
-			profiles::DataFrame: output of profile_eras, used to skip non-viable eras
+			eras::Vector{Int}: eras to sweep, already screened by the caller
+			profiles::DataFrame: output of profile_eras, for the file paths
 			summary_name::AbstractString: file stem for the summary table
 		Returns:
-			Vector{Int}: eras that failed or were skipped
+			Vector{Int}: eras that failed
 		Notes:
-			Eras with fewer than MIN_VIABLE_ARCS arcs are skipped as non-viable.
-			The summary is rewritten after each completed era. The lock is released
-			however the loop ends.
+			The summary is rewritten after every completed era, and every row carries
+			the run stamp, so a file on disk can always be traced to the run that
+			wrote it. The lock is released however the loop ends.
 		"""
 
 		#	Output Directory and Lock
 			mkpath(OUT_DIR)
 			acquire_lock(LOCK_FILE)
 
-		#	Run Stamp
+		#	Run Stamp, Carried on Every Summary Row
 			run_stamp = (run_started   = Libc.strftime("%Y-%m-%dT%H:%M:%S", time()),
-				run_pid       = getpid(),
-				julia_threads = Threads.nthreads())
+						 run_pid       = getpid(),
+						 julia_threads = Threads.nthreads())
 
 		#	Iterating Over Eras
 			rows = NamedTuple[]
-			skipped = Int[]
+			failed = Int[]
 			try
 				for era in eras
-					#	Check Viability
-						era_row = filter(r -> r.era == era, profiles)
-						if nrow(era_row) == 0 || !era_row.file_exists[1]
-							@warn "Era $era: no network file; skipping"
-							push!(skipped, era)
-							continue
-						end
-						if era_row.n_arcs[1] < MIN_VIABLE_ARCS
-							@warn "Era $era: only $(era_row.n_arcs[1]) arcs (< $MIN_VIABLE_ARCS); skipping"
-							push!(skipped, era)
-							continue
-						end
-
 					#	Locate the Network
-						net_file = resolve_new_era_net(PAJEK_DIR, era)
-						if isempty(net_file)
+					#	Taken from the profile table, so the file swept is the file
+					#	profiled; falls back to the directory when an era was requested
+					#	that the profile pass never saw.
+						hit = findfirst(==(era), profiles.era)
+						net_file = (hit !== nothing && profiles.file_exists[hit]) ?
+								   String(profiles.net_file[hit]) :
+								   resolve_new_era_net(PAJEK_DIR, era)
+						if isempty(net_file) || !isfile(net_file)
 							@warn "Era $era: network file not found; skipping"
-							push!(skipped, era)
+							push!(failed, era)
 							continue
 						end
 
@@ -298,15 +325,16 @@ using community_detection_tools
 								n_resolutions      = N_RESOLUTIONS,
 								n_runs_per_gamma   = N_RUNS_PER_GAMMA)
 							write_champ_sweep(res, @sprintf("era%02d", era);
-								directory = OUT_DIR)
-							push!(rows, merge((era = era, seconds = round(seconds; digits = 1)),
-								run_stamp, res.diagnostics))
+											  directory = OUT_DIR)
+							push!(rows, merge((era = era,
+											   seconds = round(seconds; digits = 1)),
+											  run_stamp, res.diagnostics))
 							write_champ_summary(rows, summary_name; directory = OUT_DIR)
 							d = res.diagnostics
 							@info "Era $era done" seconds d.n_kept_vertices d.gamma_star d.best_index d.n_dominant d.gain_over_components d.modularity_range
 						catch err
 							@error "Era $era failed" exception = (err, catch_backtrace())
-							push!(skipped, era)
+							push!(failed, era)
 						end
 				end
 			finally
@@ -321,7 +349,7 @@ using community_detection_tools
 			end
 
 		#	Assembling Result
-			return skipped
+			return failed
 	end
 
 ############
@@ -334,56 +362,62 @@ using community_detection_tools
 			"from a terminal: julia --threads auto community_detection_tools/champ_sweep_new_eras.jl")
 	end
 
-#	Check for Profile-Only Mode
+#	Read the Flags
 	profile_only = "--profile-only" in ARGS
-	era_args = filter(a -> a != "--profile-only", ARGS)
+	force_sweep  = "--force" in ARGS
+	era_args = filter(a -> !startswith(a, "--"), ARGS)
 
 #	Era Selection from the Command Line
-	eras = isempty(era_args) ? collect(1:N_ERAS) : parse.(Int, era_args)
+	eras = isempty(era_args) ? collect(ANALYTIC_ERAS) : parse.(Int, era_args)
 	summary_name = isempty(era_args) ? "champ_sweep_summary" :
 		"champ_sweep_summary_eras_" * join(eras, "_")
 
-#	Step 1: Profile All Eras
+#	Step 1: Profile Every Era
 	@info "Profiling era networks" PAJEK_DIR N_ERAS
 	profiles = profile_eras(PAJEK_DIR, N_ERAS)
 	mkpath(OUT_DIR)
-	profile_path = write_profiles(profiles, OUT_DIR)
-	@info "Era profiles written" path = profile_path
+	@info "Era profiles written" path = write_profiles(profiles, OUT_DIR)
 
-#	Display Profile
+#	Display the Profile
 	for row in eachrow(profiles)
 		status = if !row.file_exists
-			"MISSING"
-		elseif row.n_arcs < MIN_VIABLE_ARCS
-			"TOO SMALL"
-		else
+			"missing"
+		elseif is_viable(row)
 			"viable"
+		else
+			"below the screen"
 		end
-		@info @sprintf("  Era %2d: %6d vertices, %7d arcs  [%s]",
-			row.era, row.n_vertices, row.n_arcs, status)
+		@info @sprintf("  Era %2d: %6d vertices, %7d arcs, %5d components, giant %5.1f%%, %5d both-degree  [%s]",
+			row.era, row.n_vertices, row.n_arcs, row.n_components,
+			100 * row.giant_component_share, row.n_both_degree, status)
 	end
 
-	viable = filter(r -> r.file_exists && r.n_arcs >= MIN_VIABLE_ARCS, profiles)
-	@info "Viable eras: $(nrow(viable)) of $(N_ERAS)"
+	viable = filter(is_viable, profiles)
+	@info "Viable eras" n = nrow(viable) eras = viable.era MIN_GIANT_VERTICES MIN_GIANT_SHARE
 
-#	Step 2: CHAMP Sweep (unless profile-only)
+#	Step 2: CHAMP Sweep, Unless Profiling Only
 	if profile_only
-		@info "Profile-only mode; stopping before sweep"
+		@info "Profile-only mode; stopping before the sweep"
 	else
 		#	Warn on a Single Thread
 			if Threads.nthreads() == 1
 				@warn "Running on one thread; start Julia with --threads auto"
 			end
 
-		#	Restrict to Viable Eras in the Requested Set
-			sweep_eras = intersect(eras, viable.era)
+		#	Apply the Screen, Unless Overridden
+			sweep_eras = force_sweep ? eras : intersect(eras, viable.era)
+			if force_sweep
+				@warn "Screen overridden with --force; sweeping every requested era" sweep_eras
+			end
+
+		#	Run
 			if isempty(sweep_eras)
-				@error "No viable eras to sweep in the requested set" eras
+				@error "No viable era in the requested set" eras
 			else
 				@info "CHAMP sweeps" sweep_eras Threads.nthreads() RESOLUTION_RANGE N_RESOLUTIONS OUT_DIR
-				skipped = run_new_era_sweeps(sweep_eras, profiles, summary_name)
-				if !isempty(skipped)
-					@warn "Eras that did not complete" skipped
+				failed = run_new_era_sweeps(sweep_eras, profiles, summary_name)
+				if !isempty(failed)
+					@warn "Eras that did not complete" failed
 				end
 			end
 	end
