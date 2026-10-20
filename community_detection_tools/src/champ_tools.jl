@@ -244,7 +244,12 @@
 			number of grid points, and exact.
 
 			This replaces a test that probed a single gamma per competitor and
-			rejected admissible partitions (design doc, Appendix A).
+			rejected admissible partitions (design doc, Appendix A). That test also
+			computed the crossing with the wrong sign, (Aj - Ai) / (Pi - Pj) rather
+			than (Ai - Aj) / (Pi - Pj), so a crossing inside the range was usually
+			reported outside it and the fallback -- a comparison at partition i's
+			own gamma alone -- decided instead. Appendix A describes the midpoint
+			probe; the sign error is a second defect in the same block.
 
 			Two grid points that recovered the same partition have identical lines.
 			Both are kept, with the same interval, so the count of admissible rows
