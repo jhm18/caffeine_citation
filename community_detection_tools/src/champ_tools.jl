@@ -1,43 +1,57 @@
-#	champ_tools.jl -- CHAMP Resolution Selection
+#	champ_tools.jl -- CHAMP Resolution Sweeps and Partition Agreement
 #	Jonathan H. Morgan, Ph.D. & Sarah Delmar, Ph.D.
-#	8 September 2026
+#	20 October 2026
 #
 #	WHERE THIS SITS. Third of three source files included by
 #	community_detection_tools.jl:
 #
 #		pajek_io.jl      Pajek format in and out
 #		leiden_tools.jl  Leiden community detection
-#		champ_tools.jl   (this file)  CHAMP resolution selection
+#		champ_tools.jl   (this file)  CHAMP sweeps and partition agreement
 #
 #	MUST BE INCLUDED AFTER leiden_tools.jl. champ_community_detection calls
 #	leiden_community_detection at every gamma in the sweep, and reuses
 #	_graph_to_sparse_matrix, _binarize_matrix and calculate_modularity from that
-#	file. Only the five functions CHAMP adds are carried here, so nothing is
-#	defined twice.
+#	file. Only the functions CHAMP adds are carried here, so nothing is defined
+#	twice.
 #
-#	Pulled verbatim from Large_Graph_Similarity.jl. The dependency closure of
-#	champ_community_detection was computed rather than assembled by hand; these are
-#	the members of it not already supplied by leiden_tools.jl:
+#	WHAT CHANGED FOR THE GRANULARITY DESIGN (granularity_design.md, fourth draft).
 #
-#		_aggregate_multi_edges                       collapse duplicate ties
-#		_calculate_partition_coefficients            the (A, P) pair, undirected
-#		_calculate_partition_coefficients_directed   the (A, P) pair, directed
-#		_select_curve_intersection                   the elbow of the upper hull
-#		champ_community_detection                    the sweep and the selection
+#		a.	THE ADMISSIBLE SET IS COMPUTED EXACTLY. The old test probed one gamma per
+#			competitor, midway between the crossing point and the partition's own
+#			gamma, and rejected the partition if the competitor won there. A
+#			competitor can win at that one point while the partition is still
+#			optimal elsewhere in the range, so the test rejected admissible
+#			partitions: on grid 2 it flagged 13 of 24 envelope partitions for era
+#			17 (design doc, Appendix A). _admissible_set now intersects the
+#			half-lines each competitor imposes on gamma and keeps the partition
+#			exactly when the intersection with the swept range is non-empty. It
+#			also returns that interval, which is the dominance width the design
+#			reports.
 #
-#	adjusted_rand_index is carried alongside. It is not a CHAMP dependency, but it
-#	is the instrument for comparing one partition against another on a fixed node
-#	set -- a CHAMP solution against the legacy Pajek partition for the same era,
-#	say -- which the scale assessment will want.
+#		b.	THE SWEEP CAN KEEP EVERY PARTITION. The calibration curve the design
+#			inverts is citer-weighted k_eff as a function of gamma, which needs a
+#			membership vector at every gamma, not only at the selected one.
+#			keep_partitions = true returns them all.
 #
-#	HOW THE SELECTION WORKS. Each partition recovered at some gamma contributes a
-#	line Q(gamma) = (A - gamma*P) / 2m, with intercept A and slope -P. Coarse
-#	partitions sit high and fall steeply; fine partitions sit lower and fall
-#	gently. Dominance analysis keeps only the partitions that are optimal
-#	somewhere in the swept range, which is the upper envelope of those lines.
-#	_select_curve_intersection then takes the consecutive admissible pair with the
-#	largest change in slope and returns the shallower side -- the elbow, past which
-#	additional resolution stops buying structural information.
+#		c.	ADJUSTED MUTUAL INFORMATION. The design's validation probe (sec. 9.1)
+#			compares partitions across Leiden seeds with AMI, which corrects for
+#			chance and suits partitions with different cluster counts. It sits
+#			beside adjusted_rand_index, which is kept.
+#
+#		d.	THE ELBOW IS REPORTED, NOT USED. _select_curve_intersection and
+#			gamma_star are still written to the sweep table so the envelope
+#			diagnostics of the design's sec. 3 can be reproduced, but the
+#			calibration takes no input from them.
+#
+#	HOW THE ENVELOPE WORKS. Each partition recovered at some gamma contributes a
+#	line Q(gamma) = (A - gamma*P) / m (directed) or / 2m_eff (undirected), with
+#	intercept A and slope -P. Coarse partitions sit high and fall steeply; fine
+#	partitions sit lower and fall gently. The admissible set is the upper envelope
+#	of those lines over the swept range. _select_curve_intersection takes the
+#	consecutive admissible pair with the largest change in slope and returns the
+#	shallower side, the elbow; the design doc, sec. 3.2, shows why that elbow is
+#	a function of the grid floor on these networks.
 #
 #	Packages
 	using DataFrames
@@ -62,14 +76,14 @@
 			Handles agg_func even when no weights exist.
 			When no weights exist and agg_func=maximum, creates binary presence.
 		"""
-		
+
 		#	Check if weights exist
 			has_weights = hasproperty(edges, :weight)
-		
+
 		#	Group and aggregate
 			if has_weights
 				#	Aggregate weights for duplicate edges
-					grouped = combine(groupby(edges, [:src, :dst]), 
+					grouped = combine(groupby(edges, [:src, :dst]),
 					                 :weight => agg_func => :weight)
 			else
 				#	Handle based on agg_func
@@ -80,7 +94,7 @@
 							end
 					elseif agg_func == sum
 						#	For sum without weights: count edges
-							grouped = combine(groupby(edges, [:src, :dst]), 
+							grouped = combine(groupby(edges, [:src, :dst]),
 							                 nrow => :weight)
 					else
 						#	For other functions: apply to ones
@@ -89,7 +103,7 @@
 							end
 					end
 			end
-		
+
 		#	Return aggregated edges
 			return grouped
 	end
@@ -113,7 +127,7 @@
 		#	Validation
 			@assert size(adj,1) == size(adj,2) "_calculate_partition_coefficients: adj must be square"
 			@assert length(membership) == size(adj,1) "_calculate_partition_coefficients: membership length mismatch"
-		
+
 		#	Remap Membership to Contiguous 1..C
 			labels = sort(unique(membership))
 			label_to_col = Dict{Int,Int}(lab => i for (i, lab) in enumerate(labels))
@@ -123,10 +137,10 @@
 			@inbounds for i in 1:n
 				mapped[i] = label_to_col[membership[i]]
 			end
-		
+
 		#	Build Indicator Matrix S (n × C)
 			S = sparse(collect(1:n), mapped, ones(Float64, n), n, C)
-		
+
 		#	Calculate Effective Totals (igraph-style)
 			d = diag(adj)
 			two_m_eff = sum(adj) + sum(d)
@@ -135,16 +149,16 @@
 			end
 			m_eff = two_m_eff / 2.0
 			k_eff = vec(sum(adj, dims=2)) .+ d
-		
+
 		#	Calculate A = E_eff (Internal Weight with Doubled Loops)
 			E_blocks = S' * adj * S
 			E_diag   = S' * spdiagm(0 => d) * S
 			E_eff    = sum(diag(E_blocks)) + sum(diag(E_diag))
-		
+
 		#	Calculate P = Expected Edges
 			K_eff = vec(S' * k_eff)
 			P = sum((K_eff .^ 2) ./ (2.0 * m_eff))
-		
+
 		#	Return Coefficients
 			return (E_eff, P)
 	end
@@ -163,7 +177,7 @@
 		#	Validation
 			@assert size(adj,1) == size(adj,2) "_calculate_partition_coefficients_directed: adj must be square"
 			@assert length(membership) == size(adj,1) "_calculate_partition_coefficients_directed: membership length mismatch"
-		
+
 		#	Remap Membership to Contiguous 1..C
 			labels = sort(unique(membership))
 			label_to_col = Dict{Int,Int}(lab => i for (i, lab) in enumerate(labels))
@@ -173,10 +187,10 @@
 			@inbounds for i in 1:n
 				mapped[i] = label_to_col[membership[i]]
 			end
-		
+
 		#	Build Indicator Matrix S (n × C)
 			S = sparse(collect(1:n), mapped, ones(Float64, n), n, C)
-		
+
 		#	Calculate Total Weight and Degrees
 			m = sum(adj)
 			if m == 0.0
@@ -184,18 +198,111 @@
 			end
 			k_out = vec(sum(adj, dims=2))  # out-degrees
 			k_in = vec(sum(adj, dims=1))   # in-degrees
-		
+
 		#	Calculate A = Internal Edges
 			E_blocks = S' * adj * S
 			A = sum(diag(E_blocks))
-		
+
 		#	Calculate P = Expected Edges (Directed Null Model)
 			K_out = vec(S' * k_out)
 			K_in = vec(S' * k_in)
 			P = sum((K_out .* K_in) ./ m)
-		
+
 		#	Return Coefficients
 			return (A, P)
+	end
+
+##########################
+#   ADMISSIBLE SET       #
+##########################
+
+#	Helper Function for champ_community_detection: Admissible Set by Half-Line Intersection
+	function _admissible_set(A::AbstractVector{<:Real}, P::AbstractVector{<:Real},
+	                         gammas::AbstractVector{<:Real})
+		"""
+		Args:
+			A::AbstractVector: intercept of each partition's line, the internal weight
+			P::AbstractVector: minus the slope of each line, the null-model weight
+			gammas::AbstractVector: the swept resolutions, which fix the range
+		Returns:
+			NamedTuple: (admissible, lower, upper) -- a Bool per partition, and the
+				interval of gamma over which it is optimal (NaN when inadmissible)
+		Notes:
+			Partition i is admissible when some gamma in the swept range exists at
+			which no other partition scores higher:
+
+				{ gamma in [gmin, gmax] : A_i - gamma*P_i >= A_j - gamma*P_j for all j }
+				is non-empty.
+
+			Each competitor j imposes one half-line, because the inequality is
+			(A_i - A_j) >= gamma * (P_i - P_j). A competitor with SMALLER P than i
+			makes P_i - P_j positive and bounds gamma from ABOVE: i is the coarser,
+			steeper line and can beat j only at small gamma. A competitor with
+			LARGER P bounds gamma from below. Equal P reduces to a comparison of
+			intercepts. Intersecting the half-lines with the swept range leaves an
+			interval, and i is admissible exactly when it is non-empty. O(n^2) in the
+			number of grid points, and exact.
+
+			This replaces a test that probed a single gamma per competitor and
+			rejected admissible partitions (design doc, Appendix A).
+
+			Two grid points that recovered the same partition have identical lines.
+			Both are kept, with the same interval, so the count of admissible rows
+			can exceed the count of distinct admissible partitions; the sweep table
+			carries A and P, from which duplicates are visible.
+		"""
+
+		#	Validation
+			n = length(A)
+			if length(P) != n || length(gammas) != n
+				throw(ArgumentError("_admissible_set: A, P and gammas differ in length"))
+			end
+			if n == 0
+				return (admissible = Bool[], lower = Float64[], upper = Float64[])
+			end
+
+		#	Tolerance, Relative to the Scale of the Coefficients
+			scale = max(1.0, maximum(abs, A), maximum(abs, P))
+			tol   = 1e-9 * scale
+
+		#	Swept Range
+			γmin, γmax = extrema(gammas)
+
+		#	Intersect the Half-Lines for Each Partition
+			admissible = falses(n)
+			lower = fill(NaN, n)
+			upper = fill(NaN, n)
+			for i in 1:n
+				lo = Float64(γmin)
+				hi = Float64(γmax)
+				beaten = false
+				for j in 1:n
+					i == j && continue
+					dA = A[i] - A[j]
+					dP = P[i] - P[j]
+					if abs(dP) <= tol
+						#	Parallel lines: the higher intercept wins everywhere
+						if A[j] > A[i] + tol
+							beaten = true
+							break
+						end
+					elseif dP > 0
+						#	Competitor has smaller P: i wins only below the crossing
+						hi = min(hi, dA / dP)
+					else
+						#	Competitor has larger P: i wins only above the crossing
+						lo = max(lo, dA / dP)
+					end
+				end
+				if !beaten && lo <= hi + 1e-12
+					admissible[i] = true
+					lower[i] = lo
+					upper[i] = max(lo, hi)
+				end
+			end
+
+		#	Assembling Result
+			return (admissible = admissible, lower = lower, upper = upper)
 	end
 
 #	Helper Function for champ_community_detection: Curve-Intersection Selection
@@ -207,30 +314,19 @@
 		Returns:
 			Int: index into result.gammas of the selected partition
 		Notes:
-			Implements the canonical CHAMP optimization criterion: identify the
-			partition at the bend of the upper envelope on the convex-hull plot.
-			The bend is where two consecutive admissible partitions have the largest
-			difference in slope, because that is where the envelope changes direction
-			most sharply.
+			The canonical CHAMP elbow: among admissible partitions sorted by gamma,
+			excluding the trivial one-community partition, take the consecutive
+			pair with the largest change in P and return the member with the
+			smaller P, which sits on the shallower side of the bend.
 
-			Procedure:
-			1. Restrict to dominant partitions, sorted by γ.
-			2. Exclude trivial single-community partitions, which always dominate at
-			   low γ but represent absence of structure rather than structure.
-			3. For each consecutive pair (i, i+1) of dominant partitions, compute the
-			   absolute slope difference |slope[i+1] - slope[i]| where slope = -P.
-			4. Find the pair with the largest slope difference.
-			5. Return the partition with the smaller P (i.e., the one on the
-			   shallower-slope side of the bend), since this is the partition
-			   discovered just after the regime change to consolidated communities.
+			On these citation networks P falls fastest at the left edge of the
+			range, so the largest change is the first one and the selected gamma
+			tracks the grid floor (design doc, sec. 3.2). The value is reported as
+			gamma_star for the envelope diagnostics; the granularity calibration
+			does not use it.
 
-			On networks with a clear structural scale, the selected γ corresponds
-			to the visual elbow where the upper envelope visibly transitions from
-			steep (low-γ, many small communities) to shallow (high-γ, fewer large
-			communities) line slopes.
-
-			Falls back to the middle dominant partition if too few dominant
-			partitions exist to compute a bend (< 2 after filtering trivials).
+			Falls back to the first non-trivial admissible partition when fewer than
+			two exist, and to index 1 when none does.
 		"""
 
 		#	Extract Fields
@@ -258,8 +354,6 @@
 			sort!(dom_ix; by = i -> gammas[i])
 
 		#	Find Consecutive Pair with Largest Slope Difference
-			#	Slope of line i is -P_coeffs[i]. Largest |slope_change| = largest |P_change|.
-			#	The bend is the pair (i, i+1) where the line slopes change most sharply.
 			best_pair_lo = dom_ix[1]
 			best_pair_hi = dom_ix[2]
 			best_diff    = abs(P_coeffs[dom_ix[2]] - P_coeffs[dom_ix[1]])
@@ -276,8 +370,6 @@
 			end
 
 		#	Return the Shallower-Slope Side of the Bend
-			#	The partition with smaller P is on the shallower side, just after
-			#	the regime change to consolidated community structure.
 			return P_coeffs[best_pair_hi] < P_coeffs[best_pair_lo] ? best_pair_hi : best_pair_lo
 	end
 
@@ -297,6 +389,7 @@
 	                                  directed::Bool=false,
 	                                  agg_func::Union{Function,Nothing}=nothing,
 	                                  seed::Union{Int,Nothing}=nothing,
+	                                  keep_partitions::Bool=false,
 	                                  show_progress::Bool=true)
 		"""
 		Args:
@@ -311,21 +404,23 @@
 			directed::Bool: treat graph as directed (default = false)
 			agg_func::Function: edge aggregation (default = sum if weighted)
 			seed::Union{Int,Nothing}: RNG seed
+			keep_partitions::Bool: return the membership at every γ (default = false)
 			show_progress::Bool: display progress bars (default = true)
 		Returns:
 			NamedTuple: (membership, resolution_used, modularity, n_communities, node_names,
 			             gammas, A_coeffs, P_coeffs, modularities, n_communities_per_gamma,
-			             dominant, best_index)
+			             dominant, dominance_lower, dominance_upper, best_index, memberships)
 		Notes:
 			The γ sweep is parallelized with Threads.@threads. Each γ task calls
 			leiden_community_detection with parallel_runs=false to avoid nested
 			threading.
 
-			Selection identifies the partition at the bend of the convex-hull upper
-			envelope — the γ at which the steep-slope (low-γ) and shallow-slope
-			(high-γ) regimes transition most rapidly. This is the canonical CHAMP
-			optimum: the γ value beyond which additional resolution stops yielding
-			meaningful structural information.
+			memberships is a Vector{Vector{Int}} with one entry per γ when
+			keep_partitions is true, and empty otherwise. The granularity design
+			needs every partition, since its calibration curve is citer-weighted
+			k_eff at each γ.
+
+			best_index is the CHAMP elbow, reported for the envelope diagnostics.
 		"""
 
 		#	Validation
@@ -335,7 +430,8 @@
 				       n_communities=0, node_names=String[],
 				       gammas=Float64[], A_coeffs=Float64[], P_coeffs=Float64[],
 				       modularities=Float64[], n_communities_per_gamma=Int[],
-				       dominant=Bool[], best_index=0)
+				       dominant=Bool[], dominance_lower=Float64[], dominance_upper=Float64[],
+				       best_index=0, memberships=Vector{Int}[])
 			end
 
 		#	Set Aggregation Strategy
@@ -439,58 +535,36 @@
 					end
 			end
 
-		#	Phase 2: Dominance Analysis
-			dominant = trues(length(gammas))
-
+		#	Phase 2: Admissible Set
+			A_coeffs = [c[1] for c in all_coeffs]
+			P_coeffs = [c[2] for c in all_coeffs]
 			if length(gammas) > 1
-				nP = length(all_partitions)
-				γmin, γmax = minimum(gammas), maximum(gammas)
-
-				#	Check Dominance Relationships
-					for i in 1:nP
-						Ai, Pi = all_coeffs[i]
-						for j in 1:nP
-							i == j && continue
-							Aj, Pj = all_coeffs[j]
-
-							if !isapprox(Pi, Pj; atol=1e-12)
-								γcross = (Aj - Ai) / (Pi - Pj + 1e-12)
-								if γmin - 1e-6 < γcross < γmax + 1e-6
-									γtest = clamp((γcross + all_partitions[i].gamma)/2, γmin, γmax)
-									if (Aj - γtest*Pj) > (Ai - γtest*Pi) + 1e-12
-										dominant[i] = false
-										break
-									end
-								elseif (Aj - all_partitions[i].gamma*Pj) >
-								       (Ai - all_partitions[i].gamma*Pi) + 1e-12
-									dominant[i] = false
-									break
-								end
-							else
-								if Aj > Ai + 1e-12
-									dominant[i] = false
-									break
-								end
-							end
-						end
-					end
+				adm = _admissible_set(A_coeffs, P_coeffs, gammas)
+				dominant        = adm.admissible
+				dominance_lower = adm.lower
+				dominance_upper = adm.upper
+			else
+				dominant        = trues(1)
+				dominance_lower = [gammas[1]]
+				dominance_upper = [gammas[1]]
 			end
 
 		#	Build Intermediate Result for Selection Helper
 			intermediate = (
 				gammas                  = gammas,
-				A_coeffs                = [c[1] for c in all_coeffs],
-				P_coeffs                = [c[2] for c in all_coeffs],
+				A_coeffs                = A_coeffs,
+				P_coeffs                = P_coeffs,
 				modularities            = [p.modularity for p in all_partitions],
 				n_communities_per_gamma = [p.n_communities for p in all_partitions],
 				dominant                = dominant
 			)
 
-		#	Phase 3: Select Partition at the Convex-Hull Bend
+		#	Phase 3: Elbow of the Envelope, Reported Only
 			best_ix = _select_curve_intersection(intermediate)
 
 		#	Return Best Partition with Full Sweep Data
 			best = all_partitions[best_ix]
+			memberships = keep_partitions ? [p.membership for p in all_partitions] : Vector{Int}[]
 			return (
 				membership              = best.membership,
 				resolution_used         = best.gamma,
@@ -502,29 +576,32 @@
 				P_coeffs                = intermediate.P_coeffs,
 				modularities            = intermediate.modularities,
 				n_communities_per_gamma = intermediate.n_communities_per_gamma,
-				dominant                = dominant,
-				best_index              = best_ix
+				dominant                = collect(dominant),
+				dominance_lower         = dominance_lower,
+				dominance_upper         = dominance_upper,
+				best_index              = best_ix,
+				memberships             = memberships
 			)
 	end
 	@doc raw"""
 	**Description**
-	Implements CHAMP (Convex Hull of Admissible Modularity Partitions) to identify
-	the resolution-stable community partition of a graph. Performs a sweep across
-	resolution values γ, identifies the admissible set of partitions on the upper
-	envelope of the modularity-vs-γ convex hull, and selects the partition at the
-	bend of that envelope — the γ value at which the trade-off between
-	community-count fineness and modularity quality is optimal.
+	Implements CHAMP (Convex Hull of Admissible Modularity Partitions). Performs a
+	sweep across resolution values γ, computes each partition's hull coefficients,
+	identifies the admissible set on the upper envelope of the modularity-vs-γ
+	lines together with each admissible partition's dominance interval, and
+	reports the partition at the elbow of that envelope. The elbow is a diagnostic
+	here, not a selection: the granularity design calibrates γ per era from the
+	citer-weighted effective community count instead.
 
 	Supports directed and undirected graphs with optional edge weights. The γ
-	sweep is parallelized across CPU threads for substantial speedup on multi-core
-	machines.
+	sweep is parallelized across CPU threads.
 
 	**Usage**
 	`champ_community_detection(edges; nodes=nothing, resolution=nothing,
 	                          resolution_range=(0.1,1.8), n_resolutions=30,
 	                          weighted=false, directed=false, n_runs_per_gamma=5,
 	                          n_iterations_per_run=10, seed=nothing,
-	                          show_progress=true)`
+	                          keep_partitions=false, show_progress=true)`
 
 	**Arguments**
 	- `edges::DataFrame`: Edge list with `:src`, `:dst`, optional `:weight`.
@@ -538,19 +615,18 @@
 	- `directed::Bool`: Treat the graph as directed (default `false`).
 	- `agg_func::Function`: Edge aggregation when input has multi-edges (default `sum` if weighted, else `maximum`).
 	- `seed::Int`: Random seed for reproducibility. Per-thread RNGs are derived from this seed.
+	- `keep_partitions::Bool`: Return the membership vector at every γ (default `false`).
 	- `show_progress::Bool`: Display progress bar during the γ sweep (default `true`).
 
 	**Details**
 	CHAMP performs three phases:
 
-	1. **Sweep**: Run Leiden at each γ in the resolution grid. For each resulting partition, compute the two CHAMP coefficients:
+	1. **Sweep**: Run Leiden at each γ in the resolution grid. For each resulting partition, compute the two hull coefficients:
 	   - `A` — total edge weight within communities (the modularity "internal" term)
 	   - `P` — expected within-community weight under the null model (the modularity "penalty" term)
 	   The modularity at any γ for this partition equals `(A - γP) / m_total`, so the partition's modularity is a linear function of γ with intercept `A` and slope `-P`.
-	2. **Dominance**: For each partition i, test whether some other partition j has a higher `A - γP` value across the entire resolution range. Partitions that survive (are optimal somewhere in the range) form the *admissible set* on the convex hull.
-	3. **Selection at the convex-hull bend**: Identify the partition at the elbow of the upper envelope. Each admissible partition contributes a line with slope `-P`; the steep slopes (large P) come from low-γ partitions with many small communities, and the shallow slopes (small P) come from high-γ partitions with fewer larger communities. The bend of the envelope is the γ at which slope transitions most rapidly from steep to shallow. Trivial single-community partitions are excluded from selection because they always lie on the convex hull at low γ but represent the absence of community structure rather than its presence.
-
-	The γ sweep is parallelized using `Threads.@threads`. Each γ task calls `leiden_community_detection` with `parallel_runs=false` to prevent nested thread oversubscription.
+	2. **Admissible set**: Partition `i` is admissible when some γ in the swept range exists at which no other partition scores higher. Each competitor `j` constrains γ to a half-line, since `A_i - γP_i ≥ A_j - γP_j` is equivalent to `(A_i - A_j) ≥ γ(P_i - P_j)`: a competitor with smaller `P` bounds γ from above, one with larger `P` from below. The intersection of those half-lines with the swept range is the partition's dominance interval, returned as `dominance_lower` and `dominance_upper`; the partition is admissible exactly when the interval is non-empty.
+	3. **Elbow**: Among admissible partitions sorted by γ, excluding the trivial single-community partition, the consecutive pair with the largest change in `P` marks the bend, and the member with smaller `P` is reported as `best_index`. On the era citation networks this elbow tracks the grid floor, so it is recorded for the envelope diagnostics and not used for selection.
 
 	**Modularity Conventions**
 
@@ -558,62 +634,78 @@
 	- **Undirected**: `Q(γ) = (A - γP) / (2 m_eff)` where `m_eff = sum(adj) / 2 + sum(diag(adj)) / 2` to account for self-loops igraph-style.
 	- **Directed**: `Q(γ) = (A - γP) / m` with directed null model `K_out · K_in / m`.
 
-	**Threading**
-
-	The γ sweep is parallelized using `Threads.@threads`. To control thread count, launch Julia with `julia --threads N` or set `JULIA_NUM_THREADS`. Speedup scales approximately linearly with thread count when `n_resolutions ≥ n_threads`.
-
 	**Value**
 
 	NamedTuple containing:
-	- `membership::Vector{Int}`: Community assignments for the selected partition.
-	- `resolution_used::Float64`: γ value of the selected partition.
-	- `modularity::Float64`: Modularity score of the selected partition at its γ.
-	- `n_communities::Int`: Number of communities in the selected partition.
+	- `membership::Vector{Int}`: Community assignments for the elbow partition.
+	- `resolution_used::Float64`: γ value of the elbow partition.
+	- `modularity::Float64`: Modularity score of the elbow partition at its γ.
+	- `n_communities::Int`: Number of communities in the elbow partition.
 	- `node_names::Vector{String}`: Original node identifiers in adjacency-matrix order.
 	- `gammas::Vector{Float64}`: All γ values in the sweep.
 	- `A_coeffs::Vector{Float64}`: A coefficient for each γ partition.
 	- `P_coeffs::Vector{Float64}`: P coefficient for each γ partition.
 	- `modularities::Vector{Float64}`: Modularity for each γ partition (computed at each partition's own γ).
 	- `n_communities_per_gamma::Vector{Int}`: Community count for each γ partition.
-	- `dominant::Vector{Bool}`: `true` for partitions in the admissible set (on the convex hull).
-	- `best_index::Int`: Index into `gammas` of the selected partition.
-
-	The sweep data fields enable post-hoc visualization (see `plot_champ_sweep`) for users who want to verify the selected partition against the full sweep.
-
-	**Examples**
-
-	```julia
-			#	Default analysis on a directed weighted network
-				result = champ_community_detection(edges;
-												weighted = true,
-												directed = true)
-				println("Selected γ: $(result.resolution_used)")
-				println("Modularity: $(result.modularity)")
-
-			#	Custom resolution range
-				result = champ_community_detection(edges;
-												resolution_range = (0.2, 2.0),
-												n_resolutions    = 40,
-												weighted         = true,
-												directed         = true)
-
-			#	Single-resolution Leiden via CHAMP (skips sweep, runs Leiden once)
-				result = champ_community_detection(edges;
-												resolution = 1.0,
-												weighted   = true)
-	```
+	- `dominant::Vector{Bool}`: `true` for partitions in the admissible set.
+	- `dominance_lower::Vector{Float64}`, `dominance_upper::Vector{Float64}`: the interval of γ over which each admissible partition is optimal; `NaN` for inadmissible ones.
+	- `best_index::Int`: Index into `gammas` of the elbow partition.
+	- `memberships::Vector{Vector{Int}}`: One membership per γ when `keep_partitions` is true, otherwise empty.
 
 	**References**
 	1. Weir WH, Emmons S, Gibson R, Taylor D, Mucha PJ (2017) "Post-processing partitions to identify domains of modularity optimization." *Algorithms* 10(3):93. doi:10.3390/a10030093
 	2. Github implementation: https://github.com/wweir827/CHAMP
 
 	**See Also**
-	`leiden_community_detection`, `calculate_modularity`, `plot_champ_sweep`
+	`leiden_community_detection`, `calculate_modularity`, `champ_era_sweep`
 	""" champ_community_detection
 
 ##########################
 #   PARTITION AGREEMENT  #
 ##########################
+
+#	Helper Function for adjusted_rand_index and adjusted_mutual_information: Contingency Table
+	function _contingency(partition1::Vector{Int}, partition2::Vector{Int})
+		"""
+		Args:
+			partition1::Vector{Int}: first partition
+			partition2::Vector{Int}: second partition, same length
+		Returns:
+			Tuple: (counts::Dict{Tuple{Int,Int},Int}, a::Vector{Int}, b::Vector{Int})
+				-- the non-zero cells keyed by remapped (row, col), and the marginals
+		Notes:
+			Kept sparse because two partitions of a few thousand citing articles
+			into hundreds of communities have a contingency table that is almost
+			entirely zero.
+		"""
+
+		#	Validation
+			n = length(partition1)
+			if n != length(partition2)
+				throw(ArgumentError("partitions must have the same length"))
+			end
+
+		#	Remap Labels
+			map1 = Dict{Int,Int}()
+			map2 = Dict{Int,Int}()
+			counts = Dict{Tuple{Int,Int},Int}()
+			a = Int[]
+			b = Int[]
+			for i in 1:n
+				r = get!(map1, partition1[i]) do
+					push!(a, 0); length(a)
+				end
+				c = get!(map2, partition2[i]) do
+					push!(b, 0); length(b)
+				end
+				a[r] += 1
+				b[c] += 1
+				counts[(r, c)] = get(counts, (r, c), 0) + 1
+			end
+
+		#	Assembling Result
+			return (counts, a, b)
+	end
 
 #	Adjusted Rand Index Calculation
 	function adjusted_rand_index(partition1::Vector{Int}, partition2::Vector{Int})
@@ -627,7 +719,7 @@
 			Calculates Adjusted Rand Index between two partitions.
 			Corrects for chance agreement in clustering comparisons.
 		"""
-		
+
 		#	Validation
 			n = length(partition1)
 			if n != length(partition2)
@@ -636,67 +728,182 @@
 			if n == 0
 				return 1.0
 			end
-		
-		#	Build contingency table
-			labels1 = unique(partition1)
-			labels2 = unique(partition2)
-			n_clusters1 = length(labels1)
-			n_clusters2 = length(labels2)
-			
-		#	Create mapping for efficient indexing
-			map1 = Dict(label => i for (i, label) in enumerate(labels1))
-			map2 = Dict(label => i for (i, label) in enumerate(labels2))
-			
-		#	Build contingency matrix
-			contingency = zeros(Int, n_clusters1, n_clusters2)
-			for i in 1:n
-				row = map1[partition1[i]]
-				col = map2[partition2[i]]
-				contingency[row, col] += 1
-			end
-		
-		#	Calculate marginals
-			sum_rows = sum(contingency, dims=2)
-			sum_cols = sum(contingency, dims=1)
-		
-		#	Calculate index components
-			sum_nij_2 = sum(contingency .^ 2)
-			sum_ai_2 = sum(sum_rows .^ 2)
-			sum_bj_2 = sum(sum_cols .^ 2)
-			
-		#	Calculate combinations
-			comb_nij = (sum_nij_2 - n) / 2
-			comb_ai = (sum_ai_2 - n) / 2
-			comb_bj = (sum_bj_2 - n) / 2
-			
-		#	Total combinations
+
+		#	Contingency Table and Marginals
+			counts, a, b = _contingency(partition1, partition2)
+
+		#	Pair Counts
+			comb_nij = sum(c * (c - 1) for c in values(counts)) / 2
+			comb_ai  = sum(x * (x - 1) for x in a) / 2
+			comb_bj  = sum(x * (x - 1) for x in b) / 2
 			total_comb = n * (n - 1) / 2
-		
-		#	Expected index
+
+		#	Expected and Maximum Index
 			expected_index = (comb_ai * comb_bj) / total_comb
-		
-		#	Maximum index
 			max_index = (comb_ai + comb_bj) / 2
-		
-		#	Handle edge cases
+
+		#	Handle Edge Cases
 			if max_index == expected_index
-				if comb_nij == expected_index
-					return 1.0
-				else
-					return 0.0
+				return comb_nij == expected_index ? 1.0 : 0.0
+			end
+
+		#	Adjusted Rand Index
+			return (comb_nij - expected_index) / (max_index - expected_index)
+	end
+
+#	Helper Function for adjusted_mutual_information: Log Factorials 0..N
+	function _log_factorials(N::Int)
+		"""
+		Args:
+			N::Int: largest factorial needed
+		Returns:
+			Vector{Float64}: lf[k + 1] = log(k!) for k in 0..N
+		Notes:
+			A cumulative sum of logs, so the hypergeometric terms of the expected
+			mutual information can be formed without a special-functions dependency.
+		"""
+
+		#	Accumulate
+			lf = zeros(Float64, N + 1)
+			for k in 1:N
+				lf[k + 1] = lf[k] + log(k)
+			end
+
+		#	Assembling Result
+			return lf
+	end
+
+#	Adjusted Mutual Information Calculation
+	function adjusted_mutual_information(partition1::Vector{Int}, partition2::Vector{Int};
+	                                     normalization::Symbol = :max)
+		"""
+		Args:
+			partition1::Vector{Int}: first partition
+			partition2::Vector{Int}: second partition, same length
+			normalization::Symbol: :max (default), :arithmetic, :geometric or :min --
+				which mean of the two entropies bounds the mutual information
+		Returns:
+			Float64: AMI, 1 for identical partitions, about 0 for independent ones
+		Notes:
+			AMI = (MI - E[MI]) / (norm(H1, H2) - E[MI]), with E[MI] the expectation
+			of the mutual information under the permutation model, the
+			hypergeometric sum of Vinh, Epps and Bailey (2010). The default
+			normalization is the maximum entropy, the AMI_max of that paper; the
+			:arithmetic form matches scikit-learn's default.
+
+			The expected term is a sum over contingency cells and over the feasible
+			values of each cell, so its cost is sum_ij min(a_i, b_j). On the citing
+			articles of one era, a few thousand vertices in a few hundred
+			communities, it runs in well under a second.
+
+			Two partitions that are both trivial (one community each) return 1.0;
+			if the normalizing denominator is zero otherwise, 0.0 is returned.
+		"""
+
+		#	Validation
+			N = length(partition1)
+			if N != length(partition2)
+				throw(ArgumentError("adjusted_mutual_information: partitions must have the same length"))
+			end
+			if N == 0
+				return 1.0
+			end
+			if !(normalization in (:max, :arithmetic, :geometric, :min))
+				throw(ArgumentError("adjusted_mutual_information: unknown normalization $normalization"))
+			end
+
+		#	Contingency Table and Marginals
+			counts, a, b = _contingency(partition1, partition2)
+			Nf = Float64(N)
+
+		#	Entropies
+			H1 = -sum((x / Nf) * log(x / Nf) for x in a)
+			H2 = -sum((x / Nf) * log(x / Nf) for x in b)
+			if H1 == 0.0 && H2 == 0.0
+				return 1.0
+			end
+
+		#	Mutual Information
+			MI = 0.0
+			for ((r, c), nij) in counts
+				MI += (nij / Nf) * log(Nf * nij / (a[r] * b[c]))
+			end
+
+		#	Expected Mutual Information Under the Permutation Model
+			lf = _log_factorials(N)
+			EMI = 0.0
+			for (r, ai) in enumerate(a), (c, bj) in enumerate(b)
+				lo = max(1, ai + bj - N)
+				hi = min(ai, bj)
+				lo > hi && continue
+				base = lf[ai + 1] + lf[bj + 1] + lf[N - ai + 1] + lf[N - bj + 1] - lf[N + 1]
+				for nij in lo:hi
+					logp = base - lf[nij + 1] - lf[ai - nij + 1] - lf[bj - nij + 1] -
+					       lf[N - ai - bj + nij + 1]
+					EMI += (nij / Nf) * log(Nf * nij / (ai * bj)) * exp(logp)
 				end
 			end
-		
-		#	Adjusted Rand Index
-			ari = (comb_nij - expected_index) / (max_index - expected_index)
-		
-		return ari
+
+		#	Normalization
+			bound = normalization == :max        ? max(H1, H2) :
+			        normalization == :min        ? min(H1, H2) :
+			        normalization == :geometric  ? sqrt(H1 * H2) :
+			                                       (H1 + H2) / 2
+			denom = bound - EMI
+			if abs(denom) < 1e-12
+				return abs(MI - EMI) < 1e-12 ? 1.0 : 0.0
+			end
+
+		#	Assembling Result
+			return (MI - EMI) / denom
 	end
+	@doc raw"""
+	**Description**
+	Adjusted mutual information between two partitions of the same vertex set.
+	Corrects the mutual information for the agreement expected by chance under
+	the permutation model, so partitions with different numbers of clusters can be
+	compared on an equal footing. The granularity design's validation probe uses
+	it to measure how far Leiden partitions at one γ agree across seeds.
+
+	**Usage**
+	`adjusted_mutual_information(partition1, partition2; normalization=:max)`
+
+	**Arguments**
+	- `partition1::Vector{Int}`, `partition2::Vector{Int}`: Community labels, one per vertex, in the same vertex order.
+	- `normalization::Symbol`: Which mean of the two entropies bounds the mutual information: `:max` (default, Vinh et al.'s AMI_max), `:arithmetic` (scikit-learn's default), `:geometric` or `:min`.
+
+	**Details**
+	`AMI = (MI − E[MI]) / (norm(H₁, H₂) − E[MI])`, where `E[MI]` is the
+	hypergeometric expectation of Vinh, Epps and Bailey (2010). The expectation is
+	a sum over contingency cells and over the feasible values of each cell; its
+	cost is `Σ_ij min(a_i, b_j)`, which on the citing articles of one era is
+	negligible. Log factorials are accumulated directly, so the function has no
+	special-functions dependency.
+
+	**Value**
+	A `Float64`: 1 for identical partitions, near 0 for independent ones, and
+	negative when agreement is below chance.
+
+	**Examples**
+	```julia
+		#	Agreement of two Leiden runs on the citing articles of one era
+			ami = adjusted_mutual_information(run_a[citing], run_b[citing])
+	```
+
+	**References**
+	Vinh NX, Epps J, Bailey J (2010) "Information theoretic measures for clusterings
+	comparison: variants, properties, normalization and correction for chance."
+	*Journal of Machine Learning Research* 11:2837–2854.
+
+	**See Also**
+	`adjusted_rand_index`, `granularity_probe`
+	""" adjusted_mutual_information
 
 ###############
 #   EXPORTS   #
 ###############
 
-#	CHAMP Resolution Selection
+#	CHAMP Sweeps and Partition Agreement
 	export champ_community_detection,
-		   adjusted_rand_index
+		   adjusted_rand_index,
+		   adjusted_mutual_information
