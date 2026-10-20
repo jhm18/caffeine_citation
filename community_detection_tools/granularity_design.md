@@ -3,7 +3,7 @@
 **Design, rationale, and the claims it rests on**
 
 Jonathan H. Morgan, Ph.D. & Sarah Delmar, Ph.D.
-20 October 2026 – sixth draft
+20 October 2026 – seventh draft
 
 ---
 
@@ -15,7 +15,6 @@ Jonathan H. Morgan, Ph.D. & Sarah Delmar, Ph.D.
 | **[M]** | Mathematical property of the objective function |
 | **[L]** | Claim supported by the literature cited |
 | **[D]** | Design decision, which the findings constrain but do not determine |
-| **[P]** | Figure computed from the $m/P$ proxy; replaced by measured values when the current sweep completes |
 
 ---
 
@@ -52,11 +51,13 @@ are detected with the Leiden algorithm, a heuristic optimizer of modularity with
 resolution parameter $\gamma$.
 
 Era 17 holds 76,070 vertices: 9,080 cite something inside the era, 4,185 are both cited
-and citing, and 66,990 are cited-only with mean in-degree 1.59. The citing articles are
-joined to one another by 10,794 arcs, mean degree 2.38 among themselves **[E]**. A
-cited-only vertex of in-degree 1 gains $1 - \gamma K^{\mathrm{out}}_c / m$ by joining its
-citer's community, which is positive whenever $\gamma K^{\mathrm{out}}_c < m$ **[M]**; the
-sweep records that quantity at every $\gamma$ (Appendix B).
+and citing, and 66,990 are cited-only with mean in-degree 1.39, of which 11,090 are cited
+two or more times. The citing articles are joined to one another by 19,761 arcs, mean
+degree 4.35 among themselves, and the remaining 93,247 arcs land on cited-only works
+**[E]**. A cited-only vertex of in-degree 1 gains $1 - \gamma K^{\mathrm{out}}_c / m$ by
+joining its citer's community, which is positive whenever $\gamma K^{\mathrm{out}}_c < m$
+**[M]**; measured at every $\gamma$ of the sweep, $\max_c \gamma K^{\mathrm{out}}_c / m$
+never exceeds 0.34 **[E]**, so the condition holds throughout.
 
 ### 2.2 The resolution diagnostics
 
@@ -89,7 +90,7 @@ of them standing apart **[E]**.
 
 The structural reason is visible in §2.1: most vertices are cited-only, their assignments
 are fixed by a single citer, and the citing articles that could distinguish communities
-are joined at mean degree 2.38. The envelope changes gradually because the network offers
+are joined at mean degree 4.35. The envelope changes gradually because the network offers
 no scale at which it changes sharply.
 
 **[D]** Community resolution is therefore a design choice on these networks, and the
@@ -179,8 +180,12 @@ different construct so perfect agreement is not expected, and agreement near cha
 mean the direct-citation partition reflects the sparsity of citing-to-citing ties rather
 than the organization of the front. *Internal coherence*: within-community journal
 concentration exceeds a permutation null that reassigns citing articles across communities
-of the same sizes. The first comes from the current run; the second and third from a
-second run on existing inputs (Appendix D). If convergent validity fails, coupling becomes the
+of the same sizes. Reliability is established: on eras 11, 13, and 17, with ten single-start Leiden runs at
+each of five resolutions, AMI across seeds on the citing articles averages 0.73–0.85 and
+never falls below 0.67; mean $k_{\mathrm{eff}}$ is monotone in $\gamma$ in every era; and
+the coefficient of variation of $k_{\mathrm{eff}}$ across seeds is 0.03–0.08 at the
+working resolutions **[E]**. The second and third kinds of evidence come from a second run
+on existing inputs (Appendix D). If convergent validity fails, coupling becomes the
 primary representation and direct citation the check, and the calibration of §3 applies
 to the coupling network unchanged.
 
@@ -197,46 +202,49 @@ equally far in both directions, and it is where $W$ jumps 2.6× from era 13 and 
 specialty-scale anchor belongs. The alternative anchors bracket that scale.
 
 **Claim 5. Holding effective community size constant is the convention under which
-communities are comparable across eras. [E, D]** Three quantities can be compared across
-specifications **[P]**:
+communities are comparable across eras. [E, D]** On the measured calibration curves,
+anchored at $g = 120$ in era 14:
 
 Granularity $g$:
 
 | $\alpha$ | e11 | e12 | e13 | e14 | e15 | e16 | e17 | range |
 |---|---|---|---|---|---|---|---|---|
-| 0.00 | 14.5 | 24.2 | 42.6 | 119.5 | 127.6 | 163.4 | 251.7 | 17.4× |
-| 0.50 | 37.4 | 54.2 | 69.4 | 119.5 | 121.3 | 131.3 | 173.7 | 4.6× |
-| 1.00 | 98.6 | 117.7 | 116.8 | 119.5 | 117.1 | 119.1 | 116.5 | 1.2× |
+| 0.00 | 14.4 | 25.1 | 45.6 | 123.1 | 131.8 | 185.9 | 254.6 | 17.7× |
+| 0.50 | 48.6 | 57.1 | 74.4 | 123.1 | 125.2 | 142.0 | 171.2 | 3.5× |
+| 1.00 | 106.7 | 114.8 | 114.1 | 123.1 | 119.6 | 121.0 | 116.2 | 1.15× |
 
 Concentration $K/k_{\mathrm{eff}}$:
 
 | $\alpha$ | e11 | e12 | e13 | e14 | e15 | e16 | e17 | range |
 |---|---|---|---|---|---|---|---|---|
-| 0.00 | 2.7 | 2.9 | 4.3 | 11.4 | 10.6 | 13.2 | 18.7 | 6.9× |
-| 0.50 | 5.3 | 5.1 | 6.1 | 11.4 | 10.2 | 11.0 | 13.9 | 2.7× |
-| 1.00 | 11.6 | 10.8 | 9.3 | 11.4 | 9.9 | 10.3 | 10.0 | 1.2× |
+| 0.00 | 2.6 | 2.8 | 4.4 | 10.8 | 10.0 | 14.9 | 18.6 | 7.1× |
+| 0.50 | 6.0 | 5.4 | 6.1 | 10.8 | 9.6 | 11.5 | 13.4 | 2.5× |
+| 1.00 | 11.1 | 8.8 | 8.6 | 10.8 | 9.5 | 10.3 | 9.6 | 1.3× |
 
-Citing articles per detected community $W/K$:
+Size Gini over communities with at least one citing article:
 
-| $\alpha$ | e11 | e12 | e13 | e14 | e15 | e16 | e17 | range |
-|---|---|---|---|---|---|---|---|---|
-| 0.00 | 5.29 | 8.38 | 9.86 | 10.53 | 12.08 | 12.40 | 13.47 | 2.55× |
-| 0.50 | 7.00 | 10.55 | 11.38 | 10.53 | 11.83 | 11.90 | 12.51 | 1.79× |
-| 1.00 | 8.49 | 10.94 | 12.61 | 10.53 | 11.77 | 11.60 | 11.61 | 1.49× |
+| $\alpha$ | e11 | e12 | e13 | e14 | e15 | e16 | e17 |
+|---|---|---|---|---|---|---|---|
+| 0.00 | 0.61 | 0.69 | 0.75 | 0.81 | 0.83 | 0.84 | 0.85 |
+| 0.50 | 0.73 | 0.75 | 0.80 | 0.81 | 0.82 | 0.83 | 0.83 |
+| 1.00 | 0.78 | 0.80 | 0.82 | 0.81 | 0.82 | 0.82 | 0.81 |
 
-The calibration fixes $g$ at every $\alpha$, and $W/K = g / (K/k_{\mathrm{eff}})$, so the
-one measure free to vary is concentration. It is stable at $\alpha = 1$ (1.2×) and drifts
-nearly sevenfold at $\alpha = 0$, where holding the effective count constant leaves the
-partitions progressively more unequal as the field grows. $\alpha = 1$ is the convention
-under which the shape of the partition, and not only its level, is held across eras. The
-primary specification is re-examined on measured counts and the full size distributions
-(largest-community share, size Gini, counts above size thresholds) when the sweep
-completes.
+The calibration fixes $g$ at every $\alpha$, and $W/K = g / (K/k_{\mathrm{eff}})$, so
+concentration and the shape of the size distribution are the measures free to vary. Both
+are stable under $\alpha = 1$: concentration within 1.3× and the Gini within 0.78–0.82
+across the window. Under $\alpha = 0$, holding the effective count constant lets the
+partitions run from nearly equal in era 11 to highly concentrated in era 17, a sevenfold
+drift in concentration and a Gini rising from 0.61 to 0.85. $\alpha = 1$ is the
+convention under which the shape of the partition, and not only its level, is held across
+eras. The largest-community share falls from 0.40 to 0.05 under $\alpha = 1$; that is the
+effective count itself (era 11 holds about five effective communities at the specialty
+scale), not a change of shape.
 
 **Claim 6. The scaling rule is a convention, and the design does not estimate it. [E, D]**
 Holding $\gamma$ fixed produces whatever exponent the method and the graph yield: fitted
-$\alpha$ between 0.08 and 0.38 across $\gamma \in [0.1, 6]$ **[E, P]**, below the
-$\alpha \approx 0.59$ that modularity's resolution limit alone would impose. The settings
+$\alpha$ between $-0.03$ and $0.26$ across $\gamma \in [0.1, 6]$ **[E]**, far below the
+$\alpha \approx 0.59$ that modularity's resolution limit alone would impose. At any fixed
+resolution nearly all of the field's growth goes into community size. The settings
 of $\alpha$ name positions about how a field specializes, by adding areas of
 characteristic size or by growing a stable number of them, and that is what makes the
 sensitivity set interpretable. Because $\alpha$ is declared rather than estimated, the
@@ -253,37 +261,50 @@ integration from an isolated connection. The sweep reports the counts above 1, 3
 
 ---
 
-## 5. Provisional calibration
+## 5. The calibrated specifications
 
-Anchored at $g = 120$ for era 14, from the $m/P$ proxy **[P]**:
+From the measured calibration curves, anchored at $g = 120$ in era 14, tolerance 0.10
+**[E]**. $K$ is the detected count, excluding restored components; $n_{\geq 10}$ the
+number of communities holding ten or more citing articles.
 
-| $\alpha$ | e11 | e12 | e13 | e14 | e15 | e16 | e17 |
-|---|---|---|---|---|---|---|---|
-| 0.00 | K=98, kₑ=35.6 @γ2.7 | K=107, kₑ=37.1 @γ2.5 | K=165, kₑ=38.2 @γ1.9 | K=403, kₑ=35.5 @γ2.4 | K=383, kₑ=36.3 @γ1.9 | K=475, kₑ=36.1 @γ1.4 | K=674, kₑ=36.1 @γ1.7 |
-| 0.50 | K=74, kₑ=13.8 @γ1.0 | K=85, kₑ=16.6 @γ1.1 | K=143, kₑ=23.4 @γ1.1 | K=403, kₑ=35.5 @γ2.4 | K=391, kₑ=38.1 @γ2.1 | K=495, kₑ=44.9 @γ1.8 | K=726, kₑ=52.3 @γ2.7 |
-| 1.00 | K=61, kₑ=5.3 @γ0.4 | K=82, kₑ=7.6 @γ0.7 | K=129, kₑ=13.9 @γ0.7 | K=403, kₑ=35.5 @γ2.4 | K=393, kₑ=39.5 @γ2.3 | K=508, kₑ=49.5 @γ2.1 | K=782, kₑ=77.9 @γ3.8 |
+| Spec | Era | target $k_{\mathrm{eff}}$ | achieved | $\gamma$ | $K$ | $g$ | $n_{\geq 10}$ | met |
+|---|---|---|---|---|---|---|---|---|
+| α = 1 | 11 | 4.32 | 4.86 | 0.10 | 54 | 106.7 | 5 | at floor, +12.5% |
+| | 12 | 7.48 | 7.81 | 0.40 | 69 | 114.8 | 9 | yes |
+| | 13 | 13.56 | 14.25 | 0.60 | 122 | 114.1 | 15 | yes |
+| | 14 | 35.37 | 34.47 | 1.70 | 372 | 123.1 | 53 | yes |
+| | 15 | 38.55 | 38.69 | 1.50 | 366 | 119.6 | 60 | yes |
+| | 16 | 49.09 | 48.67 | 1.70 | 499 | 121.0 | 79 | yes |
+| | 17 | 75.67 | 78.11 | 3.40 | 753 | 116.2 | 142 | yes |
+| α = 0.5 | 11–17 | | | 0.5, 0.9, 0.8, 1.7, 1.3, 1.3, 2.4 | 64–712 | 49–171 | 11–113 | 6 of 7 (era 11, −14%) |
+| α = 0 | 11–17 | 35.4 | | 1.9, 1.9, 1.4, 1.7, 1.2, 1.1, 1.3 | 94–662 | 14–255 | 17–80 | 6 of 7 (era 16, −10%) |
+| α = 1, $g$ = 90 | 11–17 | | | 0.2, 0.7, 0.7, 2.4, 2.2, 2.4, 4.0 | 55–785 | 84–94 | 7–169 | 7 of 7 |
+| α = 1, $g$ = 160 | 11–17 | | | 0.1, 0.3, 0.4, 1.2, 0.9, 1.2, 2.5 | 54–712 | 107–162 | 5–121 | 4 of 7 |
 
-Every required $\gamma$ falls between 0.4 and 3.8, inside the swept range. $K$ is the
-detected count, excluding restored components. Target against achieved at $\alpha = 1$:
+Every required $\gamma$ except era 11's lies inside the grid. Era 11's coarsest partition
+on this grid is $g = 107$ at $\gamma = 0.1$, which sets the measured ceiling of the
+feasible anchor window at $\alpha = 1$; the floor, from era 17 at $\gamma = 6$, is
+$g = 61$. The anchor of 90 calibrates all seven eras; 160 lies above era 11's and era 12's
+reach. Extending the grid floor to 0.02 for eras 11–13, which costs about a minute of
+computation, extends era 11's curve below $k_{\mathrm{eff}} = 4.9$ and is the next sweep;
+until then the coarser alternative is the attainable one, about 105.
 
-| | e11 | e12 | e13 | e14 | e15 | e16 | e17 |
-|---|---|---|---|---|---|---|---|
-| target $k_{\mathrm{eff}}$ | 4.3 | 7.5 | 13.6 | 35.5 | 38.8 | 49.4 | 76.0 |
-| achieved | 5.3 | 7.6 | 13.9 | 35.5 | 39.5 | 49.5 | 77.9 |
+The counts in the last column are the size of the early literature: at the specialty
+scale, eras 11 and 12 hold five and nine communities with ten or more citing articles. The
+per-outcome eligibility floors of claim 7 determine which outcomes those eras can support;
+no choice of anchor changes what was published in 1971–84.
 
-Six of seven are within 2 percent; era 11 misses by 23 percent at the coarse end of the
-grid, and the tolerance rule of §7 decides whether that is calibrated or outside the
-attainable window. The feasible anchor window at $\alpha = 1$ on the present grid is
-roughly 70 to 170: era 17's floor is $g \approx 67$ at $\gamma = 6$, and era 11 reaches
-$g \approx 170$ at $\gamma = 0.1$.
+The partition written at each $\gamma$ reproduces the sweep's partition exactly, because
+the sweep seeds its five starts 0–4 and the writer uses seed 0 with five starts; the
+written and sweep-achieved values agree to the decimal.
 
 ---
 
 ## 6. Why not a fixed resolution
 
-Common practice fixes $\gamma = 1$. At $\gamma = 1$ granularity runs 37, 65, 86, 253, 197,
-218, and 359 citing articles across eras 11 to 17, a 9.6-fold change that tracks the
-17.5-fold growth of the field **[E, P]**. Several quantities the design measures at the
+Common practice fixes $\gamma = 1$. At $\gamma = 1$ granularity runs 22, 51, 69, 183, 146,
+194, and 303 citing articles across eras 11 to 17, a 13.9-fold change that tracks the
+17.5-fold growth of the field **[E]**. Several quantities the design measures at the
 community level depend on community size, so a fixed resolution leaves an era trend
 inside them.
 
@@ -332,8 +353,9 @@ calibration curve.
 **Probe.** On at least eras 11, 13, and 17, single Leiden starts across ten seeds at five
 resolutions: monotonicity of $k_{\mathrm{eff}}$ in $\gamma$, its coefficient of variation
 across seeds, and adjusted mutual information between seeds on the citing articles. The
-run-to-run variation sets the calibration tolerance; the AMI is the reliability evidence
-of claim 3. **[D]** If AMI is high at the working resolutions the direct-citation
+run-to-run variation sets the calibration tolerance (CV 0.03–0.08 at the working
+resolutions, so 0.10 sits above the noise); the AMI is the reliability evidence of
+claim 3. **[D]** If AMI is high at the working resolutions the direct-citation
 partitions carry the construct and calibration proceeds; if it is low, coupling is the
 basis for detection, and the rest of the procedure is unchanged.
 
@@ -419,14 +441,21 @@ brute-force envelope now accompanies it.
 Grid 1: `pajek_files/champ_sweep_7yr/gamma_0.01_1.0_n40/`.
 Grid 2: `pajek_files/champ_sweep_7yr/gamma_0.1_6.0_n60/`.
 
-Checks the current run closes: the era 17 arc total against the in-degree and
-citing-arc figures (66,990 × 1.59 + 10,794 ≈ 117,300 against 113,008 in §1); the $\gamma$
-of each `era*_local_gamma.clu`; the restored-component count per era; the proxy-to-measured
-ratio at every $\gamma$.
+Closed by the current run: the era 17 arc total reconciles exactly (66,990 cited-only
+works at mean in-degree 1.392 absorb 93,247 arcs, and 19,761 run among citing articles,
+for 113,008); the restored-component count per era is 44, 77, 89, 243, 269, 250, and 346;
+the $m/P$ proxy runs 0.52–0.93 of the measured citer-weighted count, rising with era and
+with $\gamma$, so no figure derived from it is retained.
 
 ---
 
 ## Appendix C: revision note
+
+The seventh draft replaces every proxy figure with the measured value from the completed
+sweeps and probe: the composition of era 17 (§2.1), the reliability evidence of claim 3,
+the comparability tables of claim 5, the exponents of claim 6, the calibrated
+specifications (§5), the fixed-resolution contrast (§6), and the Appendix B
+reconciliation. The **[P]** marker is retired.
 
 The sixth draft reorganizes the document around the approach and the claims it rests on
 (§3, §4), each claim with its support from the literature or the evidence in hand, and
@@ -450,10 +479,12 @@ Each item either implements a step of §7 or checks a claim of §4.
 
 **Implement the procedure**
 
-- [ ] Sweep eras 11–17 on grid 2 with the revised pipeline (eras 14–17 running; 11–13 next). Replaces every **[P]** figure with measured values: claim 5's tables, claim 6's exponents, §5, §6.
-- [ ] Run the probe on eras 11, 13, 17. Sets the calibration tolerance from run-to-run variation; supplies the reliability evidence for claim 3.
-- [ ] Set the primary anchor and the two alternatives within the measured feasible window (claim 4; working values 120, 90, 160).
-- [ ] Calibrate and write the five specifications; confirm every era is within tolerance or flagged at a bound (§5, era 11).
+- [x] Sweep eras 11–17 on grid 2 with the revised pipeline.
+- [x] Run the probe on eras 11, 13, 17. Tolerance 0.10 justified; reliability established.
+- [ ] Re-sweep eras 11–13 with the grid floor at 0.02, so era 11 reaches the anchor and the coarser alternative becomes attainable (§5).
+- [ ] Fix the coarser alternative anchor from the extended curves (160 if era 11 reaches it; otherwise the attainable ceiling).
+- [x] Calibrate and write the primary specification (6 of 7 within tolerance; era 11 at the floor).
+- [ ] Calibrate and write the four alternative specifications.
 - [ ] Set the per-outcome eligibility floors from the size-threshold counts (claim 7).
 - [ ] Recompute descent, tie weightings, and models per specification.
 
@@ -461,10 +492,10 @@ Each item either implements a step of §7 or checks a claim of §4.
 
 - [ ] Claim 3, convergent validity: build the within-era bibliographic-coupling networks from the dated edge list, calibrate them by §7, and compute AMI against the direct-citation partitions per era.
 - [ ] Claim 3, internal coherence: within-community journal concentration against a permutation null.
-- [ ] Claim 5: re-examine $\alpha = 1$ on measured counts and the full size distributions (largest share, Gini, threshold counts).
+- [x] Claim 5: re-examined on measured counts and the full size distributions; holds.
 - [ ] §6: read the descent criterion in `PathA_TieLayer.R`, state its relationship to community size, and state what it credits as persistence: a front that carries its foundations forward while replacing its articles is the case the criterion must decide.
-- [ ] §2.1: confirm $\max_c \gamma K^{\mathrm{out}}_c / m < 1$ across the working range from the sweep table.
-- [ ] Appendix B: reconcile the era 17 arc total.
+- [x] §2.1: $\max_c \gamma K^{\mathrm{out}}_c / m \leq 0.34$ across the whole grid.
+- [x] Appendix B: era 17 arc total reconciled.
 
 ---
 
