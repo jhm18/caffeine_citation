@@ -3,7 +3,7 @@
 **Design, rationale, and the claims it rests on**
 
 Jonathan H. Morgan, Ph.D. & Sarah Delmar, Ph.D.
-20 October 2026 – seventh draft
+21 October 2026 – eighth draft
 
 ---
 
@@ -136,9 +136,9 @@ admissible set, the elbow, and `gamma_star` play no part.
 
 ### 3.3 The specifications
 
-**[D] Primary: $\alpha = 1$, anchored at $g = 120$ citing articles per effective community
+**[D] Primary: $\alpha = 1$, anchored at $g = 90$ citing articles per effective community
 at era 14.** Sensitivity: $\alpha = 0$ and $\alpha = 0.5$ at the primary anchor, and anchors
-of roughly 90 and 160 at $\alpha = 1$. Five constructions, each carried through descent,
+of 60 and 120 at $\alpha = 1$. Five constructions, each carried through descent,
 the tie weightings, and every model. The primary specification is declared here, before
 any model is fit, and the grounds for it (§4, claims 4 and 5) concern the comparability of
 the units and not any outcome. Reporting how a result varies with the specification is
@@ -192,57 +192,68 @@ to the coupling network unchanged.
 **Claim 4. The specialty scale is about a hundred active contributors, and the anchor is
 set there. [L]** Price's invisible colleges, Crane's (1972) specialty networks, and Kuhn's
 (1970) estimate of scientific communities of perhaps a hundred members converge on that
-order. The unit here is articles; a seven-year window of a specialty publishing fifteen to
-twenty papers a year holds about a hundred citing articles. An anchor of 100–120 citing
+order. The unit here is articles; a seven-year window of a specialty publishing twelve to
+fifteen papers a year holds about ninety citing articles. An anchor of $g = 90$ citing
 articles per effective community sets the partition at the scale of the specialty as that
 literature has described it, which is the unit the questions of descent and integration
-are asked of. Era 14 is the midpoint of the analytic window, so the calibration reaches
+are asked of. It is also the level at which every era's calibration curve has a rung
+(§5): the smallest era, 518 citing articles, can be divided into about 2, 6, or 7
+effective communities and nothing between, so an anchor must land on a value the early
+literature can produce. Era 14 is the midpoint of the analytic window, so the calibration reaches
 equally far in both directions, and it is where $W$ jumps 2.6× from era 13 and then grows
 1.1× to era 15: the field's consolidation to modern scale, which is where a
-specialty-scale anchor belongs. The alternative anchors bracket that scale.
+specialty-scale anchor belongs. The alternative anchors, 60 and
+120, bracket that scale.
 
 **Claim 5. Holding effective community size constant is the convention under which
-communities are comparable across eras. [E, D]** On the measured calibration curves,
-anchored at $g = 120$ in era 14:
+communities are comparable across eras. [E, D]** On the measured calibration curves of the
+extended grid, all five specifications of §3.3:
 
 Granularity $g$:
 
-| $\alpha$ | e11 | e12 | e13 | e14 | e15 | e16 | e17 | range |
+| Spec | e11 | e12 | e13 | e14 | e15 | e16 | e17 | range |
 |---|---|---|---|---|---|---|---|---|
-| 0.00 | 14.4 | 25.1 | 45.6 | 123.1 | 131.8 | 185.9 | 254.6 | 17.7× |
-| 0.50 | 48.6 | 57.1 | 74.4 | 123.1 | 125.2 | 142.0 | 171.2 | 3.5× |
-| 1.00 | 106.7 | 114.8 | 114.1 | 123.1 | 119.6 | 121.0 | 116.2 | 1.15× |
+| α = 0, $g$ = 90 | 11.0 | 19.7 | 33.2 | 91.5 | 100.3 | 126.8 | 195.8 | 17.7× |
+| α = 0.5, $g$ = 90 | 30.0 | 46.3 | 56.7 | 91.5 | 94.0 | 105.2 | 131.9 | 4.4× |
+| α = 1, $g$ = 60 | 56.8 | 59.6 | 60.5 | 59.6 | 59.7 | 58.5 | 61.1 | 1.08× |
+| α = 1, $g$ = 90 | 91.5 | 89.8 | 86.1 | 91.5 | 90.3 | 88.4 | 93.6 | 1.09× |
+| α = 1, $g$ = 120 | 91.5 | 114.8 | 114.1 | 115.9 | 122.5 | 113.9 | 118.2 | 1.34× |
 
 Concentration $K/k_{\mathrm{eff}}$:
 
-| $\alpha$ | e11 | e12 | e13 | e14 | e15 | e16 | e17 | range |
+| Spec | e11 | e12 | e13 | e14 | e15 | e16 | e17 | range |
 |---|---|---|---|---|---|---|---|---|
-| 0.00 | 2.6 | 2.8 | 4.4 | 10.8 | 10.0 | 14.9 | 18.6 | 7.1× |
-| 0.50 | 6.0 | 5.4 | 6.1 | 10.8 | 9.6 | 11.5 | 13.4 | 2.5× |
-| 1.00 | 11.1 | 8.8 | 8.6 | 10.8 | 9.5 | 10.3 | 9.6 | 1.3× |
+| α = 0, $g$ = 90 | 2.1 | 2.5 | 3.4 | 9.0 | 8.3 | 10.7 | 15.1 | 7.2× |
+| α = 0.5, $g$ = 90 | 4.0 | 4.4 | 4.8 | 9.0 | 7.8 | 9.0 | 10.9 | 2.7× |
+| α = 1, $g$ = 60 | 6.7 | 5.2 | 5.4 | 6.1 | 5.5 | 6.0 | 5.8 | 1.3× |
+| α = 1, $g$ = 90 | 9.5 | 8.2 | 6.7 | 9.0 | 7.6 | 8.0 | 8.1 | 1.4× |
+| α = 1, $g$ = 120 | 9.5 | 8.8 | 8.6 | 10.2 | 9.4 | 9.9 | 9.9 | 1.2× |
 
 Size Gini over communities with at least one citing article:
 
-| $\alpha$ | e11 | e12 | e13 | e14 | e15 | e16 | e17 |
+| Spec | e11 | e12 | e13 | e14 | e15 | e16 | e17 |
 |---|---|---|---|---|---|---|---|
-| 0.00 | 0.61 | 0.69 | 0.75 | 0.81 | 0.83 | 0.84 | 0.85 |
-| 0.50 | 0.73 | 0.75 | 0.80 | 0.81 | 0.82 | 0.83 | 0.83 |
-| 1.00 | 0.78 | 0.80 | 0.82 | 0.81 | 0.82 | 0.82 | 0.81 |
+| α = 0, $g$ = 90 | 0.58 | 0.65 | 0.72 | 0.79 | 0.81 | 0.82 | 0.84 |
+| α = 0.5, $g$ = 90 | 0.70 | 0.74 | 0.78 | 0.79 | 0.80 | 0.82 | 0.82 |
+| α = 1, $g$ = 60 | 0.75 | 0.76 | 0.78 | 0.76 | 0.77 | 0.76 | 0.76 |
+| α = 1, $g$ = 90 | 0.78 | 0.77 | 0.81 | 0.79 | 0.80 | 0.80 | 0.80 |
+| α = 1, $g$ = 120 | 0.78 | 0.80 | 0.82 | 0.81 | 0.82 | 0.82 | 0.81 |
 
 The calibration fixes $g$ at every $\alpha$, and $W/K = g / (K/k_{\mathrm{eff}})$, so
 concentration and the shape of the size distribution are the measures free to vary. Both
-are stable under $\alpha = 1$: concentration within 1.3× and the Gini within 0.78–0.82
-across the window. Under $\alpha = 0$, holding the effective count constant lets the
-partitions run from nearly equal in era 11 to highly concentrated in era 17, a sevenfold
-drift in concentration and a Gini rising from 0.61 to 0.85. $\alpha = 1$ is the
+are stable under $\alpha = 1$ at every anchor: concentration within 1.4× and the Gini
+within 0.05 across the window. Under $\alpha = 0$, holding the effective count constant
+lets the partitions run from nearly equal in era 11 to highly concentrated in era 17, a
+sevenfold drift in concentration and a Gini rising from 0.58 to 0.84. $\alpha = 1$ is the
 convention under which the shape of the partition, and not only its level, is held across
-eras. The largest-community share falls from 0.40 to 0.05 under $\alpha = 1$; that is the
-effective count itself (era 11 holds about five effective communities at the specialty
-scale), not a change of shape.
+eras. The largest-community share falls from 0.36 to 0.05 under $\alpha = 1$ at $g = 90$;
+that is the effective count itself (era 11 holds about six effective communities at the
+specialty scale), not a change of shape.
 
 **Claim 6. The scaling rule is a convention, and the design does not estimate it. [E, D]**
 Holding $\gamma$ fixed produces whatever exponent the method and the graph yield: fitted
-$\alpha$ between $-0.03$ and $0.26$ across $\gamma \in [0.1, 6]$ **[E]**, far below the
+$\alpha$ between $-0.03$ and $0.26$ across $\gamma \in [0.02, 6]$, and $0.16$ at
+$\gamma = 1$ **[E]**, far below the
 $\alpha \approx 0.59$ that modularity's resolution limit alone would impose. At any fixed
 resolution nearly all of the field's growth goes into community size. The settings
 of $\alpha$ name positions about how a field specializes, by adding areas of
@@ -263,36 +274,53 @@ integration from an isolated connection. The sweep reports the counts above 1, 3
 
 ## 5. The calibrated specifications
 
-From the measured calibration curves, anchored at $g = 120$ in era 14, tolerance 0.10
-**[E]**. $K$ is the detected count, excluding restored components; $n_{\geq 10}$ the
-number of communities holding ten or more citing articles.
+From the measured calibration curves on the extended grid ($[0.02, 6.0]$, 64 points),
+anchored at era 14, tolerance 0.10 **[E]**. $K$ is the detected count, excluding restored
+components; $n_{\geq 10}$ the number of communities holding ten or more citing articles.
 
-| Spec | Era | target $k_{\mathrm{eff}}$ | achieved | $\gamma$ | $K$ | $g$ | $n_{\geq 10}$ | met |
-|---|---|---|---|---|---|---|---|---|
-| α = 1 | 11 | 4.32 | 4.86 | 0.10 | 54 | 106.7 | 5 | at floor, +12.5% |
-| | 12 | 7.48 | 7.81 | 0.40 | 69 | 114.8 | 9 | yes |
-| | 13 | 13.56 | 14.25 | 0.60 | 122 | 114.1 | 15 | yes |
-| | 14 | 35.37 | 34.47 | 1.70 | 372 | 123.1 | 53 | yes |
-| | 15 | 38.55 | 38.69 | 1.50 | 366 | 119.6 | 60 | yes |
-| | 16 | 49.09 | 48.67 | 1.70 | 499 | 121.0 | 79 | yes |
-| | 17 | 75.67 | 78.11 | 3.40 | 753 | 116.2 | 142 | yes |
-| α = 0.5 | 11–17 | | | 0.5, 0.9, 0.8, 1.7, 1.3, 1.3, 2.4 | 64–712 | 49–171 | 11–113 | 6 of 7 (era 11, −14%) |
-| α = 0 | 11–17 | 35.4 | | 1.9, 1.9, 1.4, 1.7, 1.2, 1.1, 1.3 | 94–662 | 14–255 | 17–80 | 6 of 7 (era 16, −10%) |
-| α = 1, $g$ = 90 | 11–17 | | | 0.2, 0.7, 0.7, 2.4, 2.2, 2.4, 4.0 | 55–785 | 84–94 | 7–169 | 7 of 7 |
-| α = 1, $g$ = 160 | 11–17 | | | 0.1, 0.3, 0.4, 1.2, 0.9, 1.2, 2.5 | 54–712 | 107–162 | 5–121 | 4 of 7 |
+The primary specification, $\alpha = 1$ at $g = 90$:
 
-Every required $\gamma$ except era 11's lies inside the grid. Era 11's coarsest partition
-on this grid is $g = 107$ at $\gamma = 0.1$, which sets the measured ceiling of the
-feasible anchor window at $\alpha = 1$; the floor, from era 17 at $\gamma = 6$, is
-$g = 61$. The anchor of 90 calibrates all seven eras; 160 lies above era 11's and era 12's
-reach. Extending the grid floor to 0.02 for eras 11–13, which costs about a minute of
-computation, extends era 11's curve below $k_{\mathrm{eff}} = 4.9$ and is the next sweep;
-until then the coarser alternative is the attainable one, about 105.
+| Era | target $k_{\mathrm{eff}}$ | achieved | $\gamma$ | $K$ | $g$ | $n_{\geq 3}$ | $n_{\geq 10}$ | largest share | met |
+|---|---|---|---|---|---|---|---|---|---|
+| 11 | 5.76 | 5.66 | 0.11 | 54 | 91.5 | 11 | 6 | 0.36 | yes |
+| 12 | 9.97 | 9.99 | 0.68 | 82 | 89.8 | 29 | 14 | 0.23 | yes |
+| 13 | 18.08 | 18.91 | 0.68 | 127 | 86.1 | 36 | 18 | 0.09 | yes |
+| 14 | 47.16 | 46.39 | 2.77 | 416 | 91.5 | 128 | 73 | 0.06 | yes |
+| 15 | 51.40 | 51.24 | 2.20 | 389 | 90.3 | 120 | 76 | 0.05 | yes |
+| 16 | 65.46 | 66.62 | 2.68 | 530 | 88.4 | 149 | 98 | 0.04 | yes |
+| 17 | 100.89 | 96.98 | 4.01 | 785 | 93.6 | 252 | 169 | 0.05 | yes |
 
-The counts in the last column are the size of the early literature: at the specialty
-scale, eras 11 and 12 hold five and nine communities with ten or more citing articles. The
-per-outcome eligibility floors of claim 7 determine which outcomes those eras can support;
-no choice of anchor changes what was published in 1971–84.
+Every era is within 5 percent of its target and none sits at a grid bound. The alternative
+specifications:
+
+| Spec | $\gamma$, eras 11–17 | $K$ | $g$ | $n_{\geq 10}$ | met |
+|---|---|---|---|---|---|
+| α = 1, $g$ = 60 | 0.40, 0.78, 1.16, 3.72, 3.34, 4.48, 6.00 | 61–862 | 57–61 | 9–219 | 7 of 7 (era 17 at the grid ceiling, −1.8%) |
+| α = 1, $g$ = 120 | 0.11, 0.40, 0.59, 1.73, 1.35, 1.82, 3.44 | 54–759 | 92–123 | 6–146 | 6 of 7 (era 11, +31%) |
+| α = 0.5, $g$ = 90 | 0.68, 1.16, 1.06, 2.77, 1.92, 1.92, 3.15 | 69–750 | 30–132 | 13–142 | 6 of 7 (era 12, −11%) |
+| α = 0, $g$ = 90 | 2.68, 2.49, 2.01, 2.77, 1.82, 1.63, 2.01 | 99–700 | 11–196 | 16–105 | 7 of 7 |
+
+Across the five specifications, 33 of 35 era calibrations are within tolerance. The two
+misses are the two smallest eras landing between rungs of their calibration curves (era
+11 at $g = 120$, era 12 at $\alpha = 0.5$), and the one bound is era 17 at $g = 60$
+reaching its target within 2 percent at $\gamma = 6$, which is a calibration on the last
+grid point rather than a miss.
+
+**Era 11's calibration curve has rungs.** Below $\gamma = 0.4$ a 518-article network
+can be divided into $k_{\mathrm{eff}}$ of 2.3, 5.7, or 6.2–6.7 effective communities and
+nothing between: the step from 2.3 to 5.7 is the largest community dropping from 65
+percent to 36 percent of the citers, and there is no partition in which it holds 50
+percent. That is the resolution limit of a small network, not a property of the
+procedure. The $g = 120$ target for era 11 ($k_{\mathrm{eff}} = 4.3$) falls between
+rungs and lands on the 5.7 partition, the same one $g = 90$ selects; an anchor of 160
+($k_{\mathrm{eff}} = 3.2$) is unreachable for era 11 and misses era 12 by 17 percent,
+and was dropped for that reason. The anchor of 90 is the specialty scale at which every
+era has a rung.
+
+The counts in the $n_{\geq 10}$ column are the size of the early literature: at the
+specialty scale, eras 11 and 12 hold six and fourteen communities with ten or more citing
+articles. The per-outcome eligibility floors of claim 7 determine which outcomes those
+eras can support; no choice of anchor changes what was published in 1971–84.
 
 The partition written at each $\gamma$ reproduces the sweep's partition exactly, because
 the sweep seeds its five starts 0–4 and the writer uses seed 0 with five starts; the
@@ -302,8 +330,8 @@ written and sweep-achieved values agree to the decimal.
 
 ## 6. Why not a fixed resolution
 
-Common practice fixes $\gamma = 1$. At $\gamma = 1$ granularity runs 22, 51, 69, 183, 146,
-194, and 303 citing articles across eras 11 to 17, a 13.9-fold change that tracks the
+Common practice fixes $\gamma = 1$. At $\gamma = 1$ granularity runs 24, 51, 70, 184, 152,
+201, and 308 citing articles across eras 11 to 17, a 12.9-fold change that tracks the
 17.5-fold growth of the field **[E]**. Several quantities the design measures at the
 community level depend on community size, so a fixed resolution leaves an era trend
 inside them.
@@ -342,7 +370,7 @@ record a reader can audit (Appendix B).
 citing population $W_e$, the restored-component count, and the cited-only vertices with
 in-degree two or more.
 
-**Sweep.** Leiden at sixty resolutions on $[0.1, 6.0]$, five starts each. At every
+**Sweep.** Leiden at sixty-four resolutions on $[0.02, 6.0]$, five starts each. At every
 resolution the partition is expanded over the full vertex set and its citer-weighted
 $k_{\mathrm{eff}}$ and $g$ measured directly, with the detected and restored counts, the
 counts above size thresholds, the largest-community share, the size Gini, the $m/P$ proxy
@@ -365,7 +393,7 @@ points within tolerance, the nearest is taken and the smaller $\gamma$ on a tie;
 of acceptable points is reported, and a selection at the edge of the grid is flagged.
 
 **Write.** Leiden re-run at $\gamma_e$ with a fixed seed; the partition written tagged by
-specification (`era17_alpha1.00_g120_e14.clu`) with a sidecar recording $\gamma_e$, the
+specification (`era17_alpha1.00_g90_e14.clu`) with a sidecar recording $\gamma_e$, the
 seed, the target, the achieved $k_{\mathrm{eff}}$ on the partition written, the detected
 and restored counts, and the size summaries. The calibration table holds one row per era
 per specification.
@@ -438,8 +466,9 @@ brute-force envelope now accompanies it.
 | Vertex-weighted size distributions of §3.1 | `era*_local_gamma.clu`, grid 2 |
 | Corpus, node-list, and backward-tie figures | `PathA_Revised_Eras.R`, `PathA_BackwardTies.R` |
 
-Grid 1: `pajek_files/champ_sweep_7yr/gamma_0.01_1.0_n40/`.
-Grid 2: `pajek_files/champ_sweep_7yr/gamma_0.1_6.0_n60/`.
+Grid 1: `pajek_files/champ_sweep_7yr/gamma_0.01_1.0_n40/` (diagnostics only).
+Grid 2: `pajek_files/champ_sweep_7yr/gamma_0.1_6.0_n60/` (diagnostics and probe).
+Grid 3: `pajek_files/champ_sweep_7yr/gamma_0.02_6.0_n64/` (calibration and partitions).
 
 Closed by the current run: the era 17 arc total reconciles exactly (66,990 cited-only
 works at mean in-degree 1.392 absorb 93,247 arcs, and 19,761 run among citing articles,
@@ -450,6 +479,12 @@ with $\gamma$, so no figure derived from it is retained.
 ---
 
 ## Appendix C: revision note
+
+The eighth draft moves the primary anchor from 120 to 90 on the evidence of the extended
+grid: 90 is the specialty scale at which every era's calibration curve has a rung, and it
+calibrates all seven eras within 5 percent. The alternative anchors are 60 and 120; 160 is
+dropped as unreachable for era 11. The tables of claim 5 and §5 are from the extended
+grid.
 
 The seventh draft replaces every proxy figure with the measured value from the completed
 sweeps and probe: the composition of era 17 (§2.1), the reliability evidence of claim 3,
@@ -481,12 +516,12 @@ Each item either implements a step of §7 or checks a claim of §4.
 
 - [x] Sweep eras 11–17 on grid 2 with the revised pipeline.
 - [x] Run the probe on eras 11, 13, 17. Tolerance 0.10 justified; reliability established.
-- [ ] Re-sweep eras 11–13 with the grid floor at 0.02, so era 11 reaches the anchor and the coarser alternative becomes attainable (§5).
-- [ ] Fix the coarser alternative anchor from the extended curves (160 if era 11 reaches it; otherwise the attainable ceiling).
-- [x] Calibrate and write the primary specification (6 of 7 within tolerance; era 11 at the floor).
-- [ ] Calibrate and write the four alternative specifications.
+- [x] Re-sweep all eras on the extended grid $[0.02, 6.0]$.
+- [x] Set the primary anchor at 90 and the alternatives at 60 and 120 from the extended curves.
+- [x] Calibrate and write the primary specification (7 of 7 within 5 percent).
+- [x] Calibrate and write all five specifications (33 of 35 era calibrations within tolerance).
 - [ ] Set the per-outcome eligibility floors from the size-threshold counts (claim 7).
-- [ ] Recompute descent, tie weightings, and models per specification.
+- [ ] Recompute descent, tie weightings, and models per specification (R side).
 
 **Check the claims**
 

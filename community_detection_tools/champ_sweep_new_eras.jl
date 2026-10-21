@@ -59,9 +59,16 @@
 #		julia --threads auto community_detection_tools/champ_sweep_new_eras.jl --probe 11 17 \
 #		      --probe-gammas 0.5,1,2,3,4 --seeds 0,1,2,3,4,5,6,7,8,9
 #
-#	Calibration (needs sweeps on disk; writes one partition per era):
+#	A different grid (the output directory follows the grid tag):
+#		julia --threads auto community_detection_tools/champ_sweep_new_eras.jl --range 0.02,6.0 --points 64
+#
+#	Calibration (needs sweeps on disk in the grid's directory; writes one partition
+#	per era per specification). One specification:
 #		julia --threads auto community_detection_tools/champ_sweep_new_eras.jl --calibrate \
 #		      --alpha 1.0 --anchor-g 120 --anchor-era 14 --tolerance 0.10
+#	The five specifications of the design in one run:
+#		julia --threads auto community_detection_tools/champ_sweep_new_eras.jl --calibrate \
+#		      --range 0.02,6.0 --points 64 --specs "1.0,120;0.5,120;0.0,120;1.0,90;1.0,160"
 #
 #	Outputs, in pajek_files/champ_sweep_7yr/gamma_<min>_<max>_n<points>/:
 #		era<NN>_sweep.tsv                one row per gamma, with the calibration curve
@@ -103,9 +110,26 @@ using community_detection_tools
 	const PROBE_ERAS    = [11, 13, 17]
 
 #	Sweep Settings
+#	The grid is read from the command line first, because the output directory is
+#	named for it: every mode that reads or writes sweep files has to agree on the
+#	grid, so --range and --points are honoured by sweep, probe and calibrate alike.
+	function _grid_from_args(args::Vector{String})
+		lo, hi = 0.1, 6.0
+		n = 60
+		ix = findfirst(==("--range"), args)
+		if ix !== nothing && ix < length(args)
+			parts = parse.(Float64, split(args[ix + 1], ','))
+			length(parts) == 2 || error("--range needs lo,hi")
+			lo, hi = parts
+		end
+		ix = findfirst(==("--points"), args)
+		if ix !== nothing && ix < length(args)
+			n = parse(Int, args[ix + 1])
+		end
+		return ((lo, hi), n)
+	end
 	const MIN_COMPONENT_SIZE = 4
-	const RESOLUTION_RANGE   = (0.1, 6.0)
-	const N_RESOLUTIONS      = 60
+	const RESOLUTION_RANGE, N_RESOLUTIONS = _grid_from_args(String.(ARGS))
 	const N_RUNS_PER_GAMMA   = 5
 
 #	Probe Defaults
@@ -384,7 +408,7 @@ using community_detection_tools
 
 		#	Walk, Skipping Each Valued Flag and Its Value
 			valued = ("--alpha", "--anchor-g", "--anchor-era", "--tolerance",
-			          "--seeds", "--probe-gammas", "--spec")
+			          "--seeds", "--probe-gammas", "--spec", "--specs", "--range", "--points")
 			out = String[]
 			skip = false
 			for a in args
@@ -758,30 +782,40 @@ using community_detection_tools
 				@error "No viable era in the requested set" eras
 			else
 				@info "Granularity probe" probe_eras gammas seeds OUT_DIR
-				failed = run_granularity_probes(probe_eras, profiles, gammas, seeds)
-				if !isempty(failed)
-					@warn "Eras that did not complete" failed
+				probe_failed = run_granularity_probes(probe_eras, profiles, gammas, seeds)
+				if !isempty(probe_failed)
+					@warn "Eras that did not complete" probe_failed
 				end
 			end
 
 	elseif calibrate
 		#	Calibration and Partition Output
-			alpha      = option_value(args, "--alpha", DEFAULT_ALPHA)
-			anchor_g   = option_value(args, "--anchor-g", DEFAULT_ANCHOR_G)
+		#	Either one specification from --alpha/--anchor-g/--spec, or several from
+		#	--specs "alpha,g;alpha,g;...", all at the same anchor era and tolerance.
 			anchor_era = option_value(args, "--anchor-era", DEFAULT_ANCHOR_ERA)
 			tolerance  = option_value(args, "--tolerance", DEFAULT_TOLERANCE)
-			spec       = option_value(args, "--spec",
-			                          @sprintf("alpha%.2f_g%d_e%02d", alpha, round(Int, anchor_g), anchor_era))
+			specs_arg  = option_value(args, "--specs", "")
+			pairs = if isempty(specs_arg)
+				[(option_value(args, "--alpha", DEFAULT_ALPHA),
+				  option_value(args, "--anchor-g", DEFAULT_ANCHOR_G))]
+			else
+				[Tuple(parse.(Float64, split(strip(p), ','))) for p in split(specs_arg, ';') if !isempty(strip(p))]
+			end
 			cal_eras = force_sweep ? eras : intersect(eras, viable.era)
 			if isempty(cal_eras)
 				@error "No viable era in the requested set" eras
 			else
-				failed = run_calibration(cal_eras, profiles;
-				                         alpha = alpha, anchor_g = anchor_g,
-				                         anchor_era = anchor_era, tolerance = tolerance,
-				                         spec = spec)
-				if !isempty(failed)
-					@warn "Eras that did not complete" failed
+				for (alpha, anchor_g) in pairs
+					spec = (length(pairs) == 1 && !isempty(option_value(args, "--spec", ""))) ?
+						option_value(args, "--spec", "") :
+						@sprintf("alpha%.2f_g%d_e%02d", alpha, round(Int, anchor_g), anchor_era)
+					cal_failed = run_calibration(cal_eras, profiles;
+					                             alpha = alpha, anchor_g = anchor_g,
+					                             anchor_era = anchor_era, tolerance = tolerance,
+					                             spec = spec)
+					if !isempty(cal_failed)
+						@warn "Eras that did not complete" spec cal_failed
+					end
 				end
 			end
 
@@ -802,9 +836,9 @@ using community_detection_tools
 				@error "No viable era in the requested set" eras
 			else
 				@info "CHAMP sweeps" sweep_eras Threads.nthreads() RESOLUTION_RANGE N_RESOLUTIONS OUT_DIR
-				failed = run_new_era_sweeps(sweep_eras, profiles, summary_name)
-				if !isempty(failed)
-					@warn "Eras that did not complete" failed
+				sweep_failed = run_new_era_sweeps(sweep_eras, profiles, summary_name)
+				if !isempty(sweep_failed)
+					@warn "Eras that did not complete" sweep_failed
 				end
 			end
 	end
