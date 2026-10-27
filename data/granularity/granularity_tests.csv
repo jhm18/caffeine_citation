@@ -1,0 +1,21 @@
+check,result,detail
+worked example: g = 82,PASS,82.0000
+worked example: k_eff = 100/82,PASS,1.219512
+worked example: mean size would have been 50,PASS,50.0
+gini of equal sizes is 0,PASS,0.00e+00
+ARI of a partition with itself is 1,PASS,1.000000
+AMI of a partition with itself is 1,PASS,1.000000
+path parsing separates anchor from gamma,PASS,era 11 alpha 1 anchor 120 anchor_era 14 gamma NA
+a grid directory does not parse as an anchor or a gamma,PASS,anchor NA gamma NA rel_dir gamma_0.01_1.0_n40
+every partition measured,PASS,84 of 84 finite
+k_eff <= communities carrying citers,PASS,max excess -8.97e+01
+k_eff >= 1,PASS,min 1.8456
+g * k_eff recovers the citer total,PASS,max residual 1.82e-12
+bridging population does not exceed the cited population,PASS,max bridge/cited 0.479
+rel_dir distinguishes same-named files,PASS,0 duplicate provenance key(s)
+threshold counts fall as the floor rises,PASS,84 of 84 rows monotone
+"following era supports bridging, over the analytic pairs",PASS,"6 pair(s) checked, all adequate"
+"ARI within [-1, 1]",PASS,range 0.1834 to 1.0000
+AMI at most 1,PASS,max 1.000000
+AMI at or above 0.60 among same-specification replicates,PASS,min 0.8696 over 7 pair(s)
+calibration tolerance floor from run-to-run spread,PASS,max spread 15.3% (era 11)

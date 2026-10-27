@@ -2123,14 +2123,26 @@ labeling lane, and the orchestrator itself.
 \label{sec:scalefinding}
 \label{sec:starfinding}
 
-\emph{Superseded in part.} Everything below describes the networks built before October
-2026, whose construction is now known to have been defective in two ways: citing articles
-and cited references were keyed in separate identifier spaces, and cited works were dated by
-the year they were cited rather than the year they were published. \S\ref{sec:rebuild}
-records the rebuild and what it changed. The resolution findings here have not been
-re-measured on the rebuilt networks, so they stand as a description of a defect rather than
-of the current construction; the sweep machinery, the diagnostics C5 to C7, and the
-reasoning about what a flat modularity envelope means all carry over unchanged.
+\emph{Superseded, and in a way that matters.} Everything below describes the networks built
+before October 2026, whose construction was defective in two ways: citing articles and cited
+references were keyed in separate identifier spaces, and cited works were dated by the year
+they were cited rather than the year they were published. \S\ref{sec:rebuild} records the
+rebuild and what it changed.
+
+The resolution findings have since been re-measured on the rebuilt networks, across two
+further sweeps, and \textbf{they survived the repair}. The elbow criterion still returned two
+to four times whatever grid floor it was given, and the widest dominance interval still
+spanned more than twofold across eras with three of seven censored at the grid ceiling
+\meas{}. So the identity defect was not the cause of the resolution failure, and the sentence
+in the summary below --- that the obstacle is the construction rather than the algorithm ---
+is half right at best: the construction defect was real and is repaired, and the resolution
+problem is independent of it.
+
+What resolves the resolution problem is not a better criterion but a different question.
+\S\ref{sec:granularity} records it: the resolution parameter is treated as a nuisance
+parameter calibrated to hold a measured quantity fixed, rather than as something the sweeps
+can identify. The sweep machinery and the reasoning about what a flat modularity envelope
+means carry over unchanged; the selection machinery does not, and is no longer used.
 
 \begin{quote}
 	\textbf{\itshape The Path~A era networks are almost partitioned before community detection
@@ -2147,7 +2159,7 @@ This subsection records what has been measured, states the construction question
 measurements raise, and lists the diagnostic checks that would answer it. None of it is
 resolved. It is written so that the work can be resumed from a cold start.
 
-\blocker{Rerun the CHAMP sweeps on the rebuilt era networks (\S\ref{sec:rebuild}), eras 11--17. The construction question is answered; the resolution question is not.}
+\checknote{DONE: the sweeps were rerun on the rebuilt networks, eras 11--17, over two grids. Both criteria failed again. Resolution is now calibrated rather than selected --- \S\ref{sec:granularity}.}
 
 \paragraph{What an era network contains.} Era~12 is the 2009 slice. It holds 18{,}256
 vertices: 989 caffeine articles returned by the Web of Science search and 17{,}267 cited
@@ -2304,20 +2316,43 @@ about an hour and require no community detection.
 	      $O(nnz)$ per vertex. That is tolerable at 50{,}000 vertices and impossible at 590{,}000.
 	      Either pass a precomputed transpose, as the function's own notes anticipate, or run the
 	      corpus undirected. This blocks C4 from becoming a detection run.
-	\item \textbf{C6. Re-derivation under the repaired tie layer.} \checknote{C6: re-derive descent survival and the single-article community share.} The descent-survival figures of
+	\item \textbf{C6. Re-derivation under the repaired tie layer.} \checknote{C6 PART: the descent criterion is verified and the bridging populations are measured (\S\ref{sec:granularity}). Still to re-derive: the survival figures and the single-article share, on the calibrated partitions.} The descent-survival figures of
 	      0.54\% and 1.55\%, and the finding that 60.7\% of era-23 communities hold exactly one
 	      article, were all measured under the pre-repair tie layer and against the legacy
 	      partitions. Both need re-running once a construction is settled.
-	\item \textbf{C7. The dominance flag.} \checknote{C7: \code{n\_dominant} over-counts; do not use as a diagnostic until fixed.} \code{champ\_community\_detection} marks more
-	      partitions dominant than ever reach the envelope: era~12 flags 34, while only 19 win at
-	      any $\gamma$ in the swept range \meas{}. The crossing test and its $10^{-12}$ tolerance
-	      admit partitions that never become optimal. No conclusion here depends on this, because
-	      the elbow rule is applied to a superset, but \code{n\_dominant} should not be used as a
-	      diagnostic until it is fixed.
+	\item \textbf{C7. The dominance flag.} \checknote{C7 CORRECTED: the flag UNDER-counts, not over-counts, and the cause is identified. Off the critical path --- the calibration does not use the admissible set --- but still wrong where the envelope is reported.} \code{champ\_community\_detection} does not
+	      report the admissible set correctly. On the 2026 grids it marks \emph{fewer} partitions
+	      dominant than reach the envelope: era~17 flags 13 of 24, era~16 flags 9 of 22, and
+	      era~13 flags 12 of 20 while also flagging two that are not on the envelope at all
+	      \meas{}. The direction recorded in earlier drafts was wrong.
+
+	      The cause is the test itself. For each competitor $j$ it probes a single $\gamma$ midway
+	      between the pair's crossing point and the partition's own $\gamma$, and marks the
+	      partition inadmissible when $j$ scores higher there. A competitor may score higher at
+	      that probe point while the partition is still optimal elsewhere in the range, so
+	      admissible partitions are rejected. The correct test is a one-dimensional feasibility
+	      question: partition $i$ is admissible if and only if
+	      $\{\gamma \in [\gamma_{\min},\gamma_{\max}] : A_i - \gamma P_i \ge A_j - \gamma P_j\ \forall j\}$
+	      is non-empty, which each competitor constrains to a half-line.
+
+	      Because the elbow is computed over the flagged set, the reported $\gamma^{*}$ was wrong
+	      for two eras on the second grid: era~11 reported 1.0 against a true-envelope elbow of
+	      0.4, and era~14 reported 0.5 against 0.4 \meas{}. The envelope figures in this document
+	      are recomputations from the per-$\gamma$ coefficients rather than readings of the
+	      \code{dominant} column. The calibration of \S\ref{sec:granularity} does not use the
+	      admissible set at all, so the defect no longer blocks anything, but it should be fixed
+	      wherever the envelope is reported.
 \end{enumerate}
 
-\question{Open: which construction. Three options, with what each costs in era pairs and answerable questions.}
-\begin{decision}{Which construction the community stage uses}
+\checknote{RESOLVED October 2026: option (a), seven-year eras. Analytic range 11--17, six consecutive pairs. The options are kept as the record of what was weighed.}
+\begin{decision}{Resolved: which construction the community stage uses}
+	\emph{Resolved.} Option (a) was adopted at a width of seven years, giving the analytic range
+	eras 11 to 17 and six consecutive pairs rather than the eleven the original one-year design
+	assumed. \S\ref{sec:rebuild} records the construction and \S\ref{sec:granularity} the
+	resolution rule that follows from it. Option (c), detection on a coupling network, remains
+	the live alternative if the direct-citation partitions prove inadequate downstream; it is
+	not foreclosed. The three options are kept below as the record of what was weighed.
+
 	This is the question that blocks everything downstream, and it should be settled with
 	C1--C4 in hand rather than in the abstract. Three options are on the table.
 
@@ -2351,8 +2386,16 @@ about an hour and require no community detection.
 	explicitly before any code is written.
 \end{decision}
 
-\question{On hold until a construction is chosen.}
-\begin{decision}{What the scale screen is, and what failing it means}
+\checknote{RESOLVED October 2026: there is no scale screen, because no pooled resolution is selected. What remains is a viability screen on the giant component, used only to decide whether an era is swept at all.}
+\begin{decision}{Resolved: what the scale screen is, and what failing it means}
+	\emph{Resolved, by dissolution.} The scale screen existed to decide which eras could
+	contribute to the selection of a pooled $\gamma^{*}$. No pooled $\gamma^{*}$ is selected
+	(\S\ref{sec:granularity}), so there is nothing to screen for. What remains is a narrower
+	\emph{viability} screen --- a floor on the giant component, 500 vertices and a 50\% share ---
+	used only to decide whether an era network is worth sweeping at all. Era 18, with a 13\%
+	giant component, fails it; eras 11 to 17 clear it with giant shares of 0.81 to 0.92
+	\meas{}. The questions below are kept as the record.
+
 	This decision is held in abeyance and becomes live again only if a construction is adopted
 	whose networks have structure to screen. Three questions then return, and they constrain one
 	another.
@@ -2526,6 +2569,149 @@ era.
 	\emph{Lean on the full network.} The whole-corpus network is now built alongside the era
 	networks, over the same node ids. Communities detected there would rest on the entire
 	citation record, at the cost of time-varying community structure.
+\end{decision}
+
+% =====================================================================
+\subsection{Community Granularity: Calibration in Place of Selection}
+\label{sec:granularity}
+
+\begin{quote}
+	\textbf{\itshape Neither CHAMP criterion identifies a resolution on these networks, and the
+	failure survived the construction repair. Resolution is therefore treated as a nuisance
+	parameter calibrated to hold a measured quantity fixed, rather than as something the sweeps
+	can estimate. The quantity is granularity: the number of citing articles in the community of
+	a randomly chosen citing article. A declared scaling rule states how it should change as the
+	field grows, and the field grows seventeenfold across the window, so some such rule is
+	unavoidable. The adopted rule holds granularity approximately constant, which gives
+	comparable units in unequal numbers across eras.}
+\end{quote}
+
+\paragraph{The measure.} For a partition $C$ of an era network, let $w_c$ be the number of
+citing articles in community $c$ and $W = \sum_c w_c$. Then
+
+\[
+	k_{\mathrm{eff}}(C) = \frac{W^{2}}{\sum_c w_c^{2}},
+	\qquad
+	g(C) = \frac{W}{k_{\mathrm{eff}}} = \frac{\sum_c w_c^{2}}{W} .
+\]
+
+$k_{\mathrm{eff}}$ is the inverse-Simpson effective number of communities; $g$ is
+\emph{granularity}, measured in citing articles. Two departures from the obvious definition
+are deliberate. Granularity counts citing articles rather than all vertices, because a
+cited-only work with in-degree one is assigned to its citer's community by arithmetic and
+counting it would make the measure depend on how many references each community's members
+happened to make inside the window. And it is an effective count rather than $W/K$, because
+the median community holds exactly one citing article in every partition measured --- at
+every scaling rule and every anchor \meas{} --- so $K$ overstates the usable units by an
+order of magnitude. The usable count is the number of communities above a size floor; four is
+the working floor, since group behaviour shifts between a triad and a group of four.
+
+\paragraph{The scaling rule.} Writing $k_{\mathrm{eff}} \propto W^{\alpha}$, the pipeline
+takes $\alpha$ and an anchor as declared inputs and derives one resolution per era:
+$k_{\mathrm{eff}}^{\text{target}}(e) = k_{\mathrm{ref}}(W_e/W_{\mathrm{ref}})^{\alpha}$, and
+$\gamma_e$ is the resolution at which era $e$ attains it. The sweeps of
+\S\ref{sec:scalefinding} supply the calibration curves; the admissible set, the elbow
+criterion and $\gamma^{*}$ play no part.
+
+$\alpha$ is not identified by any analysis here --- holding $\gamma$ fixed yields fitted
+exponents between 0.08 and 0.38 with no systematic relation to $\gamma$ \meas{} --- so it is a
+declared design parameter rather than an estimate. It corresponds to nameable positions about
+how a field specializes, by adding areas of characteristic size or by growing a stable number
+of them, and that correspondence is what makes the alternatives interpretable. But because
+$\alpha$ is specified rather than estimated, this construction cannot adjudicate between
+those positions, and no analysis should be read as doing so.
+
+\paragraph{The adopted specification.} $\alpha = 1$, anchor $g = 120$ citing articles per
+effective community at era 14, calibration tolerance 15\%. Measured on the calibrated
+partitions:
+
+\begin{center}
+\small
+\begin{tabular}{rrrrrrr}
+\toprule
+Era & Citing arts. & $g$ & $k_{\mathrm{eff}}$ & Comm. $\geq 4$ citers & $g$ bridging & Bridging works \\
+\midrule
+11 & 518 & 91.5 & 5.7 & 9 & 208 & 745 \\
+12 & 897 & 114.8 & 7.8 & 18 & 211 & 1{,}329 \\
+13 & 1{,}627 & 114.1 & 14.3 & 30 & 424 & 4{,}475 \\
+14 & 4{,}244 & 115.9 & 36.6 & 80 & 305 & 8{,}332 \\
+15 & 4{,}626 & 122.5 & 37.8 & 80 & 353 & 9{,}839 \\
+16 & 5{,}891 & 113.9 & 51.7 & 110 & 350 & 13{,}855 \\
+17 & 9{,}080 & 118.2 & 76.8 & 201 & 211 & 9{,}829 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent All values measured \meas{}. Six of seven eras land within 5\% of the 120 target.
+Era 11 sits at 91.5 because it saturates: its partitions at anchors 90 and 120 are identical,
+and so is that grid's elbow partition, so no distinct partition exists between those targets.
+
+Unequal unit counts across eras --- 9 in era 11 against 201 in era 17 --- are expected rather
+than a defect. The field grew seventeenfold; holding granularity fixed necessarily lets the
+number of units grow with it. That is what choosing $\alpha = 1$ means, and it is the trade
+the design prefers: comparable units in unequal numbers rather than a comparable number of
+units of drifting size.
+
+\paragraph{What calibration bought.} The clearest statement of the gain is the comparison
+against what the elbow criterion would have selected. For era 17:
+
+\begin{center}
+\small
+\begin{tabular}{lrrr}
+\toprule
+Partition & Comm. $\geq 4$ citers & Largest community's citer share & $g$ \\
+\midrule
+Elbow, grid $[0.01, 1.0]$ & 15 & 72.9\% & 4{,}920 \\
+Calibrated, $\alpha=1$, $g=120$ & 201 & 4.6\% & 118 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent Measured \meas{}. The same comparison holds in every era.
+
+\paragraph{The bridging population, and why its residual variation is growth.}
+\code{pa\_bridging\_works} defines descent on \emph{works}: a work bridges the pair $(e, e+1)$
+when it belongs to era $e$'s partition, some era $e$ article cites it, and some era $e+1$
+article cites it. Conditions two and three require being \emph{cited} in two consecutive
+eras, so a citing article with no in-degree can never bridge. The population carrying descent
+is therefore not the population granularity is calibrated on, and both are measured.
+
+Bridging granularity varies from 208 to 424 across the analytic prior eras, against 29 to 433
+under $\alpha = 0$ \meas{}, so the adopted rule stabilizes it by roughly a factor of seven.
+The residual variation tracks growth at the era boundary rather than the partition: era 13 is
+the outlier at 424 because its following era holds 5{,}182 citing articles against era 13's
+own 1{,}627 --- the steepest growth step in the window --- so more era 14 articles reach back
+into it. No choice of $\gamma_e$ can control that, since it depends on era $e+1$'s size.
+
+\paragraph{Validation.} Three of the five requirements are met and recorded. Partition
+stability: adjusted mutual information across replicate runs at a fixed specification never
+falls below 0.870 \meas{}, so the partitions are a stable foundation. Run-to-run variation:
+citer-weighted $k_{\mathrm{eff}}$ moves by up to 15.3\% between replicates, in era 11, which
+is what sets the 15\% tolerance --- anything tighter fits Leiden's own variation rather than
+the target. And the degree-weighted proxy $m/P$ used to read starting resolutions off the
+sweep tables understates the citer-weighted count, so calibration is measured on membership
+rather than on the proxy.
+
+\paragraph{Open items.} Era 18 spans 2020--2021 and holds 2{,}100 citing articles against era
+17's 10{,}669, so era 17's bridging population is truncated --- 13.8\% of its cited works,
+against 33 to 48\% in eras 11 to 16 \meas{}. The descent pair $(17,18)$ is outside the
+analytic set, so this is a boundary footnote rather than an input. Separately, the partition
+writer does not record the resolution or the seed in the file name, so a partition cannot yet
+be traced to the run that produced it.
+
+\checknote{Open: the partition writer should record gamma and seed in the file name. Nothing on disk currently identifies the resolution a partition was detected at.}
+
+\begin{decision}{The anchor, and whether it needs its own sensitivity}
+	$\alpha$ fixes how granularity changes across eras; the anchor fixes its level. At
+	$\alpha = 1$ the anchor determines effective community size in every era, so it is not a
+	minor parameter: anchors of 60, 90, 120 and 160 were all built, and era 17's usable unit
+	count runs 294, 225, 201 and 162 across them \meas{}.
+
+	The working anchor of 120 was chosen to put era 11 above the rule-of-four floor without
+	making the later eras unreadably fine. Anchor 60 would give era 11 twelve usable communities
+	instead of nine, at the cost of nearly 300 in era 17. Whether the substantive conclusions
+	move across that range is a robustness question the models can answer, and the partitions
+	for it already exist.
 \end{decision}
 
 \subsection{Model Validation and Predictive Checks}
