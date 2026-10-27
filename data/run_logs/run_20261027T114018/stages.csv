@@ -1,0 +1,4 @@
+stage,status,seconds,detail,finished
+granularity,OK,6.5,84 partition(s) measured,2026-10-27T11:40:25
+tie_layer,OK,126.9,30 pair-specification row(s),2026-10-27T11:42:32
+test,OK,32.6,suite completed,2026-10-27T11:43:04

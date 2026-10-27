@@ -1,0 +1,9 @@
+check,result,detail
+sender_era is a single column,PASS,sender_era
+sender_era is populated,PASS,1238288 of 1238288 edges dated
+every pair produced bridging works,PASS,min 745
+every pair produced descent ties,PASS,min 110
+every specification produced every pair,PASS,5 specification(s) x 6 pair(s)
+participating communities do not exceed the partition,PASS,citing and cited sides within bounds
+fractional weight totals the participating works,PASS,676.000000 against 676 distinct works
+shuffling the edge list changes nothing,PASS,"pair 11 -> 12, 1026 work ties"

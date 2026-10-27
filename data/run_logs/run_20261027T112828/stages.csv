@@ -1,0 +1,4 @@
+stage,status,seconds,detail,finished
+granularity,OK,6.4,84 partition(s) measured,2026-10-27T11:28:35
+tie_layer,OK,121.8,30 pair-specification row(s),2026-10-27T11:30:36
+test,FAILED,0,test file not found: /workspace/caffeine_citation/tests/Test_PathA_TieLayer.R,2026-10-27T11:30:36

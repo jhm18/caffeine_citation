@@ -1,0 +1,9 @@
+group,check,ok,detail
+scripts,every file in the load order exists,TRUE,5 files
+upstream,the era construction's outputs exist,TRUE,4 files
+upstream,every era has a node table,TRUE,7 eras
+partitions,specification alpha1.00_g120_e14,TRUE,"7 eras resolve, lengths agree"
+partitions,specification alpha0.00_g120_e14,TRUE,"7 eras resolve, lengths agree"
+partitions,specification alpha0.50_g120_e14,TRUE,"7 eras resolve, lengths agree"
+partitions,specification alpha1.00_g90_e14,TRUE,"7 eras resolve, lengths agree"
+partitions,specification alpha1.00_g160_e14,TRUE,"7 eras resolve, lengths agree"

@@ -1,0 +1,17 @@
+path,exists,bytes,modified
+/workspace/caffeine_citation/scripts/RPajekFunctions_30April2023.r,TRUE,30860,2026-04-06T14:31:38
+/workspace/caffeine_citation/scripts/Path_A/PathA_PajekReaders.R,TRUE,7273,2026-09-08T10:21:47
+/workspace/caffeine_citation/scripts/Path_A/PathA_EraResolution.R,TRUE,26607,2026-10-27T11:00:21
+/workspace/caffeine_citation/scripts/Path_A/PathA_TieLayer.R,TRUE,44109,2026-10-27T11:09:21
+/workspace/caffeine_citation/scripts/Path_A/PathA_Granularity.R,TRUE,49433,2026-10-27T11:22:02
+/workspace/caffeine_citation/data/eras_7yr/pa_node_list.Rda,TRUE,8641348,2026-10-06T11:58:54
+/workspace/caffeine_citation/data/eras_7yr/pa_edge_list.Rda,TRUE,5021315,2026-10-06T11:58:55
+/workspace/caffeine_citation/data/eras_7yr/era_construction_summary.csv,TRUE,1193,2026-10-06T11:58:56
+/workspace/caffeine_citation/data/eras_7yr/era_construction_tests.csv,TRUE,1197,2026-10-06T11:58:58
+/workspace/caffeine_citation/data/eras_7yr/era11_nodes.Rda,TRUE,41431,2026-10-06T11:58:45
+/workspace/caffeine_citation/data/eras_7yr/era12_nodes.Rda,TRUE,67094,2026-10-06T11:58:45
+/workspace/caffeine_citation/data/eras_7yr/era13_nodes.Rda,TRUE,160325,2026-10-06T11:58:46
+/workspace/caffeine_citation/data/eras_7yr/era14_nodes.Rda,TRUE,414151,2026-10-06T11:58:46
+/workspace/caffeine_citation/data/eras_7yr/era15_nodes.Rda,TRUE,498417,2026-10-06T11:58:47
+/workspace/caffeine_citation/data/eras_7yr/era16_nodes.Rda,TRUE,637021,2026-10-06T11:58:49
+/workspace/caffeine_citation/data/eras_7yr/era17_nodes.Rda,TRUE,1041713,2026-10-06T11:58:51

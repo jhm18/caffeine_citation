@@ -89,9 +89,6 @@
 #   CONFIGURATION   #
 #####################
 
-#	Working Directory
-	setwd("/workspace/caffeine_citation")
-
 #	Input Paths
 	ERA_DIR    <- "/workspace/caffeine_citation/data/eras_7yr"
 	SWEEP_ROOT <- "/workspace/caffeine_citation/pajek_files/champ_sweep_7yr"
@@ -112,7 +109,7 @@
 #	four, so a community of four citing articles is the smallest that behaves like a
 #	group rather than like a dyad with an attachment. Three and five bracket it, and
 #	ten is reported for outcomes that need a distribution rather than a count.
-	CITER_FLOORS <- c(1L, 3L, 4L, 5L, 10L)
+	CITER_FLOORS <- c(1L, 2L, 3L, 4L, 5L, 10L)
 
 ###############
 #   HELPERS   #
@@ -1312,53 +1309,32 @@ pa_run_granularity_tests <- function(profiles, agreement = data.table(),
 		return(tests)
 }
 
-############
-#   MAIN   #
-############
+#############################
+#   HOW TO RUN THIS STAGE   #
+#############################
 
-#	Measure
-	gran_results <- pa_run_granularity(root = SWEEP_ROOT,
-									   eras = ANALYTIC_ERAS,
-									   era_dir = ERA_DIR,
-									   output_dir = GRAN_DIR,
-									   with_bridging = TRUE,
-									   with_agreement = TRUE)
-
-#	Granularity, Citing Articles and Bridging Works Side by Side
-	cat("\nGranularity by era and specification:\n")
-	print(gran_results$profiles[, .(era, alpha, anchor, rel_dir, n_communities,
-									k_eff_citers, granularity,
-									k_eff_bridge, granularity_bridge)])
-
-#	Usable Units and Shape
-	cat("\nUsable units and shape behind the scalar:\n")
-	print(gran_results$profiles[, .(era, alpha, anchor, n_comm_citers_ge_4,
-									n_comm_citers_ge_5, n_comm_citers_ge_10,
-									largest_citer_share, citer_size_gini)])
-
-#	Bridging Population and the Following Era
-	cat("\nBridging population against the following era:\n")
-	print(unique(gran_results$profiles[, .(era, n_cited, n_bridge_eligible,
-										   n_citers_next_era)]))
-
-#	Partition Agreement
-	if (nrow(gran_results$agreement) > 0L) {
-		cat("\nAgreement among partitions built to the same specification:\n")
-		print(gran_results$agreement[, .(era, alpha, anchor, n_compared, k_a, k_b,
-										 k_eff_rel_diff, ari, ami)])
-	}
-
-#	Read the Result
-	cat("\nHow to read this:\n")
-	cat("  CALIBRATION    granularity near the anchor means the target was hit.\n")
-	cat("                 This and granularity_bridge are the primary measures.\n")
-	cat("  DESCENT        granularity_bridge covers the population descent uses.\n")
-	cat("                 Holding it near-constant is what makes era-to-era\n")
-	cat("                 descent comparisons mean anything.\n")
-	cat("  USABLE UNITS   n_comm_citers_ge_4, never n_communities. Unequal counts\n")
-	cat("                 across eras are expected: the field grew.\n")
-	cat("  SHAPE          largest_citer_share and citer_size_gini are secondary.\n")
-	cat("                 An early era dominated by a few communities is a\n")
-	cat("                 property of a young field, not a measurement fault.\n")
-	cat("  TOLERANCE      k_eff_rel_diff is the floor on any calibration\n")
-	cat("                 tolerance; a tighter tolerance fits Leiden noise.\n")
+#	NO MAIN BLOCK, DELIBERATELY. PathA_Pipeline.R sources this file to load its
+#	functions, and an auto-run here would measure every partition on disk before a
+#	single stage had been declared. The working directory is likewise not set here:
+#	setwd() inside a sourced library mutates global state, and the pipeline owns it.
+#
+#	Run as a pipeline stage:
+#
+#		source("scripts/Path_A/PathA_Pipeline.R")
+#		res <- pa_pipeline(stages = "granularity")
+#
+#	Or directly:
+#
+#		res <- pa_run_granularity()
+#		res$profiles[, .(era, alpha, anchor, k_eff_citers, granularity,
+#		                 k_eff_bridge, granularity_bridge)]
+#
+#	HOW TO READ THE OUTPUT.
+#
+#		CALIBRATION    granularity near the anchor means the target was hit. This
+#		               and granularity_bridge are the primary measures.
+#		DESCENT        granularity_bridge covers the population descent uses.
+#		USABLE UNITS   n_comm_citers_ge_4, never n_communities. Unequal counts
+#		               across eras are expected: the field grew.
+#		SHAPE          largest_citer_share and citer_size_gini are secondary.
+#		TOLERANCE      k_eff_rel_diff is the floor on any calibration tolerance.

@@ -1,0 +1,3 @@
+
+# Tie-layer risk sets: regenerable, 52-292 MB each
+data/tie_layer/**/*_risk_set.rds
