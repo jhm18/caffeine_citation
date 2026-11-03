@@ -44,7 +44,10 @@
 	PA_LOG_DIR <- file.path(PA_ROOT, "data/run_logs")
 
 #	Stages, in Order
-	PA_STAGES <- c("granularity", "tie_layer", "test")
+#	coupling follows tie_layer because the two share the dated edge list and because
+#	a cross-stage check reads the tie layer's output; it does not otherwise depend on
+#	it, so either can be run alone.
+	PA_STAGES <- c("granularity", "tie_layer", "coupling", "test")
 
 #	The Test Suite
 #	A single declared path rather than a search over candidate locations. The
@@ -78,8 +81,11 @@
 		#
 		#		RPajekFunctions_30April2023.r comes first because PathA_PajekReaders.R
 		#		wraps its read_net(). PathA_EraResolution.R needs the readers, and
-		#		PathA_TieLayer.R needs the era maps. PathA_Granularity.R is independent
-		#		of the other three and is loaded last.
+		#		PathA_TieLayer.R needs the era maps. PathA_Coupling.R comes after the
+		#		tie layer because it reuses pa_dedupe_edges and pa_attach_sender_era
+		#		from it rather than redefining them, and because TL_SPECS is its
+		#		default specification table. PathA_Granularity.R is independent of all
+		#		of them and is loaded last.
 		#	"""
 
 		#	Declare
@@ -87,13 +93,15 @@
 				   "Path_A/PathA_PajekReaders.R",
 				   "Path_A/PathA_EraResolution.R",
 				   "Path_A/PathA_TieLayer.R",
+				   "Path_A/PathA_Coupling.R",
 				   "Path_A/PathA_Granularity.R")
 			sentinel <- c("read_net",
 						  "pa_read_era_network",
 						  "pa_era_map",
 						  "pa_run_tie_layer",
+						  "pa_run_coupling",
 						  "pa_run_granularity")
-			lane <- c("pajek", "pajek", "era", "tie", "granularity")
+			lane <- c("pajek", "pajek", "era", "tie", "coupling", "granularity")
 
 		#	Assembling Result
 			return(data.frame(order    = seq_along(f),
@@ -358,6 +366,22 @@ pa_preflight <- function(specs = NULL, eras = NULL, stages = PA_STAGES,
 				stringsAsFactors = FALSE)
 		}
 
+	#	The Coupling Stage's Destination Is Writable
+	#	The coupling stage writes four files per pair-specification, so a bad or
+	#	read-only destination should fail now rather than after the first product.
+		if ("coupling" %in% stages) {
+			ok <- tryCatch({
+				dir.create(CP_OUT_DIR, recursive = TRUE, showWarnings = FALSE)
+				dir.exists(CP_OUT_DIR) && file.access(CP_OUT_DIR, 2L) == 0L
+			}, error = function(e) FALSE)
+			checks[[length(checks) + 1L]] <- data.frame(
+				group  = "stages",
+				check  = "the coupling output directory is writable",
+				ok     = ok,
+				detail = if (ok) CP_OUT_DIR else paste("not writable:", CP_OUT_DIR),
+				stringsAsFactors = FALSE)
+		}
+
 	#	Provenance Stamps
 		stamp_files <- c(tab$file, up, era_files)
 		if ("test" %in% stages) stamp_files <- c(stamp_files, PA_TEST_FILE)
@@ -470,6 +494,7 @@ pa_pipeline <- function(stages = PA_STAGES, specs = NULL, eras = NULL,
 				out <- switch(st,
 					granularity = pa_run_granularity(),
 					tie_layer   = pa_run_tie_layer(specs = specs, eras = eras),
+					coupling    = pa_run_coupling(specs = specs, eras = eras),
 					test        = {
 						if (!file.exists(PA_TEST_FILE)) {
 							stop("test file not found: ", PA_TEST_FILE,
@@ -507,6 +532,18 @@ pa_pipeline <- function(stages = PA_STAGES, specs = NULL, eras = NULL,
 															0L
 														} else {
 															nrow(res$value$summary)
+														}),
+								  coupling    = sprintf("%d pair-specification row(s), %s nonzero cell(s)",
+														if (is.null(res$value$summary)) {
+															0L
+														} else {
+															nrow(res$value$summary)
+														},
+														if (is.null(res$value$summary)) {
+															"0"
+														} else {
+															format(sum(res$value$summary$n_nonzero),
+																   big.mark = ",")
 														}),
 								  test        = as.character(res$value))
 						  } else {

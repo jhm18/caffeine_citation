@@ -1,0 +1,2 @@
+era_prior,era_t,n_communities_t,n_communities_prior,n_grid,n_nonzero,density,total_coupling,max_coupling,n_vocabulary,n_pool_works,R_t_min,R_t_median,R_t_max,R_prior_median,kappa_pair_mapped,kappa_pair_all,kappa_corpus,kappa_used,kappa_pool
+11,12,178,133,23674,1940,0.08194643913153671,8294,158,14193,14193,1,18,811,16,3.448069591673666e-4,3.406073134557685e-4,1.6588590370200813e-5,3.448069591673666e-4,pair_mapped

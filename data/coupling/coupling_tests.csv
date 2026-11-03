@@ -1,0 +1,9 @@
+check,result,detail
+every specification produced every pair,PASS,5 specification(s) x 6 pair(s)
+every pair produced coupling,PASS,min 422 nonzero cell(s)
+"kappa lies in (0, 1]",PASS,2.150e-05 to 3.448e-04
+kappa clears its Cauchy-Schwarz floor,PASS,min ratio to 1/n 4.89
+density is a share,PASS,2.5% to 8.2%
+coupling does not exceed the smaller reference set,PASS,max excess 0 over 14308 cell(s)
+the grid rebuilds to its recorded size,PASS,"14308 rows, 564 nonzero against 14308 and 564"
+shuffling the edge list changes nothing,PASS,"pair 11 -> 12, 564 cell(s)"

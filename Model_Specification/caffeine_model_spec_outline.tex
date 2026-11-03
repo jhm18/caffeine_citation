@@ -316,9 +316,9 @@ that particular connections ought to exist. The method is designed to transfer t
 case providing its first demonstration.
 
 Finally, this is a literature that changes. Communities appear, grow, merge, and
-disappear. We will need to distinguish a \emph{community} in a single year from a
-\emph{literature} that persists across years, and from a \emph{lineage} claim that one
-year's community is the same community as the next year's. Section~\ref{sec:objects}
+disappear. We will need to distinguish a \emph{community} in a single era from a
+\emph{literature} that persists across eras, and from a \emph{lineage} claim that one
+era's community is the same community as the next era's. Section~\ref{sec:objects}
 does that, and the distinction turns out to determine which questions we can answer with
 the data we have.
 
@@ -327,10 +327,11 @@ the data we have.
 \label{sec:paths}
 \seccap{Two ways of building the networks, answering two different kinds of temporal questions.}
 
-The corpus is divided into eras -- for the analytic window, single publication years from
-2009 to 2020. How we assign works to eras determines what kind of temporal object we can
-study, and there are two defensible constructions that answer different questions. They
-are not competing implementations. They are different measurement instruments.
+The corpus is divided into eras -- for the analytic window, seven-year publication windows
+covering 1971 to 2019. How we assign works to eras determines what kind of temporal object
+we can study, and there are two defensible constructions that answer different questions.
+They are not competing implementations. They are different measurement instruments. The
+width of the window is a third, separate decision, settled in \S\ref{sec:rebuild}.
 
 \subsection{Path A: birth-era networks}
 
@@ -438,7 +439,7 @@ relation outward: descent first, then coupling, then -- in Path B -- persistence
 \seccap{Four things that all get called ``a research area'' in ordinary speech, and why
 keeping them apart lets us answer a hard question with easy data.}
 
-Community detection gives us clusters within a single year. Everything else we might want
+Community detection gives us clusters within a single era. Everything else we might want
 to say about how research areas behave over time is a further claim, and the claims
 differ in how much they cost.
 
@@ -493,10 +494,12 @@ identity claim, is Path B's business (\S\ref{sec:pathb}).
 
 \subsection{Two temporal windows}
 
-The corpus spans 23 eras, from 1907--1944 through 2020. Those eras are not equal in
-width: the early ones cover decades, and eras 12--23 are the only unbroken run of single
-years. Two different
-spans are therefore in play, and confusing them makes several questions ambiguous.
+The corpus runs from 1901 to 2021, tiled into seventeen seven-year eras of equal width
+(\S\ref{sec:rebuild}). Earlier revisions of this document used an unequal tiling of 23
+eras in which eras 12--23 were single years; that construction was abandoned in October
+2026 because single-year networks carry too few within-era arcs to detect community
+structure at all (\S\ref{sec:scalefinding}). Two different spans are nevertheless still in play,
+and confusing them makes several questions ambiguous.
 
 \begin{center}
 \small
@@ -504,21 +507,40 @@ spans are therefore in play, and confusing them makes several questions ambiguou
 \toprule
 \textbf{Window} & \textbf{What it covers and what it is used for}\\
 \doublerule
-Historical window & All 23 eras. Used to reconstruct the major literatures and describe
-                    how they emerge, grow, contract, and decline over the full history of
-                    the field.\\[3pt]
-Integration window & Eras 12--23, single years from 2009 to 2020, giving eleven adjacent
-                    era pairs on a constant one-year base. Used for the models of
-                    integration, where comparing across pairs requires that the pairs be
-                    commensurable.\\
+Historical window & All seventeen eras, 1901--2021. Used to reconstruct the major
+                    literatures and describe how they emerge, grow, contract, and decline
+                    over the full history of the field.\\[3pt]
+Integration window & Eras 11--17, 1971--2019, giving six adjacent era pairs on a constant
+                    seven-year base. Used for the models of integration, where comparing
+                    across pairs requires that the pairs be commensurable. Two separate
+                    bounds produce it, and they are not the same test
+                    (\S\ref{sec:rebuild}).\\
 \bottomrule
 \end{tabular}
 \end{center}
 
 Era width matters for the integration models because the descent relation looks one era
-back: a one-year window and a thirty-eight-year window select very different citations.
+back, and a window's width decides which citations it can see at all: a fixed seven-year
+tiling retains 24.6\% of the corpus's article-to-article arcs, where single years retained
+almost none and a mean degree near 2.0 left nothing to partition (\S\ref{sec:rebuild}).
 It matters much less for describing a literature's trajectory, where the quantity is how
 much of the field the literature occupies and the eras are simply time points.
+
+The two bounds on the integration window are worth separating, because only one of them is
+a property of the networks. The \emph{viability screen} asks whether a resolution parameter
+has anything to choose among: it requires a giant component of at least 500 vertices holding
+at least half the network, since resolution can only partition within a component. Eras 1--9
+fail it, with giant shares of 0.18 to 0.36 \meas{}. Era 18 clears the size floor at 802
+vertices but fails the share floor at 0.267, because 2020--2021 is a two-year stub whose
+citations have not yet accumulated \meas{}. Era 10 \emph{passes} the screen --- 820 vertices
+at a 0.750 share --- and is still excluded, for the second reason: it holds 192 citing
+articles, so at the working anchor of 120 its target is 1.6 effective communities, which is
+below the rule-of-four floor and barely more than one unit \meas{}. The screen sets the upper
+bound at 17; the calibration target sets the lower bound at 11.
+
+The cost of the wider window is era pairs. Six is enough to estimate a linear drift term
+and thin for an interaction with it, which bears directly on RQ4 and RQ11; both are
+reported with the per-pair uncertainty visible rather than pooled.
 
 \subsection{Why the questions come in tiers}
 
@@ -977,12 +999,18 @@ over the same conceptual population.
 \end{itemize}
 
 \paragraph{How restrictive descent is.} Of the citations an era emits, 0.54\% and 1.55\%
-survive into the descent network on the two era pairs examined so far \meas{}. That is the
-price of the strong definition: the cited work must both belong to the earlier era and have
-been in active use there. It is an indication of how narrow a one-year inheritance window
-is, and not a clean measurement of citation lag -- it also reflects how the corpus was
-built and how the eras were partitioned, and separating those would take a decomposition
-we have not done.
+survived into the descent network on the two era pairs examined under the superseded
+single-year construction \meas{}. That is the price of the strong definition: the cited work
+must both belong to the earlier era and have been in active use there. It indicates how
+narrow an inheritance window is, and not a clean measurement of citation lag -- it also
+reflects how the corpus was built and how the eras were partitioned, and separating those
+would take a decomposition we have not done.
+
+Under the seven-year tiling the figure is recomputed for all six pairs and all five
+specifications from the \code{total\_intensity} and \code{total\_out\_citations} columns of
+the pair summary, whose ratio the pipeline reports as
+\code{pct\_descent\_survival}.\checknote{C6 PART: the summary columns are in place; the
+figures land with the next pipeline run and replace the two above.}
 
 \subsection{Three ways to weight each network}
 \label{sec:weightings}
@@ -1275,7 +1303,7 @@ K_{ijp} &\sim \mathrm{NegBinomial}\!\left(\lambda_{ijp},\, \phi_K\right)\\[2pt]
   + \underbrace{\theta^{K}_{i} + \psi^{K}_{j}}_{\text{propensities}}
 \end{align}
 
-with the proximity slope allowed to drift across the eleven era pairs,
+with the proximity slope allowed to drift across the six era pairs,
 
 \begin{equation}
 \alpha_{S,p} \sim \mathrm{Normal}\!\left(\bar{\alpha}_S + \gamma_\alpha\,(t_p - \bar{t}),\;
@@ -1293,7 +1321,7 @@ with the proximity slope allowed to drift across the eleven era pairs,
 \textbf{Term} & \textbf{Meaning}\\
 \doublerule
 $\bar{\alpha}_S$ & How steeply shared reading rises with topical proximity, averaged over
-the eleven era pairs. \textbf{This answers RQ1.}\\[3pt]
+the six era pairs. \textbf{This answers RQ1.}\\[3pt]
 $\gamma_\alpha$ & Whether that relationship strengthens or weakens over time.
 \textbf{Half of RQ4.}\\[3pt]
 $\sigma_\ell$ & How much the relationship differs among literatures. If close to zero, the
@@ -1338,11 +1366,20 @@ seventeen shared works would need seventeen salience terms.
 So one row of data is one \emph{bridging work} paired with one \emph{citing community}: did
 era-$t$ community $i$ cite work $h$, and how often? The cited community $j$ follows from
 $h$, since a bridging work belongs to a community in the earlier era by definition. For the
-2019--2020 pair the risk set pairs 877 bridging works with every era-23 community that
-emits citations -- up to all 394 of them -- giving on the order of 345{,}000 rows, the
-overwhelming majority of them zeros \meas{}. Only 151 of those communities appear in a
-realized tie; the rest contribute rows that are entirely zero, and those are precisely the
-observations RQ10 rests on.
+$(16,17)$ pair the risk set pairs 13{,}855 bridging works with every era-17 community that
+emits citations -- up to all 1{,}105 of them -- giving 15.3 million rows, the overwhelming
+majority of them zeros; across the six analytic pairs the risk set is 31.1 million rows
+against 11{,}257 realized community-pair ties \meas{}.
+
+Where those zeros sit matters for how RQ10 is read, and the calibrated partitions moved
+them. Under the single-year construction only 151 of 394 citing communities appeared in any
+realized tie, which made it look as though most communities stand outside the descent
+relation entirely. Under calibration 806 of 1{,}105 do \meas{} -- most communities inherit
+from somewhere. The zeros are concentrated at work-by-community resolution rather than at
+community level: it is not that communities fail to connect to each other, it is that most
+individual works go uncited by most communities that could have cited them. A forgone
+connection is therefore a claim about a work and an audience, which is the resolution the
+model is already fit at, and not a claim that two communities are strangers.
 
 Aggregating the fitted model back over the works belonging to a community recovers the
 community-pair quantity, so the question remains one about communities even though the
@@ -1779,8 +1816,8 @@ them.}
 Section~\ref{sec:paths} set out what active-era networks would allow: following a community
 through time, and asking what predicts its survival. The natural model is a
 \textbf{discrete-time hazard model} -- for each community in each year, the probability that
-it ends that year, given that it has survived so far. Because eras here are single years,
-discrete time is the natural form. A \emph{competing risks} version separates two different
+it ends that era, given that it has survived so far. Because eras are discrete windows
+rather than continuous time, discrete time is the natural form. A \emph{competing risks} version separates two different
 endings, dying and being absorbed into another community, which the lifecycle vocabulary
 requires and a single-outcome model cannot distinguish.
 
@@ -1897,7 +1934,9 @@ deliberately; the model is fit with one pair and refit with the other.
 \code{cog\_subject\_i}, \code{cog\_subject\_j} & covariate & $c_i$, $c_j$ by subject matter\\
 \code{cog\_venue\_i}, \code{cog\_venue\_j} & covariate & $c_i$, $c_j$ by provenance\\
 \code{work\_vintage} & covariate & Era of $h$; tests mechanism M1\\
-\code{pair\_index} & covariate & 1--11, carrying the time trends\\
+\code{pair\_index} & covariate & 1--6, carrying the time trends. Eras are tiled at a fixed
+  width, so era midpoints are affine in era number and the index is exactly equivalent to a
+  centered midpoint for a linear term\\
 \bottomrule
 \end{longtable}
 \end{center}
@@ -2032,8 +2071,8 @@ The tests below are grouped by what they protect.
 
 \paragraph{Inputs.} Every era resolves to an existing network and partition file; vertex
 count equals partition length; each era's vertex set matches the node list exactly (verified
-for all twelve eras of the integration window, in both directions \meas{}); after deduplication the edge list has no repeated
-sender--target pair and 1{,}238{,}336 rows remain \meas{}.
+for all seven eras of the integration window, in both directions \meas{}); after deduplication the edge list has no repeated
+sender--target pair and all 1{,}238{,}288 rows remain, none removed \meas{}.
 
 \paragraph{Determinism.} Shuffling the order of the edge list leaves every output
 bit-identical. This is the regression test for the arbitrary-attribution defect and the most
@@ -2056,11 +2095,30 @@ than by convention.
 \paragraph{Prompts.} No prompt contains the literal string \code{"NA"}; every participating
 community receives a label.
 
-\paragraph{Known-answer fixtures.} The 2019--2020 pair reproduces 561 ties over 877 bridging
-works, with 151 of 394 citing and 234 of 794 cited communities participating \meas{}; the
-2018--2019 pair reproduces 251 ties over 126 bridging works \meas{}. A change to these
-numbers is a deliberate specification change and the fixture is updated in the same commit
-that causes it.
+\paragraph{Known-answer fixtures.} All six analytic pairs are pinned, under the primary
+specification $\alpha = 1$ at anchor 120 \meas{}:
+
+\begin{center}
+\small
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{Pair} & \textbf{Ties} & \textbf{Bridging works} & \textbf{Citing part.} &
+  \textbf{Cited part.}\\
+\doublerule
+$(11,12)$ &   140 &    745 &   70 of 146 &  28 of 98\\
+$(12,13)$ &   273 &  1{,}329 &  117 of 211 &  56 of 146\\
+$(13,14)$ &   964 &  4{,}475 &  364 of 615 & 108 of 211\\
+$(14,15)$ & 1{,}874 &  8{,}332 &  419 of 622 & 237 of 615\\
+$(15,16)$ & 2{,}595 &  9{,}839 &  544 of 760 & 252 of 622\\
+$(16,17)$ & 5{,}411 & 13{,}855 &  806 of 1{,}105 & 351 of 760\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+A change to these numbers is a deliberate specification change and the fixture is updated in
+the same commit that causes it. The suite also pins the corpus itself at 589{,}784 nodes and
+1{,}238{,}288 edges, and each era's vertex and community counts, so a silent change upstream
+fails before any descent figure moves.
 
 These fixtures are development fixtures, and they are expected to change once. Eras 1--21
 carry partition files named \code{era<N>\_Community.clu} and eras 22--23 carry
@@ -2087,35 +2145,117 @@ findings in the following subsection rest almost entirely on such measurements.
 
 \paragraph{Built and passing.} The Path~A foundation is written in R under
 \code{scripts/Path\_A/}: Pajek readers that return values rather than writing to the global
-environment, era-file resolution across the three directory layouts, era maps, and the tie
-layer. Its suite passes 38 checks. The known-answer fixtures reproduce 561 ties over 877
-bridging works for 2019--2020 and 251 over 126 for 2018--2019, with 151 of 394 citing and 234
-of 794 cited communities participating. These results confirm that the rewritten layer
-encodes the same both-periods reading as the original. Shuffling the edge list leaves bridging
-works, work-resolution ties, and descent weights bit-identical, so the arbitrary-attribution
-defect of \S\ref{sec:pipeline} is repaired and covered by a regression test.
+environment, era-file resolution against specification-tagged partitions, era maps, the tie
+layer, and the granularity measures. \code{PathA\_Pipeline.R} is the single entry point.
+It loads the five files in a declared order with a sentinel check per file, runs a preflight
+over every input before anything expensive starts, and writes a run log recording the size
+and modification time of all seventeen inputs, so a set of descent ties can be traced to the
+construction and the partitions that produced it. A full run takes 166 seconds: granularity
+in 6.5, the tie layer in 127, the test suite in 33 \meas{}.
+
+The suite passes 99 checks, and the pipeline's own internal checks add 28 more --- 20 in the
+granularity stage, 8 in the tie layer. The known-answer fixtures cover all six analytic pairs
+and reproduce 140, 273, 964, 1{,}874, 2{,}595 and 5{,}411 descent ties over 745, 1{,}329,
+4{,}475, 8{,}332, 9{,}839 and 13{,}855 bridging works \meas{}. Participation rises across the
+window: 70 of 146 citing and 28 of 98 cited communities for the $(11,12)$ pair, against 806 of
+1{,}105 and 351 of 760 for $(16,17)$ \meas{}.
+
+Two cross-validations are worth recording because they exercise different code paths against
+the same quantity. Shuffling the edge list leaves bridging works, work-resolution ties, and
+descent weights bit-identical, so the arbitrary-attribution defect of \S\ref{sec:pipeline} is
+repaired and covered by a regression test. And the bridging counts computed in
+\code{PathA\_Granularity.R} are reproduced exactly by \code{pa\_bridging\_works}, which
+arrives at them a different way.
+
+The fractional weighting satisfies its conservation identity to floating point: the weights
+for the $(11,12)$ pair total 676.000000 against 676 distinct participating works \meas{}.
+Single-work ties, which were 72--90\% of all ties under the elbow-selected partitions, are
+42.3--51.2\% under calibration \meas{} --- the ties now rest on several shared works rather
+than one, which is what makes the breadth and intensity weightings carry different
+information.
 
 The community-detection stage is written in Julia under
 \code{community\_detection\_tools/}: Pajek format I/O, the Leiden stack, and CHAMP, behind
 one wrapper module. The Pajek suite passes 182 checks, including every era of the integration
 window; the Leiden suite passes 33 and the CHAMP suite 67.
 
-The scale-assessment stage is written and has been run over the whole integration window.
-\code{champ\_era\_sweep} sweeps one era and returns its hull coefficients, its selected
-resolution, and a row of diagnostics; \code{write\_champ\_sweep} and
-\code{write\_champ\_summary} record them; the driver \code{champ\_sweep\_eras.jl} runs eras
-12 through 23. Two complete sweeps have been run, one over $\gamma \in [0.1, 1.8]$ and one
-over $\gamma \in [0.01, 1.0]$. Their results are the subject of \S\ref{sec:scalefinding}, and
-they are the reason the community stage is now blocked on a construction question rather than
-on code.
+The sweep stage is written and has been run over the whole integration window, but what it
+is for has changed. It was built to select a resolution by the CHAMP criteria; those criteria
+do not identify one on these networks, and the failure survived the construction repair
+(\S\ref{sec:scalefinding}). The stage now serves the calibration of
+\S\ref{sec:granularity}: each era's sweep is a curve of effective community count against
+resolution, and $\gamma_e$ is read off it by inverting to the era's target. The admissible
+set, the elbow and $\gamma^{*}$ are no longer consulted, and the sweep's value is the
+gradient rather than any point on it.
+
+\code{champ\_era\_sweep} sweeps one era and returns its hull coefficients and a row of
+diagnostics; \code{write\_champ\_sweep} and \code{write\_champ\_summary} record them. The
+driver profiles all eighteen eras first, applies the viability screen to the profile table,
+and sweeps only the eras that clear it. Three grids have been run on the rebuilt networks
+\meas{}:
+
+\begin{center}
+\small
+\begin{tabular}{@{}llr@{}}
+\toprule
+\textbf{Grid} & \textbf{Range and spacing} & \textbf{Role}\\
+\doublerule
+\code{gamma\_0.01\_1.0\_n40} & $[0.01, 1.0]$, 40 points & First pass; truncates later eras\\
+\code{gamma\_0.1\_6.0\_n60}  & $[0.1, 6.0]$, 60 points  & Wider; era 11 target at the bound\\
+\code{gamma\_0.02\_6.0\_n64} & $[0.02, 6.0]$, 64 points & \textbf{Adopted}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent The earlier $[0.1, 1.8]$ sweep belongs to the superseded single-year construction
+and is not comparable to these. The adopted grid is the one the tie layer reads: its
+$\alpha = 1$, anchor-120 partitions give 1{,}105 era-17 communities, which is the count every
+downstream table carries \meas{}. Eight specifications are built on it --- $\alpha \in
+\{0, 0.5, 1\}$ at anchor 120, $\alpha = 1$ at anchors 60, 90 and 160, and $\alpha \in
+\{0, 0.5\}$ at anchor 90 --- of which the five of \S\ref{sec:granularity} are carried into
+the tie layer.
+
+\paragraph{Why the elbow cannot be used here, precisely.} On the adopted grid the selected
+resolution $\gamma^{*}$ is \emph{the same number in all seven eras}: 0.1149, the second of
+64 grid points, at \code{best\_index} 2 for every era from 11 to 17 \meas{}. On the
+$[0.1, 6.0]$ grid it is index 2 or 3 in five of seven. An era's $\gamma^{*}$ is therefore
+locating the grid's lower edge and its spacing, not any feature of that era's network --- and
+a criterion that returns the same answer for a 2{,}629-vertex network and a 76{,}070-vertex
+one is reporting the instrument. The dominance criterion does not narrow things either: 21 to
+24 of the 64 partitions are flagged dominant in each era \meas{}, about a third of the grid.
+
+This is the sense in which the criteria ``fail''. They compute, they return values, and the
+values are artifacts of the sweep's own parameterization.
+
+Reading a starting resolution off a sweep row is cheap because the sweep already carries what
+it needs: $P/m = \sum_c K^{\mathrm{out}}_c K^{\mathrm{in}}_c / m^2$, so $k_{\mathrm{eff}}
+\approx m/P$ without re-detecting anything. The proxy is degree-weighted and understates the
+citer-weighted count --- 66.1 against 78.1 for era 17's calibrated partition, and a ratio of
+0.55 to 0.74 across era 11's probe resolutions \meas{} --- so it locates the neighbourhood of
+$\gamma_e$ and the calibration is then measured on membership, never on the proxy
+(\S\ref{sec:granularity}).
+
+The calibration has been measured rather than assumed. At $\alpha = 1$ with anchor 120 at
+era 14, the realized granularity is 91.5, 114.8, 114.1, 115.9, 122.5, 113.9 and 118.2 citing
+articles per effective community against the 120 target --- six of seven within 5\%
+\meas{}. Era 11 is the exception and the calibration table records it as unmet: its nearest
+attainable $k_{\mathrm{eff}}$ overshoots the target by 31.1\%, and \emph{no} resolution on
+the grid brings it within tolerance \meas{}. Its selected $\gamma$ is 0.1149 --- which is
+$\gamma^{*}$, grid point 2. Era 11's calibrated partition and its elbow partition are the
+same 54 detected communities, so for that era the two procedures have converged by
+exhaustion rather than by agreement.
 
 \paragraph{Written, not yet run.} Coupling and the exposure constants
 (\S\ref{sec:modelI}), built on sparse incidence matrices so that all three weightings follow
 from one multiplication. The hand-built fixtures pass; the corpus implementation remains
-untested.
+untested. This is the gating item for Model~I, whose outcome is the coupling count and not
+the descent relation the tie layer produces.
 
-\paragraph{Not started.} Topical proximity, journal extraction, the cognitive measures, the
-labeling lane, and the orchestrator itself.
+\paragraph{Not started.} Topical proximity, journal extraction, the cognitive measures, and
+the labeling lane. Nine of Model~II's thirteen non-index columns come from these lanes, so
+the design matrix of \S\ref{sec:design} cannot be assembled until they land; the four the
+tie layer already supplies --- outcome, exposure, \code{pair\_index} and \code{work\_vintage}
+--- are the frame the rest join onto.
 
 % =====================================================================
 
@@ -2159,7 +2299,7 @@ This subsection records what has been measured, states the construction question
 measurements raise, and lists the diagnostic checks that would answer it. None of it is
 resolved. It is written so that the work can be resumed from a cold start.
 
-\checknote{DONE: the sweeps were rerun on the rebuilt networks, eras 11--17, over two grids. Both criteria failed again. Resolution is now calibrated rather than selected --- \S\ref{sec:granularity}.}
+\checknote{DONE: the sweeps were rerun on the rebuilt networks, eras 11--17, over three grids. On the adopted grid gamma-star is the same grid point in all seven eras, and 21-24 of 64 partitions are flagged dominant, so both criteria report the sweep's parameterization rather than the networks. Resolution is now calibrated rather than selected --- \S\ref{sec:granularity}.}
 
 \paragraph{What an era network contains.} Era~12 is the 2009 slice. It holds 18{,}256
 vertices: 989 caffeine articles returned by the Web of Science search and 17{,}267 cited
@@ -2392,9 +2532,10 @@ about an hour and require no community detection.
 	contribute to the selection of a pooled $\gamma^{*}$. No pooled $\gamma^{*}$ is selected
 	(\S\ref{sec:granularity}), so there is nothing to screen for. What remains is a narrower
 	\emph{viability} screen --- a floor on the giant component, 500 vertices and a 50\% share ---
-	used only to decide whether an era network is worth sweeping at all. Era 18, with a 13\%
-	giant component, fails it; eras 11 to 17 clear it with giant shares of 0.81 to 0.92
-	\meas{}. The questions below are kept as the record.
+	used only to decide whether an era network is worth sweeping at all. Era 18 holds 802
+	vertices in its giant component, clearing the 500-vertex floor, but that component is only
+	26.7\% of the network and it fails the share floor; eras 11 to 17 clear both, with giant
+	shares of 0.81 to 0.92 \meas{}. The questions below are kept as the record.
 
 	This decision is held in abeyance and becomes live again only if a construction is adopted
 	whose networks have structure to screen. Three questions then return, and they constrain one
@@ -2613,6 +2754,17 @@ $\gamma_e$ is the resolution at which era $e$ attains it. The sweeps of
 \S\ref{sec:scalefinding} supply the calibration curves; the admissible set, the elbow
 criterion and $\gamma^{*}$ play no part.
 
+Two properties of those curves keep the inversion from being as clean as that sentence
+sounds, and both are recorded per era in the calibration table. First, the curve is
+\emph{not monotone} in $\gamma$ in any of the seven eras \meas{}, so a target can be attained
+at more than one resolution and the inversion is a search rather than a lookup. Second, the
+number of grid resolutions that meet the target within tolerance runs 0, 1, 1, 6, 4, 4 and 7
+for eras 11 through 17 \meas{}. Where several qualify the table records the bracketing
+interval --- era 17's target is met anywhere in $\gamma \in [3.06, 3.63]$ --- and the
+selected resolution is the one closest to the target within it. The interval is reported
+because its width, not the point, is what says how sharply the target identifies a
+resolution.
+
 $\alpha$ is not identified by any analysis here --- holding $\gamma$ fixed yields fitted
 exponents between 0.08 and 0.38 with no systematic relation to $\gamma$ \meas{} --- so it is a
 declared design parameter rather than an estimate. It corresponds to nameable positions about
@@ -2622,8 +2774,22 @@ $\alpha$ is specified rather than estimated, this construction cannot adjudicate
 those positions, and no analysis should be read as doing so.
 
 \paragraph{The adopted specification.} $\alpha = 1$, anchor $g = 120$ citing articles per
-effective community at era 14, calibration tolerance 15\%. Measured on the calibrated
-partitions:
+effective community at era 14, on grid \code{gamma\_0.02\_6.0\_n64}.
+
+The tolerance needs stating carefully, because the figure the design justifies and the figure
+the run used are not the same. The driver's default is 10\%, and its own comment calls that a
+placeholder pending the stability probe \meas{}; the probe has since measured run-to-run
+spread in $k_{\mathrm{eff}}$ of up to 15.3\%, which is the floor a tolerance cannot go below
+without fitting Leiden's own variation rather than the target. The partitions below were
+therefore calibrated at 10\%. Nothing in the table changes if the tolerance is relaxed to the
+justified 15\% --- the six eras that meet it are already inside 5.4\%, and era 11 misses by
+31.1\% and fails either way --- but the constant should be set to 0.15 so that the
+\code{met} column means what the design says it
+means.\checknote{Open: DEFAULT\_TOLERANCE is still the 0.10 placeholder. Set it to 0.15 and
+re-run the calibration pass so \code{met} reflects the justified floor; no partition is
+expected to move.}
+
+Measured on the calibrated partitions:
 
 \begin{center}
 \small
@@ -2683,23 +2849,40 @@ the outlier at 424 because its following era holds 5{,}182 citing articles again
 own 1{,}627 --- the steepest growth step in the window --- so more era 14 articles reach back
 into it. No choice of $\gamma_e$ can control that, since it depends on era $e+1$'s size.
 
-\paragraph{Validation.} Three of the five requirements are met and recorded. Partition
-stability: adjusted mutual information across replicate runs at a fixed specification never
-falls below 0.870 \meas{}, so the partitions are a stable foundation. Run-to-run variation:
-citer-weighted $k_{\mathrm{eff}}$ moves by up to 15.3\% between replicates, in era 11, which
-is what sets the 15\% tolerance --- anything tighter fits Leiden's own variation rather than
-the target. And the degree-weighted proxy $m/P$ used to read starting resolutions off the
-sweep tables understates the citer-weighted count, so calibration is measured on membership
-rather than on the proxy.
+\paragraph{Validation.} Three of the five requirements are met and recorded, and stability has
+been measured two ways that should be reported together, because the gentler one on its own
+overstates the case.
+
+\emph{Across replicate specification runs.} Adjusted mutual information between partitions of
+the same era at the same specification does not fall below 0.870 \meas{} --- 0.8696 at the
+minimum over seven eras. This compares runs that each already average five Leiden restarts at
+a fixed seed.
+
+\emph{Across independent seeds.} The probe runs ten seeds at each of
+$\gamma \in \{0.5, 1, 2, 3, 4\}$ on eras 11, 13 and 17. Mean AMI between seed pairs is 0.79
+to 0.85 and the minimum is 0.734, at $\gamma = 3.0$ in era 11 \meas{}. Single-seed agreement
+is therefore materially weaker than the replicate figure suggests, which is an argument for
+keeping the five-restart consensus rather than a reason to doubt the partitions --- but the
+0.734 is the number a sceptical reader should be given.
+
+\emph{Run-to-run variation in the measured quantity.} Citer-weighted $k_{\mathrm{eff}}$ moves
+by up to 15.3\% between replicates, in era 11; the probe's coefficient of variation over ten
+seeds reaches 11.6\%, also in era 11 and at the sparsest resolution \meas{}. Either figure
+puts the tolerance floor near 15\%.
 
 \paragraph{Open items.} Era 18 spans 2020--2021 and holds 2{,}100 citing articles against era
 17's 10{,}669, so era 17's bridging population is truncated --- 13.8\% of its cited works,
 against 33 to 48\% in eras 11 to 16 \meas{}. The descent pair $(17,18)$ is outside the
-analytic set, so this is a boundary footnote rather than an input. Separately, the partition
-writer does not record the resolution or the seed in the file name, so a partition cannot yet
-be traced to the run that produced it.
+analytic set, so this is a boundary footnote rather than an input.
 
-\checknote{Open: the partition writer should record gamma and seed in the file name. Nothing on disk currently identifies the resolution a partition was detected at.}
+Separately, and correcting an earlier note in this document: the partition writer \emph{does}
+record the resolution and the seed. Each \code{.clu} is accompanied by a
+\code{\_meta.tsv} carrying $\gamma$, the seed, the restart and iteration counts, the
+achieved $k_{\mathrm{eff}}$ and the write timestamp --- era 17's primary partition records
+$\gamma = 3.437$ at seed 0 \meas{}. What the \emph{file name} omits is $\gamma$ and the seed,
+which is why the R-side provenance parser leaves those columns empty and keys on the grid
+directory and specification tag instead. That is a cosmetic gap in the naming convention, not
+a provenance gap.
 
 \begin{decision}{The anchor, and whether it needs its own sensitivity}
 	$\alpha$ fixes how granularity changes across eras; the anchor fixes its level. At
