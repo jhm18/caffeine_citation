@@ -1,7 +1,7 @@
 #	PathA_NodeMetadata.R -- Article Metadata Keyed to node_id
 #	Jonathan H. Morgan, Ph.D. & Sarah Delmar, Ph.D.
 #	3 November 2026
-
+#
 #	WHY THIS EXISTS. Five of the six outstanding Model I covariates need article
 #	metadata that the rebuilt node list does not carry. pa_node_list.Rda holds
 #	identifiers, years, degrees and era, and nothing else: no author, journal, title,
@@ -29,7 +29,7 @@
 #			carries author_id, which the rebuilt list dropped. It matches the
 #			rebuilt keys at 100% over 589,784 nodes, and 322,712 distinct author
 #			ids make it usable for author overlap on its own \meas{}.
-
+#
 #	WHY THE DOWNLOAD IS NOT OPTIONAL, AND WHAT THE REFERENCE STRINGS ACTUALLY MISS.
 #	To be an article in this corpus is to be a record in the Web of Science download,
 #	and a journal article record carries its journal in SO. So an article's journal is
@@ -50,7 +50,7 @@
 #		17              57.9%                           95.5%
 #
 #	Two conclusions follow, and they are different for the two populations.
-
+#
 #	For ARTICLES the download closes the gap. Journal, authors, title and abstract all
 #	arrive per record, so a community measure computed on its articles has no coverage
 #	problem. The residue is the small share of records that are books or series items
@@ -104,6 +104,15 @@
 #	Output
 	NM_OUT_DIR <- file.path(NM_ROOT, "data/node_metadata")
 
+#	Naming What to Take From the Download
+#	NULL on both, which is the usual case. NM_WOS_OBJECT names the object inside the
+#	Rda when it holds more than one; NM_WOS_COMPONENT names the component inside that
+#	object when the object is a list of a table plus parameters and notes, as a
+#	bibliometrics export often is. Left NULL, the run reports the structure and takes
+#	the longest table it finds.
+	NM_WOS_OBJECT    <- NULL
+	NM_WOS_COMPONENT <- NULL
+
 #	Analytic Eras, for the Coverage Report
 	NM_ERAS <- 11:17
 
@@ -120,7 +129,37 @@
 		keywords_author = c("DE", "author_keywords", "keywords"),
 		keywords_index  = c("ID", "keywords_plus", "index_keywords"),
 		authors         = c("AU", "authors", "author_full", "AF"),
-		year            = c("PY", "year", "year_published"))
+		year            = c("PY", "year", "year_published"),
+		wos_categories  = c("WC", "wos_categories", "categories"),
+		research_areas  = c("SC", "research_areas", "subject_categories"),
+		accession       = c("UT", "accession", "wos_id"))
+
+#	Web of Science Tags Whose Lines Are Separate Values
+#	Everything else wraps: a title or abstract continued on the next line is one
+#	sentence and joins with a space, not a semicolon.
+	NM_LIST_TAGS <- c("AU", "AF", "BA", "BF", "CA", "GP", "DE", "ID", "CR", "C1",
+					  "RP", "EM", "RI", "OI", "FU", "WC", "SC", "OA", "PA")
+
+#	Tags That Mark the End of a Record Rather Than Carrying Content
+	NM_TERMINATOR_TAGS <- c("ER", "EF")
+
+#	Fields Retained When Flattening Batched Records
+#	Every candidate name above, plus the two-letter tags a plaintext record uses for
+#	them. Everything else is dropped on the way in, because a record's CR field holds
+#	every reference it makes and keeping those for 39,000 records would cost hundreds
+#	of megabytes to hold what the edge list already carries.
+	NM_KEEP_FIELDS <- unique(c(unlist(NM_FIELDS, use.names = FALSE),
+							   "UT", "PT", "AF", "C1", "WC", "SC"))
+
+#	Why the Category Fields Are Kept
+#	WC holds Web of Science Categories and SC holds Research Areas, both assigned per
+#	record. They are the basis for disciplinary distance and for the venue-based
+#	cognitive measure, and they are better than a hand-built journal list for that
+#	job: \S8.4 records that the four core cognitive-architecture venues hold nine
+#	nodes between them in a corpus of 590,170, so a measure keyed to journal titles
+#	has almost nothing to key on, while a category assigned to every record does.
+#	UT is the Web of Science accession number, kept as a stable record identifier in
+#	case the download is ever refreshed.
 
 #	Fields That Only the Download Can Supply
 #	Named so the coverage report can say which covariates are blocked when one of
@@ -157,13 +196,18 @@
 		#		path: an .Rda file
 		#		what: the object's name, or NULL to take the only object
 		#	Returns:
-		#		the object, as a data.frame
+		#		the object, exactly as it was saved
 		#	Notes:
 		#		Loads into a dedicated environment so nothing in the caller's frame
 		#		is shadowed, and refuses to guess when a file holds several objects
-		#		and no name was given. Coerced to data.frame because the saved
-		#		objects are data.tables and several downstream helpers in this
-		#		project select columns with data.frame semantics.
+		#		and no name was given.
+		#
+		#		Deliberately does NOT coerce. An earlier version wrapped the result
+		#		in as.data.frame(), which crashed with "arguments imply differing
+		#		number of rows" on a saved object that is a list of unequal-length
+		#		components rather than a table. Coercion is the caller's decision,
+		#		through pa_as_table(), so a file that is not a table can be
+		#		described instead of killing the run.
 		#	"""
 
 		#	Validation
@@ -190,7 +234,382 @@
 			}
 
 		#	Assembling Result
-			return(as.data.frame(get(what, envir = env, inherits = FALSE)))
+			return(get(what, envir = env, inherits = FALSE))
+	}
+
+#	Coerce to a Table, or Give Up Cleanly
+	pa_as_table <- function(x) {
+		#	"""
+		#	Args:
+		#		x: any loaded object
+		#	Returns:
+		#		a data.frame, or NULL when x is not one table
+		#	Notes:
+		#		A data.frame or data.table passes through. Anything else is tried
+		#		and the failure caught, because as.data.frame() on a list of
+		#		unequal-length components raises rather than returning NULL.
+		#	"""
+
+		#	Early return
+			if (is.data.frame(x)) {
+				return(as.data.frame(x))
+			}
+
+		#	Refuse Anything That Is Not Already Column-Shaped
+		#	as.data.frame() will happily accept a nested list whose leaves happen to
+		#	share a length and return a frame of one column per leaf -- a batched
+		#	download of equal-sized batches came back 120 x 8392 that way, which is
+		#	worse than an error because it looks like success. So a list qualifies
+		#	only when every component is an atomic vector of one common length.
+			if (!is.list(x) || length(x) == 0L || is.null(names(x))) {
+				return(NULL)
+			}
+			if (!all(vapply(x, is.atomic, logical(1)))) {
+				return(NULL)
+			}
+			lens <- vapply(x, length, integer(1))
+			if (length(unique(lens)) != 1L || lens[1] == 0L) {
+				return(NULL)
+			}
+
+		#	Try, and Give Up Rather Than Raise
+			out <- tryCatch(as.data.frame(x, stringsAsFactors = FALSE),
+							error = function(e) NULL)
+
+		#	Assembling Result
+			if (is.null(out) || nrow(out) == 0L) return(NULL)
+			return(out)
+	}
+
+#	Pick the Article Table Out of a List-Shaped File
+	pa_pick_table <- function(x, prefer = NULL) {
+		#	"""
+		#	Args:
+		#		x: a loaded object that is a list but not a table
+		#		prefer: a component name to use, or NULL to choose
+		#	Returns:
+		#		list(table, chosen), or NULL when no component is a table
+		#	Notes:
+		#		A Web of Science export saved by a bibliometrics package is often a
+		#		list of a data frame plus parameters and notes. Rather than make the
+		#		caller edit code to name the data frame, this finds the components
+		#		that are tables and takes the longest, which is the one row per
+		#		article. The choice is returned so the run can report it.
+		#	"""
+
+		#	Early return
+			if (!is.list(x) || is.data.frame(x)) {
+				return(NULL)
+			}
+
+		#	A Named Preference Wins
+			nm <- names(x)
+			if (!is.null(prefer) && !is.null(nm) && prefer %in% nm &&
+				is.data.frame(x[[prefer]])) {
+				return(list(table = as.data.frame(x[[prefer]]), chosen = prefer))
+			}
+
+		#	Otherwise the Longest Table
+			is_tab <- vapply(x, is.data.frame, logical(1))
+			if (!any(is_tab)) {
+				return(NULL)
+			}
+			rows <- vapply(seq_along(x), function(i) {
+				if (is_tab[i]) nrow(x[[i]]) else 0L
+			}, integer(1))
+			best <- which.max(rows)
+			if (rows[best] == 0L) {
+				return(NULL)
+			}
+			label <- if (is.null(nm)) paste0("[[", best, "]]") else nm[best]
+
+		#	Assembling Result
+			return(list(table = as.data.frame(x[[best]]), chosen = label))
+	}
+
+#	Convert the Download With bibliometrix, if It Is Installed
+	pa_wos_convert2df <- function(x, dbsource = "wos", format = "plaintext") {
+		#	"""
+		#	Args:
+		#		x: the loaded download, a list of batches of records
+		#		dbsource: bibliometrix dbsource (default "wos")
+		#		format: bibliometrix format (default "plaintext")
+		#	Returns:
+		#		data.frame with bibliometrix's standard column names, or NULL
+		#	Notes:
+		#		This is the preferred route and pa_flatten_records is the fallback.
+		#		The saved object's shape -- a list named by export file, each holding
+		#		500 records -- is what a bibliometrix read produces, and convert2df
+		#		is the maintained converter for it. It knows the tag quirks a
+		#		hand-rolled parser has to rediscover one at a time.
+		#
+		#		Returns NULL rather than raising on any failure, so the fallback can
+		#		run. A missing package is one such failure and not an error.
+		#	"""
+
+		#	Early return
+			if (!requireNamespace("bibliometrix", quietly = TRUE)) {
+				return(NULL)
+			}
+
+		#	Flatten to Lines, Which Is What convert2df Consumes
+			lines <- tryCatch(as.character(unlist(x, use.names = FALSE)),
+							  error = function(e) NULL)
+			if (is.null(lines) || length(lines) == 0L) {
+				return(NULL)
+			}
+
+		#	Convert
+			out <- tryCatch(
+				bibliometrix::convert2df(lines, dbsource = dbsource,
+										 format = format),
+				error = function(e) NULL, warning = function(w) NULL)
+
+		#	Assembling Result
+			if (is.null(out) || !is.data.frame(out) || nrow(out) == 0L) {
+				return(NULL)
+			}
+			return(as.data.frame(out))
+	}
+
+#	Parse One Web of Science Record
+	pa_wos_record <- function(rec) {
+		#	"""
+		#	Args:
+		#		rec: one record from the download
+		#	Returns:
+		#		named list of one-element character fields, or NULL
+		#	Notes:
+		#		Two shapes are handled because an export can arrive either way. A
+		#		NAMED record is already a field map and only needs its multi-element
+		#		fields collapsed -- authors, keywords and references come as vectors.
+		#		An UNNAMED character vector is raw plaintext, where a field begins
+		#		with a two-letter tag and continues on lines indented by three
+		#		spaces, so the tag has to be carried down the continuation lines.
+		#	"""
+
+		#	Early return
+			if (length(rec) == 0L) {
+				return(NULL)
+			}
+
+		#	A Named Record Is a Tag Map, but Its Values Are Lists of Words
+		#	Caffeine_Compilation_31Mar2021.R built this object by splitting every
+		#	line on spaces, so a tag's value is a list of lines and each line is a
+		#	character vector of words -- and the first word of the first line is the
+		#	tag itself. as.character() on that deparses the vector instead of
+		#	reading it, which is why an earlier version produced strings like
+		#	c("TI", "A", "study").
+			if (!is.null(names(rec)) && any(nzchar(names(rec)))) {
+				tags <- names(rec)
+				out <- lapply(seq_along(rec), function(i) {
+					#	Each Line Becomes One String
+						value <- rec[[i]]
+						if (!is.list(value)) value <- list(value)
+						lines_text <- vapply(value, function(ln) {
+							paste(as.character(ln), collapse = " ")
+						}, character(1))
+
+					#	Drop the Tag From the First Line
+						if (length(lines_text) > 0L) {
+							lines_text[1] <- sub(paste0("^", tags[i], "[[:space:]]*"),
+												 "", lines_text[1])
+						}
+
+					#	A List Tag Keeps Its Line Boundaries
+						sep <- if (tags[i] %in% NM_LIST_TAGS) "; " else " "
+						trimws(paste(lines_text[nzchar(lines_text)], collapse = sep))
+				})
+				names(out) <- tags
+				out <- out[!(tags %in% NM_TERMINATOR_TAGS)]
+				return(out[nzchar(unlist(out))])
+			}
+
+		#	Otherwise Plaintext: Carry the Tag Down Continuation Lines
+		#	A tag is two characters at the start of a line. It may be followed by a
+		#	space and a value, or stand alone -- the record terminator ER does, which
+		#	is why the pattern cannot require the space. Requiring it made ER a
+		#	continuation of whatever field came last, so the DOI came out as
+		#	"10.1/7; ER".
+			lines <- as.character(unlist(rec, use.names = FALSE))
+			is_tag <- grepl("^[A-Z][A-Z0-9]( |$)", lines)
+			tag <- ifelse(is_tag, substr(lines, 1L, 2L), NA_character_)
+			body <- ifelse(is_tag, sub("^[A-Z][A-Z0-9] ?", "", lines), lines)
+			body <- sub("^[[:space:]]+", "", body)
+			carried <- tag
+			for (i in seq_along(carried)) {
+				if (is.na(carried[i]) && i > 1L) carried[i] <- carried[i - 1L]
+			}
+			keep <- !is.na(carried) & nzchar(body) &
+					!(carried %in% NM_TERMINATOR_TAGS)
+
+		#	Early return
+			if (!any(keep)) {
+				return(NULL)
+			}
+
+		#	Join Each Field With the Separator Its Content Calls For
+		#	A list field carries one value per line -- authors, keywords, references
+		#	-- and joins with a semicolon. Everything else is text wrapped across
+		#	lines, where a semicolon would split a title mid-sentence: "A study;
+		#	continued" rather than "A study continued".
+			fields <- split(body[keep], carried[keep])
+
+		#	Assembling Result
+			out <- lapply(names(fields), function(f) {
+				sep <- if (f %in% NM_LIST_TAGS) "; " else " "
+				paste(fields[[f]], collapse = sep)
+			})
+			names(out) <- names(fields)
+			return(out)
+	}
+
+#' @title pa_flatten_records
+#' @description Flatten a batched Web of Science download into one row per record.
+#'
+#' @param x The loaded download: a list of batches, each a list of records.
+#' @param keep Field names to retain, or NULL for all. Default NULL.
+#'
+#' @details
+#' A Web of Science export comes in 500-record batches because that is the interface's
+#' download limit, so the saved object is a list of lists and no component is a table.
+#' This unlists one level to reach the records, parses each, and binds them with
+#' fill = TRUE so a record missing a field gets NA rather than shifting the columns.
+#'
+#' Retaining only the needed fields is not an optimization. A record's CR field holds
+#' every reference it makes, often hundreds, and keeping those for 39,000 records
+#' would cost hundreds of megabytes to hold a quantity the edge list already carries.
+#'
+#' @return A list with table, n_records and fields.
+#'
+#' @examples
+#' flat <- pa_flatten_records(download)
+#' flat$fields
+#'
+#' @export
+pa_flatten_records <- function(x, keep = NULL) {
+	#	"""
+	#	Args:
+	#		x: the loaded download, a list of batches of records
+	#		keep: field names to retain, or NULL for all
+	#	Returns:
+	#		list(table, n_records, fields)
+	#	"""
+
+	#	Validation
+		if (!is.list(x) || length(x) == 0L) {
+			stop("pa_flatten_records: expected a non-empty list")
+		}
+
+	#	Reach the Records
+	#	One level down from batches. recursive = FALSE matters: unlisting all the
+	#	way would dissolve the records themselves into a character vector.
+		records <- unlist(x, recursive = FALSE, use.names = FALSE)
+		if (length(records) == 0L) {
+			stop("pa_flatten_records: no records found one level down")
+		}
+
+	#	Which Fields Exist, From a Sample
+		sample_n <- min(200L, length(records))
+		parsed_sample <- lapply(records[seq_len(sample_n)], pa_wos_record)
+		fields <- sort(unique(unlist(lapply(parsed_sample, names))))
+
+	#	Early return
+		if (length(fields) == 0L) {
+			stop("pa_flatten_records: no field names could be read from the ",
+				 "first ", sample_n, " records")
+		}
+
+	#	Where Each Record Sits
+	#	Carried because it is the only complete link to the canonical node key.
+	#	article_combinedv2.Rda holds file_id 1 to 79 and article_id 1 to 500 against
+	#	source_combined, so a record's position identifies it even when it has no
+	#	DOI -- and 5,061 of the 35,103 articles have a triple key rather than a DOI
+	#	\meas{}, which a DOI join cannot reach at all.
+		batch_names <- names(x)
+		if (is.null(batch_names)) batch_names <- paste0("[[", seq_along(x), "]]")
+		position <- rbindlist(lapply(seq_along(x), function(i) {
+			rec_names <- names(x[[i]])
+			if (is.null(rec_names)) rec_names <- as.character(seq_along(x[[i]]))
+			data.table(batch_index  = i,
+					   batch_name   = batch_names[i],
+					   record_name  = rec_names,
+					   record_index = seq_along(x[[i]]))
+		}))
+
+	#	Parse, Keeping Only What Is Asked For
+		rows <- lapply(records, function(rec) {
+			one <- pa_wos_record(rec)
+			if (is.null(one)) return(list(.unparsed = NA_character_))
+			if (!is.null(keep)) one <- one[intersect(names(one), keep)]
+			if (length(one) == 0L) return(list(.unparsed = NA_character_))
+			one
+		})
+
+	#	Assembling Result
+	#	Unparsed records are kept as blank rows rather than dropped, so that row i
+	#	still corresponds to position i. Dropping them would shift every record
+	#	after the first failure out of alignment with its key.
+		out <- rbindlist(rows, fill = TRUE, use.names = TRUE)
+		if (".unparsed" %in% names(out)) {
+			out[, ".unparsed" := NULL]
+		}
+		out <- cbind(position[seq_len(nrow(out))], out)
+		return(list(table = as.data.frame(out), n_records = length(records),
+					fields = fields))
+}
+
+#	Describe an Object That Is Not a Table
+	pa_describe_object <- function(x, depth = 2L) {
+		#	"""
+		#	Args:
+		#		x: any loaded object
+		#		depth: how many levels to describe (default 2)
+		#	Returns:
+		#		data.frame(level, element, class, dim, names_head)
+		#	Notes:
+		#		Exists so an unexpected file shape produces a report rather than a
+		#		stack trace. Recurses into the first component because a batched
+		#		download is a list of lists, and one level of description stops
+		#		exactly short of the field names that identify it.
+		#	"""
+
+		#	One Row Describing Anything
+			describe_one <- function(el, label, level) {
+				data.frame(
+					level      = level,
+					element    = label,
+					class      = paste(class(el), collapse = "/"),
+					dim        = paste(if (is.null(dim(el))) length(el) else dim(el),
+									   collapse = " x "),
+					names_head = paste(utils::head(names(el), 8), collapse = ", "),
+					stringsAsFactors = FALSE)
+			}
+
+		#	Early return
+			if (!is.list(x) || is.data.frame(x)) {
+				return(describe_one(x, "<the object>", 1L))
+			}
+
+		#	Iterating Over Components
+			nm <- names(x)
+			if (is.null(nm)) nm <- paste0("[[", seq_along(x), "]]")
+			rows <- lapply(seq_along(x), function(i) describe_one(x[[i]], nm[i], 1L))
+
+		#	Recurse Into the First Component
+		#	Capped at the first, because 79 batches of 500 would describe 39,500
+		#	records to say one thing about their shape.
+			if (depth > 1L && length(x) > 0L && is.list(x[[1]]) &&
+				!is.data.frame(x[[1]]) && length(x[[1]]) > 0L) {
+				first <- x[[1]]
+				fnm <- names(first)
+				if (is.null(fnm)) fnm <- paste0("[[", seq_along(first), "]]")
+				rows[[length(rows) + 1L]] <- describe_one(
+					first[[1]], paste0(nm[1], " -> ", fnm[1]), 2L)
+			}
+
+		#	Assembling Result
+			return(do.call("rbind", rows))
 	}
 
 #	Normalize a Join Key
@@ -209,6 +628,122 @@
 		#	Assembling Result
 			return(gsub("[[:space:]]", "", tolower(as.character(x))))
 	}
+
+#' @title pa_download_keys
+#' @description The canonical node key for each download record, by its position.
+#'
+#' @param edge_table The edge-level table, article_combined.
+#' @param key_col Name of the canonical key column. Default "source_combined".
+#'
+#' @details
+#' This is the bridge that makes the download joinable in full. The edge table holds
+#' file_id, article_id and the citing article's canonical key on every row, so taking
+#' the distinct triples gives one key per download record -- 35,103 positions
+#' resolving to 34,974 distinct keys, which is exactly the article-node count
+#' \meas{}. A position appears more than once where consecutive export files overlap
+#' at their boundary, so the result is deduplicated on the key.
+#'
+#' Position rather than DOI is the point. 5,061 of those keys are author-year-journal
+#' triples formed by a canonicalization upstream of this project, and the rule that
+#' formed them is not recorded here, so they cannot be reconstructed from the
+#' download's author, year and journal fields without guessing. Their position can.
+#'
+#' @return A data.table with file_id, article_id and node_key.
+#'
+#' @examples
+#' keys <- pa_download_keys(article_combined)
+#'
+#' @export
+pa_download_keys <- function(edge_table, key_col = "source_combined") {
+	#	"""
+	#	Args:
+	#		edge_table: the edge-level table
+	#		key_col: name of the canonical key column
+	#	Returns:
+	#		data.table(file_id, article_id, node_key)
+	#	"""
+
+	#	Validation
+		need <- c("file_id", "article_id", key_col)
+		missing <- setdiff(need, names(edge_table))
+		if (length(missing) > 0L) {
+			stop("pa_download_keys: edge table is missing: ",
+				 paste(missing, collapse = ", "))
+		}
+
+	#	One Row per Position
+		dt <- as.data.table(edge_table)[, .(file_id = as.integer(file_id),
+											article_id = as.integer(article_id),
+											node_key = pa_norm_key(get(key_col)))]
+		dt <- dt[!is.na(file_id) & !is.na(article_id) & !is.na(node_key)]
+		dt <- unique(dt, by = c("file_id", "article_id"))
+
+	#	Assembling Result
+		setorder(dt, file_id, article_id)
+		return(dt)
+}
+
+#' @title pa_position_alignment
+#' @description Check that a download record's position resolves to its own DOI.
+#'
+#' @param wos The flattened download, carrying batch_index and record_name.
+#' @param download_keys Output of pa_download_keys.
+#' @param schema Output of pa_resolve_schema.
+#'
+#' @details
+#' The positional join assumes that file_id enumerates the download's batches in the
+#' same order the batches appear, which is the alphabetical order list.files() gave
+#' the compilation script. That assumption is testable rather than something to take
+#' on faith: where a record carries its own DOI and its position resolves to a
+#' DOI-shaped key, the two must be the same string. A low agreement rate means the
+#' batch ordering differs and the positional keys are attached to the wrong records,
+#' which would silently mislabel every article's metadata.
+#'
+#' @return A data.frame with comparable, agreeing and pct.
+#'
+#' @examples
+#' pa_position_alignment(wos, download_keys, schema)
+#'
+#' @export
+pa_position_alignment <- function(wos, download_keys, schema) {
+	#	"""
+	#	Args:
+	#		wos: the flattened download
+	#		download_keys: output of pa_download_keys
+	#		schema: output of pa_resolve_schema
+	#	Returns:
+	#		data.frame(comparable, agreeing, pct)
+	#	"""
+
+	#	Early return
+		doi_col <- schema$column[schema$field == "doi"]
+		if (is.null(download_keys) || length(doi_col) != 1L || is.na(doi_col) ||
+			!all(c("batch_index", "record_name") %in% names(wos))) {
+			return(data.frame(comparable = 0L, agreeing = 0L, pct = NA_real_,
+							  stringsAsFactors = FALSE))
+		}
+
+	#	Attach the Positional Key
+		dt <- as.data.table(wos)[, .(batch_index = as.integer(batch_index),
+									 record_name = as.character(record_name),
+									 own = pa_norm_key(get(doi_col)))]
+		dk <- as.data.table(download_keys)[, .(batch_index = as.integer(file_id),
+											   record_name = as.character(article_id),
+											   positional = node_key)]
+		dt[dk, on = .(batch_index, record_name), positional := i.positional]
+
+	#	Compare Only Where Both Are DOIs
+		cmp <- dt[!is.na(own) & nzchar(own) & !is.na(positional) &
+				  grepl("^10\\.", positional)]
+
+	#	Assembling Result
+		return(data.frame(
+			comparable = nrow(cmp),
+			agreeing   = sum(cmp$own == cmp$positional),
+			pct        = if (nrow(cmp) == 0L) NA_real_ else
+							round(100 * mean(cmp$own == cmp$positional), 1),
+			stringsAsFactors = FALSE))
+}
 
 #' @title pa_resolve_schema
 #' @description Map each needed metadata field to a column that exists in the download.
@@ -338,6 +873,7 @@ pa_parse_references <- function(edge_table, citation_col = "citation") {
 #' @param schema Output of pa_resolve_schema, or NULL when wos is NULL.
 #' @param references Output of pa_parse_references, or NULL to skip the fill.
 #' @param legacy The legacy node list carrying author_id, or NULL to skip it.
+#' @param download_keys Output of pa_download_keys, or NULL to join the download on DOI alone.
 #'
 #' @details
 #' Precedence is download, then reference strings, then legacy. The download wins
@@ -352,11 +888,12 @@ pa_parse_references <- function(edge_table, citation_col = "citation") {
 #' @return A data.table with one row per node and the metadata columns that resolved.
 #'
 #' @examples
-#' meta <- pa_node_metadata(node_list, wos, schema, references, legacy)
+#' meta <- pa_node_metadata(node_list, wos, schema, references, legacy, keys)
 #'
 #' @export
 pa_node_metadata <- function(node_list, wos = NULL, schema = NULL,
-							 references = NULL, legacy = NULL) {
+							 references = NULL, legacy = NULL,
+							 download_keys = NULL) {
 	#	"""
 	#	Args:
 	#		node_list: the rebuilt node list
@@ -364,6 +901,7 @@ pa_node_metadata <- function(node_list, wos = NULL, schema = NULL,
 	#		schema: output of pa_resolve_schema, or NULL
 	#		references: output of pa_parse_references, or NULL
 	#		legacy: legacy node list with author_id, or NULL
+	#		download_keys: output of pa_download_keys, or NULL
 	#	Returns:
 	#		data.table, one row per node
 	#	"""
@@ -383,27 +921,64 @@ pa_node_metadata <- function(node_list, wos = NULL, schema = NULL,
 											 era = as.integer(era))]
 		meta[, key := pa_norm_key(node_key)]
 
-	#	From the Download, by DOI
+	#	From the Download
 		if (!is.null(wos) && !is.null(schema)) {
 			#	Validation
 				doi_col <- schema$column[schema$field == "doi"]
-				if (length(doi_col) == 0L || is.na(doi_col)) {
-					stop("pa_node_metadata: the download has no resolvable doi ",
-						 "column, so it cannot be joined to the node list")
+				have_doi <- length(doi_col) == 1L && !is.na(doi_col)
+				have_position <- !is.null(download_keys) &&
+								 all(c("batch_index", "record_name") %in%
+									 names(wos))
+				if (!have_doi && !have_position) {
+					stop("pa_node_metadata: the download offers neither a doi ",
+						 "column nor a position, so it cannot be joined")
 				}
 
-			#	Build the Lookup From the Resolved Columns Only
+			#	The Columns Worth Taking
 				take <- schema[schema$found & schema$field != "doi", , drop = FALSE]
-				lookup <- as.data.table(wos)[, c(doi_col, take$column),
-											 with = FALSE]
-				setnames(lookup, c("key", take$field))
-				lookup[, key := pa_norm_key(key)]
-				lookup <- lookup[!is.na(key) & nzchar(key)]
-				lookup <- unique(lookup, by = "key")
+				lookup <- as.data.table(wos)
+				keep_cols <- intersect(c("batch_index", "record_name", doi_col,
+										 take$column), names(lookup))
+				lookup <- lookup[, keep_cols, with = FALSE]
+				setnames(lookup, take$column, take$field, skip_absent = TRUE)
+
+			#	Prefer the Canonical Key From Position
+			#	A DOI join reaches only the DOI-keyed articles, which was measured
+			#	at 62.8% of era 11 rising to 94.7% of era 17 -- matching, era for
+			#	era, the share of article keys that are DOIs rather than triples
+			#	\meas{}. Position reaches both kinds.
+				lookup[, key := NA_character_]
+				if (have_position) {
+					dk <- as.data.table(download_keys)[, .(
+							batch_index = as.integer(file_id),
+							record_name = as.character(article_id),
+							positional_key = node_key)]
+					lookup[, record_name := as.character(record_name)]
+					lookup[dk, on = .(batch_index, record_name),
+						   key := i.positional_key]
+				}
+
+			#	Fall Back to the DOI Where Position Gave Nothing
+				if (have_doi) {
+					lookup[is.na(key),
+						   key := pa_norm_key(get(doi_col))]
+				}
 
 			#	Join
+				lookup <- lookup[!is.na(key) & nzchar(key)]
+				lookup <- unique(lookup, by = "key")
 				meta[lookup, on = "key",
 					 (take$field) := mget(paste0("i.", take$field))]
+		}
+
+	#	First Author From the Download's Author List
+	#	The download reaches every article, so taking the first name off its author
+	#	list beats the reference-string route, which reaches 57 to 69%. The CR fill
+	#	below then covers only the cited-only works the download never held.
+		if ("authors" %in% names(meta)) {
+			meta[, first_author := NA_character_]
+			meta[!is.na(authors) & nzchar(authors),
+				 first_author := trimws(sub(";.*$", "", authors))]
 		}
 
 	#	Fill Journal and First Author From the Reference Strings
@@ -548,15 +1123,97 @@ pa_run_node_metadata <- function(node_file = NM_NODE_FILE,
 	#	"""
 
 	#	The Node List Is Required
-		node_list <- pa_load_one(node_file, "pa_nodes")
+		node_list <- pa_as_table(pa_load_one(node_file, "pa_nodes"))
+		if (is.null(node_list)) {
+			stop("pa_run_node_metadata: pa_nodes in ", node_file,
+				 " is not a table")
+		}
 		if (verbose) cat("Node list: ", nrow(node_list), " nodes\n", sep = "")
 
 	#	The Download, if Present
+	#	Loaded without coercion, then coerced here, because the file may hold a list
+	#	of components rather than one table. If it does, the run describes it and
+	#	continues rather than dying on as.data.frame().
 		wos <- NULL
 		schema <- NULL
 		if (file.exists(wos_file)) {
-			wos <- pa_load_one(wos_file)
-			schema <- pa_resolve_schema(wos)
+			wos_raw <- pa_load_one(wos_file, NM_WOS_OBJECT)
+			wos <- pa_as_table(wos_raw)
+
+			#	A List-Shaped File: a Table Inside It, or Batched Records
+				if (is.null(wos)) {
+					cat("\nThe download is not a single table. Its structure:\n")
+					print(utils::head(pa_describe_object(wos_raw), 6),
+						  row.names = FALSE)
+					cat("  ... ", length(wos_raw), " component(s) in all\n",
+						sep = "")
+
+					#	First Try: a Component That Is Already a Table
+						picked <- pa_pick_table(wos_raw, NM_WOS_COMPONENT)
+						if (!is.null(picked)) {
+							wos <- picked$table
+							cat("\n  Taking component \"", picked$chosen, "\": ",
+								nrow(wos), " rows, ", ncol(wos), " columns.\n",
+								"  Set NM_WOS_COMPONENT to override.\n", sep = "")
+						}
+
+					#	Second Try: Parse the Records Directly
+					#	This comes before bibliometrix, which is the opposite of what
+					#	you would expect, and the reason is in
+					#	Caffeine_Compilation_31Mar2021.R. That script built this
+					#	object by splitting every line on spaces, so a record is a
+					#	tag map whose values are lists of word vectors. convert2df
+					#	wants the plaintext LINES, and unlisting this object yields
+					#	individual words, not lines -- so it cannot read it. It is
+					#	kept below for a download that is still raw plaintext.
+						if (is.null(wos)) {
+							cat("\n  No component is a table. Reading it as ",
+								"batched records...\n", sep = "")
+							flat <- tryCatch(
+								pa_flatten_records(wos_raw, keep = NM_KEEP_FIELDS),
+								error = function(e) {
+									cat("  could not: ", conditionMessage(e), "\n",
+										sep = "")
+									NULL
+								})
+							if (!is.null(flat)) {
+								wos <- flat$table
+								cat("  ", flat$n_records, " record(s) in ",
+									length(wos_raw), " batch(es); ",
+									nrow(wos), " flattened\n", sep = "")
+								cat("  fields present in the download: ",
+									paste(flat$fields, collapse = " "), "\n",
+									sep = "")
+							}
+						}
+
+					#	Third Try: bibliometrix, for a Still-Raw Plaintext Download
+						if (is.null(wos)) {
+							cat("\n  Trying bibliometrix::convert2df()...\n")
+							wos <- pa_wos_convert2df(wos_raw)
+							if (!is.null(wos)) {
+								cat("  converted: ", nrow(wos), " records, ",
+									ncol(wos), " columns\n", sep = "")
+							} else if (!requireNamespace("bibliometrix",
+														 quietly = TRUE)) {
+								cat("  bibliometrix is not installed\n")
+							} else {
+								cat("  convert2df could not read it either\n")
+							}
+						}
+
+					#	Give Up Cleanly
+						if (is.null(wos)) {
+							cat("\n  Continuing without the download, so no text ",
+								"columns.\n", sep = "")
+						}
+				}
+			rm(wos_raw)
+			if (!is.null(wos)) {
+				schema <- pa_resolve_schema(wos)
+			}
+		}
+		if (!is.null(wos)) {
 			if (verbose) {
 				cat("Download: ", nrow(wos), " rows, ", ncol(wos), " columns\n",
 					sep = "")
@@ -576,7 +1233,7 @@ pa_run_node_metadata <- function(node_file = NM_NODE_FILE,
 				cat("\nAll columns in the download:\n")
 				print(names(wos))
 			}
-		} else if (verbose) {
+		} else if (verbose && !file.exists(wos_file)) {
 			cat("Download NOT FOUND at ", wos_file,
 				"\n  continuing on the reference strings alone; no text columns\n",
 				sep = "")
@@ -584,12 +1241,31 @@ pa_run_node_metadata <- function(node_file = NM_NODE_FILE,
 
 	#	The Reference Strings, if Present
 		references <- NULL
+		download_keys <- NULL
 		if (file.exists(edge_file)) {
-			edge_table <- pa_load_one(edge_file)
+			edge_table <- pa_as_table(pa_load_one(edge_file))
+			if (is.null(edge_table)) {
+				stop("pa_run_node_metadata: ", edge_file, " is not a table")
+			}
 			references <- pa_parse_references(edge_table)
+
+			#	The Positional Bridge to the Canonical Keys
+			#	Built from the same table, because file_id and article_id index
+			#	the download and source_combined is the key the node list uses.
+				download_keys <- tryCatch(pa_download_keys(edge_table),
+										  error = function(e) NULL)
 			if (verbose) {
 				cat("\nReference strings: ", nrow(references),
 					" works keyed by DOI with a journal\n", sep = "")
+				if (is.null(download_keys)) {
+					cat("Positional keys: unavailable; the download will join on ",
+						"DOI alone\n", sep = "")
+				} else {
+					cat("Positional keys: ", nrow(download_keys),
+						" download position(s), ",
+						sum(!grepl("^10\\.", download_keys$node_key)),
+						" of them triples rather than DOIs\n", sep = "")
+				}
 			}
 			rm(edge_table)
 		} else if (verbose) {
@@ -599,7 +1275,11 @@ pa_run_node_metadata <- function(node_file = NM_NODE_FILE,
 	#	The Legacy List, if Present
 		legacy <- NULL
 		if (file.exists(legacy_file)) {
-			legacy <- pa_load_one(legacy_file, "node_list")
+			legacy <- pa_as_table(pa_load_one(legacy_file, "node_list"))
+			if (is.null(legacy)) {
+				stop("pa_run_node_metadata: node_list in ", legacy_file,
+					 " is not a table")
+			}
 			if (verbose) {
 				cat("Legacy list: ", nrow(legacy), " nodes with author_id\n",
 					sep = "")
@@ -608,9 +1288,24 @@ pa_run_node_metadata <- function(node_file = NM_NODE_FILE,
 			cat("Legacy list NOT FOUND at ", legacy_file, "\n", sep = "")
 		}
 
+	#	Does a Record's Position Resolve to Its Own DOI?
+	#	The positional join rests on file_id enumerating the batches in the
+	#	order they appear. Tested rather than assumed.
+		alignment <- NULL
+		if (!is.null(wos) && !is.null(schema) && !is.null(download_keys)) {
+			alignment <- pa_position_alignment(wos, download_keys, schema)
+			if (verbose) {
+				cat("Position alignment: ", alignment$agreeing, " of ",
+					alignment$comparable, " records resolve to their own DOI",
+					if (!is.na(alignment$pct)) sprintf(" (%.1f%%)", alignment$pct)
+					else "", "\n", sep = "")
+			}
+		}
+
 	#	Build
 		if (verbose) cat("\nJoining...\n")
-		meta <- pa_node_metadata(node_list, wos, schema, references, legacy)
+		meta <- pa_node_metadata(node_list, wos, schema, references, legacy,
+								 download_keys)
 		rm(wos)
 
 	#	Coverage
@@ -649,7 +1344,7 @@ pa_run_node_metadata <- function(node_file = NM_NODE_FILE,
 
 	#	Checks
 		tests <- pa_run_node_metadata_tests(meta, node_list, coverage, schema,
-											output_dir = output_dir)
+											alignment, output_dir = output_dir)
 		if (verbose) {
 			#	Reported Rows Are Not Failures
 			#	A SKIP row carries a measurement with no threshold to pass, so it
@@ -677,6 +1372,7 @@ pa_run_node_metadata <- function(node_file = NM_NODE_FILE,
 #' @param node_list The rebuilt node list.
 #' @param coverage Output of pa_metadata_coverage.
 #' @param schema Output of pa_resolve_schema, or NULL when the download was absent.
+#' @param alignment Output of pa_position_alignment, or NULL.
 #' @param output_dir Destination for the test table, or NULL to skip writing.
 #'
 #' @details
@@ -690,6 +1386,7 @@ pa_run_node_metadata <- function(node_file = NM_NODE_FILE,
 #'
 #' @export
 pa_run_node_metadata_tests <- function(meta, node_list, coverage, schema = NULL,
+									   alignment = NULL,
 									   output_dir = NM_OUT_DIR) {
 	#	"""
 	#	Args:
@@ -697,6 +1394,7 @@ pa_run_node_metadata_tests <- function(meta, node_list, coverage, schema = NULL,
 	#		node_list: the rebuilt node list
 	#		coverage: output of pa_metadata_coverage
 	#		schema: output of pa_resolve_schema, or NULL
+	#		alignment: output of pa_position_alignment, or NULL
 	#		output_dir: destination for the test table, or NULL
 	#	Returns:
 	#		data.frame of checks
@@ -763,6 +1461,19 @@ pa_run_node_metadata_tests <- function(meta, node_list, coverage, schema = NULL,
 						   " nodes, reported"),
 					NA, detail)
 			}
+		}
+
+	#	The Positional Join Is Attached to the Right Records
+	#	This is the check that protects every metadata column at once. If the
+	#	batch ordering were wrong, each article would receive another
+	#	article's title, journal and abstract, and nothing downstream would
+	#	notice.
+		if (!is.null(alignment) && alignment$comparable > 0L) {
+			out[[length(out) + 1L]] <- pa_check_nm(
+				"a record's position resolves to its own DOI",
+				alignment$pct >= 99,
+				sprintf("%d of %d (%.1f%%)", alignment$agreeing,
+						alignment$comparable, alignment$pct))
 		}
 
 	#	Articles Carry a Journal Once the Download Is Joined

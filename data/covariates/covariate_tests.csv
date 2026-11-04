@@ -1,0 +1,9 @@
+check,result,detail
+source records never outnumber works,PASS,max excess 0
+"every share lies in [0, 1]",PASS,0.000 to 1.000 over 1491 value(s)
+one row per community,PASS,0 duplicate key(s) over spec_tag + era + community
+no era profiles more vertices than it has nodes,PASS,max 74.7% of era nodes
+a title hit is also a text hit,PASS,0 violation(s) over 32367 article(s)
+a set against itself has Jaccard one,PASS,"2 diagonal cell(s), min 1.000000"
+a profile against itself has Hellinger zero,PASS,"2 diagonal cell(s), max 0.000000"
+the hand-calculated overlap is reproduced,PASS,"expected 0.5, got 0.5"

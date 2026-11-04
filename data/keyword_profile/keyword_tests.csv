@@ -1,0 +1,8 @@
+check,result,detail
+the anchor matches cognition and not recognition,PASS,"5 of 5 wanted, 0 of 5 unwanted"
+seed terms appear in the keyword record,PASS,"14 of 14 present: vigilance, sustained attention, reaction time, working memory, executive function, psychomotor"
+a seed term is adjacent to itself,PASS,min 1.0000 over 10 seed term(s)
+"adjacency lies in [0, 1]",PASS,0.000 to 1.000
+adjacent never exceeds the carriers,PASS,max excess 0
+no term is carried by more articles than have keywords,PASS,max 12918 against 28052
+both keyword fields contributed,SKIP,"author 117127, index 239249"

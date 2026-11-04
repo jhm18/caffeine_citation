@@ -1,0 +1,1551 @@
+#	PathA_Covariates.R
+#	Community-level covariates for the Model I design matrix.
+#
+#	Jonathan H. Morgan and Sarah Delmar
+#	03 November 2026
+#
+#	Model I has one row per ordered community pair: an era-t community i against
+#	an era-(t-1) community j (S13.2). Its covariates are therefore of two kinds,
+#	and only the first kind is computed here.
+#
+#	The first kind is a property of one community: how many articles it holds, how
+#	many distinct authors and journals, what share of its articles sit in a
+#	cognitive research area, what share carry a term from the frozen lexicon. These
+#	are small -- one row per community, a few thousand rows per specification --
+#	and they are written to disk.
+#
+#	The second kind is a property of a pair: author overlap, venue overlap,
+#	disciplinary distance. These are not written here. They are a function of two
+#	community-level objects, so storing them would be storing something
+#	recomputable from what is stored already, and PathA_ModelI.R calls
+#	pa_pair_overlap and pa_pair_distance while the grid is in memory.
+#
+#	A NOTE ON SIZE, BECAUSE AN EARLIER VERSION OF THIS COMMENT HAD IT WRONG. The
+#	Model I grid is communities against communities, and the largest era pair is
+#	1,105 x 760 = 839,800 ordered pairs; all six pairs together are 1.87 million
+#	rows, a few hundred megabytes. The 13,855 x 1,105 figure that used to appear
+#	here is Model II's grid -- bridging WORKS against citing communities (S13.1)
+#	-- and it does not describe anything this lane feeds.
+#
+#	Input:
+#		data/node_metadata/node_metadata.Rda       pa_node_metadata()
+#		data/keyword_profile/cognitive_lexicon.csv pa_build_lexicon()
+#		data/eras_7yr/pa_node_list.Rda             the rebuilt node list
+#		the era networks and partitions, through pa_build_era_maps()
+#
+#	Output:
+#		data/covariates/<spec_tag>/community_profiles.csv
+#		data/covariates/<spec_tag>/community_authors.rds
+#		data/covariates/<spec_tag>/community_venues.rds
+#		data/covariates/<spec_tag>/community_areas.rds
+#		data/covariates/<spec_tag>/plots/*.png
+#		data/covariates/covariate_summary.csv
+#		data/covariates/covariate_tests.csv
+
+#################
+#   LIBRARIES   #
+#################
+
+	suppressPackageStartupMessages({
+		library(data.table)
+		library(Matrix)
+		library(readr)
+		library(dplyr)
+	})
+
+#####################
+#   CONFIGURATION   #
+#####################
+
+#	Project Root
+	CV_ROOT <- Sys.getenv("CAFFEINE_DIR", "/workspace/caffeine_citation")
+
+#	Inputs
+	CV_META_FILE    <- file.path(CV_ROOT, "data/node_metadata/node_metadata.Rda")
+	CV_LEXICON_FILE <- file.path(CV_ROOT,
+								 "data/keyword_profile/cognitive_lexicon.csv")
+	CV_ERA_DIR      <- file.path(CV_ROOT, "data/eras_7yr")
+
+#	Output
+	CV_OUT_DIR <- file.path(CV_ROOT, "data/covariates")
+
+#	Which Research Areas Count as Cognitive PROVENANCE
+#	Web of Science assigns research areas to the JOURNAL, not to the article, so
+#	this measures where a work was published rather than what it is about. That
+#	is S8.4's "cognitive disciplinary provenance" -- is the work published where
+#	cognitive scientists publish -- and it is deliberately a separate variable
+#	from cog_subject, which reads the article's own text.
+#
+#	Psychology and Behavioral Sciences rather than the four core cognitive
+#	venues, because those four hold nine nodes between them in a corpus of
+#	590,000. At that granularity provenance is not measurable.
+#
+#	A vigilance experiment in Psychopharmacology is the case that makes the
+#	separation worth keeping: cognitive subject matter, pharmacological
+#	provenance. Collapsing them would hide exactly the distinction that might
+#	explain why integration succeeds or fails.
+	CV_VENUE_CATEGORIES <- c("Psychology", "Behavioral Sciences")
+
+#	The Lexicon Is Used Whole
+#	There is no core subset. The keyword lane's attempt to split the lexicon into
+#	an experimental group and an applied one by co-occurrence failed -- in a set
+#	of 1,341 articles where the top term carries 1,229 of them, every term is
+#	far from every other and the cut peeled off three terms. What the lane does
+#	carry is psych_concentration, which reads each term's behaviour outside the
+#	cognitive set -- above one, psychology is who uses it out there; below one,
+#	the rest of the corpus is. That column is diagnostic and is not used to
+#	subset, because a threshold on it would be a free parameter bought with
+#	nothing. Only term and is_anchor are read from the lexicon file here, so the
+#	keyword lane can change what else it writes without touching this one.
+
+#	Which Specifications to Profile
+#	Read from TL_SPECS at run time rather than copied here. The tie layer,
+#	the coupling lane and this one have to use the same rows: a covariate
+#	describing one partition beside an outcome counted on another is not a
+#	covariate, and two copies of the same five numbers is how that happens.
+#
+#	Only the primary row is profiled by default. The sensitivity rows exist to
+#	show the coupling coefficient does not depend on an arbitrary resolution
+#	(S14.8); that check reruns this lane with CV_SPEC_ROLES widened, and until it
+#	is being made, profiling five specifications is five times the work for one
+#	design matrix.
+	CV_SPEC_ROLES <- "primary"
+
+#	A Community With Too Few Source Records to Profile
+#	NOT a size filter, which is what the old name CV_MIN_ARTICLES made it sound
+#	like. A node in these networks is a work; n_source counts the works published
+#	inside the era's seven-year window that carry a Web of Science record, and
+#	every other node is a work cited from outside it. A community of 297 works
+#	can hold four source records -- era 17 community 627 does -- and it is that
+#	community's metadata that is thin, not the community.
+#
+#	A share computed on two records is not a measurement, so below this floor the
+#	share columns are NA. The communities themselves are profiled anyway: they
+#	are rows in the design matrix and dropping them would be a selection. The
+#	counts are always reported, and they are what the model should use.
+	CV_MIN_SOURCE <- 5L
+
+#	Plots
+	CV_WRITE_PLOTS <- TRUE
+	CV_PLOT_WIDTH  <- 877L
+	CV_PLOT_HEIGHT <- 676L
+
+#	The Four-Plot
+#	Run sequence, lag, histogram, normal QQ: the NIST four-plot, which checks the
+#	four assumptions a univariate summary rests on. Drawn here rather than sourced
+#	from R_Plot_Utilities_2Oct2020.R, whose util$four_plot does the right drawing
+#	through plumbing that will not survive a batch run: it writes a fixed p_1.png
+#	into the working directory, round-trips it through magick and ggplotify, and
+#	assigns the result into .GlobalEnv under a name with a space in it. The panels
+#	below are that function's panels -- same layout, same brown -- writing
+#	straight to a named file and returning the path. The family is the device's
+#	own serif rather than util$four_plot's HersheySerif: Hershey fonts are
+#	vector outlines R draws stroke by stroke, which is why they look thin and
+#	unhinted, and the container has a real serif face installed.
+	CV_PLOT_FAMILY <- "serif"
+	CV_PLOT_COLOR  <- "brown"
+
+########################
+#   INTERNAL HELPERS   #
+########################
+
+#	Resolving the Specifications
+#	TL_SPECS lives in PathA_TieLayer.R. If it is absent this lane was loaded
+#	without its dependencies, and saying so by name is more use than letting
+#	the object-not-found surface from four frames down.
+	pa_cv_specs <- function(roles = CV_SPEC_ROLES) {
+		if (!exists("TL_SPECS")) {
+			stop("pa_cv_specs: TL_SPECS not found. This lane needs the tie ",
+				 "layer's specification table; source ",
+				 "scripts/Path_A/PathA_TieLayer.R first, or run this file ",
+				 "under Rscript, which sources it.")
+		}
+		specs <- as.data.frame(TL_SPECS)
+		if (!is.null(roles) && "spec_role" %in% names(specs)) {
+			specs <- specs[specs$spec_role %in% roles, , drop = FALSE]
+		}
+		if (nrow(specs) == 0L) {
+			stop("pa_cv_specs: no specification has spec_role in ",
+				 paste(roles, collapse = ", "))
+		}
+		return(specs)
+	}
+
+#	Normalizing a Free-Text Field
+	pa_cv_norm <- function(x) {
+		out <- tolower(trimws(as.character(x)))
+		out[is.na(out)] <- ""
+		return(gsub("[[:space:]]+", " ", out))
+	}
+
+#	Normalizing an Author Name
+#	Web of Science writes authors as "Smith, JA". Letters and the comma survive,
+#	everything else goes, so that "Smith, J.A." and "SMITH, JA" are one person.
+#	Two different people who publish under the same surname and initials become
+#	one here, which inflates author overlap slightly and cannot be fixed without
+#	a disambiguated author table.
+	pa_cv_author_key <- function(x) {
+		return(gsub("[^a-z,]", "", pa_cv_norm(x)))
+	}
+
+#	Normalizing a Journal Name
+	pa_cv_venue_key <- function(x) {
+		return(gsub("[^a-z0-9]", "", pa_cv_norm(x)))
+	}
+
+#	Splitting a Semicolon-Delimited Field Into Long Form
+#	pa_wos_record joins the list-valued tags with "; ", so every multi-valued
+#	field on the metadata table -- authors, keywords, categories, research areas
+#	-- is one string per article and has to be taken apart before it can be
+#	counted. NA becomes no rows rather than one empty row.
+	pa_cv_split <- function(ids, values) {
+		text <- as.character(values)
+		text[is.na(text)] <- ""
+		pieces <- strsplit(text, ";", fixed = TRUE)
+		out <- data.table(node_id = rep(as.integer(ids), lengths(pieces)),
+						  value = trimws(unlist(pieces, use.names = FALSE)))
+		return(out[nzchar(value)])
+	}
+
+###################################
+#   BUILDING COMMUNITY PROFILES   #
+###################################
+
+#' @title pa_community_members
+#' @description Attach the metadata an era map's vertices carry.
+#'
+#' @param era_map One era map from pa_build_era_maps.
+#' @param meta The node metadata table from pa_node_metadata.
+#'
+#' @details
+#' An era's communities hold two kinds of vertex. Articles are works published in
+#' the era and carry a Web of Science record: a journal, an author list, a year,
+#' a set of research areas. Cited-only vertices are works the era's articles
+#' reference, which may be older than the corpus or outside it altogether, and
+#' carry almost nothing. Every profile below is therefore computed over the
+#' source-record vertices only, and n_nodes is kept beside n_source so that a
+#' community whose profile rests on a handful of records can be recognised.
+#'
+#' @return A data.table, one row per vertex, with the metadata columns joined on.
+#'
+#' @examples
+#' members <- pa_community_members(maps[["17"]], meta)
+#'
+#' @export
+pa_community_members <- function(era_map, meta) {
+	#	"""
+	#	Args:
+	#		era_map: one era map from pa_build_era_maps
+	#		meta: the node metadata table
+	#	Returns:
+	#		data.table, one row per vertex, metadata joined
+	#	"""
+
+	#	Validation
+		need <- c("node_id", "community", "era")
+		missing <- setdiff(need, names(era_map))
+		if (length(missing) > 0L) {
+			stop("pa_community_members: the era map is missing: ",
+				 paste(missing, collapse = ", "))
+		}
+		if (!("node_id" %in% names(meta))) {
+			stop("pa_community_members: the metadata table has no node_id column")
+		}
+
+	#	Scope
+		carry <- intersect(c("node_id", "is_article", "journal", "journal_abbrev",
+							 "authors", "year", "research_areas",
+							 "wos_categories"), names(meta))
+		m <- unique(as.data.table(meta)[, ..carry], by = "node_id")
+
+	#	Join
+		v <- as.data.table(era_map)[, .(node_id = as.integer(node_id),
+										community = as.integer(community),
+										era = as.integer(era))]
+		out <- m[v, on = "node_id"]
+
+	#	The Article Flag Comes From the Node List, Not the Metadata
+	#	A vertex can be an article with no retrievable record. is_article on the
+	#	era map is the structural fact; is_article on the metadata table is the
+	#	same fact copied, and where only one is present that one is used.
+		if (!("is_article" %in% names(out))) out[, is_article := NA]
+		if ("is_article" %in% names(era_map)) {
+			out[, is_article := as.logical(era_map$is_article)[
+								   match(node_id, era_map$node_id)]]
+		}
+		out[is.na(is_article), is_article := FALSE]
+
+	#	Assembling Result
+		return(out)
+}
+
+#' @title pa_community_sets
+#' @description Reduce a community's articles to the distinct values of one field.
+#'
+#' @param members Output of pa_community_members.
+#' @param field Metadata column to read: authors, journal or research_areas.
+#' @param articles_only Restrict to article vertices. Default TRUE.
+#'
+#' @details
+#' The result is long and distinct: one row per community and value, whatever the
+#' number of articles carrying it. That is what an overlap wants -- two
+#' communities sharing an author share it once -- and it is also what keeps the
+#' object small enough to hold for every community in an era at once.
+#'
+#' The journal field falls back to journal_abbrev where the full name is absent,
+#' because the two are the same venue under two spellings and treating them as
+#' different venues would depress venue overlap for no reason.
+#'
+#' @return A data.table with community, value and n_source.
+#'
+#' @examples
+#' authors <- pa_community_sets(members, "authors")
+#'
+#' @export
+pa_community_sets <- function(members, field, articles_only = TRUE) {
+	#	"""
+	#	Args:
+	#		members: output of pa_community_members
+	#		field: "authors", "journal" or "research_areas"
+	#		articles_only: restrict to article vertices
+	#	Returns:
+	#		data.table(community, value, n_source)
+	#	"""
+
+	#	Validation
+		field <- match.arg(field, c("authors", "journal", "research_areas",
+									"wos_categories"))
+		dt <- as.data.table(members)
+		if (isTRUE(articles_only)) dt <- dt[is_article %in% TRUE]
+
+	#	The Venue Fallback
+		if (field == "journal") {
+			raw <- if ("journal" %in% names(dt)) dt$journal else
+					   rep(NA_character_, nrow(dt))
+			if ("journal_abbrev" %in% names(dt)) {
+				blank <- is.na(raw) | !nzchar(trimws(as.character(raw)))
+				raw[blank] <- dt$journal_abbrev[blank]
+			}
+		} else {
+			if (!(field %in% names(dt))) {
+				return(data.table(community = integer(0), value = character(0),
+								  n_source = integer(0)))
+			}
+			raw <- dt[[field]]
+		}
+
+	#	Early return
+		if (nrow(dt) == 0L) {
+			return(data.table(community = integer(0), value = character(0),
+							  n_source = integer(0)))
+		}
+
+	#	Long Form, One Row per Article and Value
+		long <- pa_cv_split(dt$node_id, raw)
+		long[, value := switch(field,
+							   authors = pa_cv_author_key(value),
+							   journal = pa_cv_venue_key(value),
+							   pa_cv_norm(value))]
+		long <- long[nzchar(value)]
+
+	#	Early return
+		if (nrow(long) == 0L) {
+			return(data.table(community = integer(0), value = character(0),
+							  n_source = integer(0)))
+		}
+
+	#	Attach the Community and Count
+		long[dt, on = "node_id", community := i.community]
+		out <- unique(long, by = c("community", "node_id", "value"))[
+				   , .(n_source = .N), by = .(community, value)]
+
+	#	Assembling Result
+		setorder(out, community, -n_source, value)
+		return(out)
+}
+
+#' @title pa_lexicon_hits
+#' @description Flag which articles carry a term from the frozen lexicon.
+#'
+#' @param meta The node metadata table.
+#' @param lexicon Output of pa_build_lexicon, or the written cognitive_lexicon.csv.
+#' @param eras Integer eras to score.
+#'
+#' @details
+#' Two flags, and the difference between them is the point. has_title is computed
+#' from titles alone; has_text is computed from titles, abstracts and both keyword
+#' fields.
+#'
+#' Only the first is comparable across eras. Titles are present for 100 per cent
+#' of articles in all seven eras; abstracts run 0.3, 0.2, 31.2, 93.3, 94.9, 94.9
+#' and 95.8 per cent, and keywords_index is similar. A covariate built on the
+#' wider field set would therefore be measured well in the late eras and barely
+#' at all in the early ones -- and since pair_index is the model's time trend, the
+#' covariate's measurement quality would rise with the very term it is being
+#' fitted alongside. has_title is the one that belongs in the design matrix;
+#' has_text is carried for the eras where it exists, as a check that the
+#' title-only measure is not reading something different.
+#'
+#' @return A data.table with node_id, era, has_title and has_text.
+#'
+#' @examples
+#' hits <- pa_lexicon_hits(meta, lexicon, eras = 11:17)
+#'
+#' @export
+pa_lexicon_hits <- function(meta, lexicon, eras) {
+	#	"""
+	#	Args:
+	#		meta: the node metadata table
+	#		lexicon: the frozen lexicon
+	#		eras: integer eras to score
+	#	Returns:
+	#		data.table(node_id, era, has_title, has_text)
+	#	"""
+
+	#	Validation
+		if (!exists("pa_text_terms", mode = "function")) {
+			stop("pa_lexicon_hits: pa_text_terms() not found; source ",
+				 "PathA_KeywordProfile.R first")
+		}
+		if (!("term" %in% names(lexicon))) {
+			stop("pa_lexicon_hits: the lexicon has no term column")
+		}
+
+	#	Early return
+		if (nrow(lexicon) == 0L) {
+			return(data.table(node_id = integer(0), era = integer(0),
+							  has_title = logical(0), has_text = logical(0)))
+		}
+
+	#	The Vocabulary
+		vocabulary <- unique(as.character(lexicon$term))
+
+	#	Tokenize Once per Field Set
+	#	pa_text_terms is the same tokenizer the lexicon was built with, which is
+	#	what makes the join exact rather than approximate: a bigram counted one
+	#	way on the way in and another way on the way out would silently miss.
+		titles <- pa_text_terms(meta, fields = "title", eras = eras)
+		wide   <- pa_text_terms(meta, fields = KP_TEXT_FIELDS, eras = eras)
+
+	#	Reduce to the Carriers
+		hit_title <- unique(titles[term %in% vocabulary, .(node_id, era)])
+		hit_text  <- unique(wide[term %in% vocabulary, .(node_id, era)])
+
+	#	Every Scored Article Gets a Row
+	#	An article with no lexicon term is a FALSE, not a missing row. Left as a
+	#	missing row it would drop out of the denominator and every share would be
+	#	one.
+		universe <- unique(as.data.table(meta)[
+							   is_article %in% TRUE & era %in% as.integer(eras),
+							   .(node_id, era)])
+		universe[, `:=`(has_title = node_id %in% hit_title$node_id,
+						has_text  = node_id %in% hit_text$node_id)]
+
+	#	Assembling Result
+		setattr(universe, "n_terms", length(vocabulary))
+		return(universe)
+}
+
+#' @title pa_community_profile
+#' @description Summarize each community in one row.
+#'
+#' @param members Output of pa_community_members.
+#' @param hits Output of pa_lexicon_hits, or NULL to omit the lexicon shares.
+#' @param cog_categories Research areas counted as cognitive. Default CV_VENUE_CATEGORIES.
+#' @param min_source Fewest source records a share is reported for. Default CV_MIN_SOURCE.
+#'
+#' @details
+#' Counts first, shares second. The counts -- vertices, articles, distinct authors,
+#' distinct venues -- are what they say. The shares are over the community's
+#' source records, and are NA rather than a number below min_source, because a
+#' share of two is a coin toss reported to three decimal places.
+#'
+#' cog_venue and cog_subject are the two measures S8.4 keeps apart. cog_venue is
+#' provenance: the share of the community's source records published in journals
+#' Web of Science files under Psychology or Behavioral Sciences. cog_subject is
+#' subject matter: the share whose own titles carry a frozen-lexicon term. A
+#' cognitive paper in a pharmacology journal scores on the second and not the
+#' first, and that disagreement is a finding about the community rather than an
+#' error to resolve.
+#'
+#' @return A data.table, one row per community.
+#'
+#' @examples
+#' profile <- pa_community_profile(members, hits)
+#'
+#' @export
+pa_community_profile <- function(members, hits = NULL,
+								 cog_categories = CV_VENUE_CATEGORIES,
+								 min_source = CV_MIN_SOURCE) {
+	#	"""
+	#	Args:
+	#		members: output of pa_community_members
+	#		hits: output of pa_lexicon_hits, or NULL
+	#		cog_categories: research areas counted as cognitive
+	#		min_source: fewest source records a share is reported for
+	#	Returns:
+	#		data.table, one row per community
+	#	"""
+
+	#	Validation
+		dt <- as.data.table(members)
+		need <- c("community", "era", "node_id", "is_article")
+		missing <- setdiff(need, names(dt))
+		if (length(missing) > 0L) {
+			stop("pa_community_profile: members is missing: ",
+				 paste(missing, collapse = ", "))
+		}
+
+	#	Early return
+		if (nrow(dt) == 0L) {
+			return(data.table(era = integer(0), community = integer(0)))
+		}
+
+	#	Counts
+	#	Grouped by era as well as community. A community id is only unique
+	#	within an era -- each era's partition numbers its communities from one --
+	#	so grouping by community alone would fold era 16's community 3 into era
+	#	17's. The driver passes one era at a time and would not notice; a caller
+	#	who binds two eras first would get a table that looks right and is not.
+		dt$era <- as.integer(dt$era)
+		out <- dt[, .(n_nodes = .N,
+					  n_source = sum(is_article %in% TRUE)),
+				  by = .(era, community)]
+		key <- c("era", "community")
+
+	#	Distinct Authors and Venues
+		for (spec in list(c("authors", "n_authors"),
+						  c("journal", "n_venues"),
+						  c("research_areas", "n_areas"))) {
+			sets <- rbindlist(lapply(split(dt, by = "era"), function(block) {
+				one <- pa_community_sets(block, spec[1L])
+				one$era <- as.integer(block$era[1L])
+				return(one)
+			}), fill = TRUE)
+			counts <- if (nrow(sets) == 0L) {
+						  data.table(era = integer(0), community = integer(0),
+									 n = integer(0))
+					  } else {
+						  sets[, .(n = .N), by = .(era, community)]
+					  }
+			out[counts, on = key, (spec[2L]) := i.n]
+			out[is.na(get(spec[2L])), (spec[2L]) := 0L]
+		}
+
+	#	Median Year
+		if ("year" %in% names(dt)) {
+			years <- dt[is_article %in% TRUE,
+						.(median_year = as.numeric(stats::median(
+							suppressWarnings(as.integer(year)), na.rm = TRUE))),
+						by = .(era, community)]
+			out[years, on = key, median_year := i.median_year]
+		} else {
+			out[, median_year := NA_real_]
+		}
+
+	#	The Category Share
+	#	Matched on the split value rather than by searching the joined string,
+	#	because "Psychology" is a substring of "Psychology, Experimental" and a
+	#	string search would count the narrow area as the broad one.
+		areas <- pa_cv_split(dt$node_id[dt$is_article %in% TRUE],
+							 dt$research_areas[dt$is_article %in% TRUE])
+		wanted <- pa_cv_norm(cog_categories)
+		cog_ids <- unique(areas$node_id[pa_cv_norm(areas$value) %in% wanted])
+		cog <- dt[is_article %in% TRUE,
+				  .(n_cog_venue = sum(node_id %in% cog_ids)),
+				  by = .(era, community)]
+		out[cog, on = key, n_cog_venue := i.n_cog_venue]
+		out[is.na(n_cog_venue), n_cog_venue := 0L]
+
+	#	The Lexicon Shares
+		if (!is.null(hits) && nrow(hits) > 0L) {
+			h <- as.data.table(hits)[, .(node_id, has_title, has_text)]
+			j <- h[dt[is_article %in% TRUE, .(node_id, era, community)],
+				   on = "node_id"]
+			lex <- j[, .(n_scored = sum(!is.na(has_title)),
+						 n_core_title = sum(has_title %in% TRUE),
+						 n_core_text  = sum(has_text %in% TRUE)),
+					 by = .(era, community)]
+			out[lex, on = key, `:=`(n_scored = i.n_scored,
+									n_core_title = i.n_core_title,
+									n_core_text = i.n_core_text)]
+		}
+		for (col in c("n_scored", "n_core_title", "n_core_text")) {
+			if (!(col %in% names(out))) out[, (col) := NA_integer_]
+			out[is.na(get(col)), (col) := 0L]
+		}
+
+	#	Shares, Suppressed Where the Denominator Is Too Small
+		small <- out$n_source < as.integer(min_source)
+		share <- function(numerator, denominator) {
+			value <- ifelse(denominator > 0L, numerator / denominator, NA_real_)
+			value[small] <- NA_real_
+			return(round(value, 4))
+		}
+		out[, `:=`(cog_venue        = share(n_cog_venue, n_source),
+				   cog_subject      = share(n_core_title, n_scored),
+				   cog_subject_text = share(n_core_text, n_scored))]
+
+	#	Assembling Result
+		setcolorder(out, c("era", "community", "n_nodes", "n_source"))
+		setorder(out, era, community)
+		return(out)
+}
+
+#################################
+#   COMPARING TWO COMMUNITIES   #
+#################################
+
+#' @title pa_set_incidence
+#' @description Build a sparse community-by-value incidence matrix.
+#'
+#' @param sets Output of pa_community_sets.
+#' @param communities Community ids on the rows, in order.
+#' @param vocabulary Values on the columns, in order.
+#'
+#' @return A sparse binary Matrix, length(communities) x length(vocabulary).
+#'
+#' @examples
+#' inc <- pa_set_incidence(authors, sort(unique(authors$community)),
+#'                         unique(authors$value))
+#'
+#' @export
+pa_set_incidence <- function(sets, communities, vocabulary) {
+	#	"""
+	#	Args:
+	#		sets: output of pa_community_sets
+	#		communities: community ids on the rows
+	#		vocabulary: values on the columns
+	#	Returns:
+	#		sparse binary Matrix
+	#	"""
+
+	#	Scope
+		dt <- as.data.table(sets)[community %in% as.integer(communities) &
+								  value %in% vocabulary]
+
+	#	Early return
+		if (nrow(dt) == 0L) {
+			return(Matrix::sparseMatrix(i = integer(0), j = integer(0), x = numeric(0),
+										dims = c(length(communities),
+												 length(vocabulary))))
+		}
+
+	#	Assembling Result
+		return(Matrix::sparseMatrix(
+			i = match(dt$community, communities),
+			j = match(dt$value, vocabulary),
+			x = 1,
+			dims = c(length(communities), length(vocabulary))))
+}
+
+#' @title pa_pair_overlap
+#' @description Overlap between every era-t community and every era-(t-1) community.
+#'
+#' @param sets_i Output of pa_community_sets for the era-t communities.
+#' @param sets_j Output of pa_community_sets for the era-(t-1) communities.
+#' @param communities_i Community ids on the i side, or NULL for all present.
+#' @param communities_j Community ids on the j side, or NULL for all present.
+#'
+#' @details
+#' Returned sparse, and that is the whole reason this is a function rather than a
+#' column on a stored table. The grid for the last era pair is 13,855 x 1,105,
+#' which is 15.3 million ordered pairs; the pairs that share an author are a small
+#' fraction of that. Only the nonzero rows come back and the caller fills the rest
+#' with zero, which is what they are -- two communities with no author in common
+#' have an author overlap of exactly nothing, not a missing value.
+#'
+#' The denominator is each community's full set size, not the size of its
+#' intersection with the shared vocabulary. An author who appears on one side only
+#' still counts against the union, which is what makes this a Jaccard coefficient
+#' rather than a conditional share.
+#'
+#' @return A data.table with community_i, community_j, n_shared and jaccard.
+#'
+#' @examples
+#' overlap <- pa_pair_overlap(authors_t, authors_prior)
+#'
+#' @export
+pa_pair_overlap <- function(sets_i, sets_j, communities_i = NULL,
+							communities_j = NULL) {
+	#	"""
+	#	Args:
+	#		sets_i: community sets for era t
+	#		sets_j: community sets for era t-1
+	#		communities_i: ids on the i side, or NULL
+	#		communities_j: ids on the j side, or NULL
+	#	Returns:
+	#		data.table(community_i, community_j, n_shared, jaccard)
+	#	"""
+
+	#	Validation
+		si <- as.data.table(sets_i)
+		sj <- as.data.table(sets_j)
+		for (s in list(si, sj)) {
+			missing <- setdiff(c("community", "value"), names(s))
+			if (length(missing) > 0L) {
+				stop("pa_pair_overlap: a set table is missing: ",
+					 paste(missing, collapse = ", "))
+			}
+		}
+
+	#	Rows and Columns
+		rows <- if (is.null(communities_i)) sort(unique(si$community)) else
+					as.integer(communities_i)
+		cols <- if (is.null(communities_j)) sort(unique(sj$community)) else
+					as.integer(communities_j)
+
+	#	Early return
+		empty <- data.table(community_i = integer(0), community_j = integer(0),
+							n_shared = integer(0), jaccard = numeric(0))
+		if (length(rows) == 0L || length(cols) == 0L) return(empty)
+
+	#	Set Sizes, Over Every Value
+	#	Taken before the vocabulary is narrowed, because the union is over both
+	#	whole sets.
+		size_i <- si[, .(n = uniqueN(value)), by = community]
+		size_j <- sj[, .(n = uniqueN(value)), by = community]
+		n_i <- size_i$n[match(rows, size_i$community)]
+		n_j <- size_j$n[match(cols, size_j$community)]
+		n_i[is.na(n_i)] <- 0L
+		n_j[is.na(n_j)] <- 0L
+
+	#	Only Shared Values Can Produce an Intersection
+		vocabulary <- intersect(unique(si$value), unique(sj$value))
+		if (length(vocabulary) == 0L) return(empty)
+
+	#	The Intersection, in One Product
+		inc_i <- pa_set_incidence(si, rows, vocabulary)
+		inc_j <- pa_set_incidence(sj, cols, vocabulary)
+		shared <- inc_i %*% Matrix::t(inc_j)
+
+	#	The Nonzero Cells
+		triplet <- as(shared, "TsparseMatrix")
+		if (length(triplet@x) == 0L) return(empty)
+		out <- data.table(community_i = rows[triplet@i + 1L],
+						  community_j = cols[triplet@j + 1L],
+						  n_shared = as.integer(triplet@x))
+		out <- out[n_shared > 0L]
+
+	#	Normalize
+		union_size <- n_i[match(out$community_i, rows)] +
+					  n_j[match(out$community_j, cols)] - out$n_shared
+		out$jaccard <- round(ifelse(union_size > 0,
+									out$n_shared / union_size, NA_real_), 6)
+
+	#	Assembling Result
+		setorder(out, community_i, community_j)
+		return(out)
+}
+
+#' @title pa_pair_distance
+#' @description Hellinger distance between every pair of research-area profiles.
+#'
+#' @param sets_i Research-area sets for the era-t communities.
+#' @param sets_j Research-area sets for the era-(t-1) communities.
+#' @param communities_i Community ids on the i side, or NULL for all present.
+#' @param communities_j Community ids on the j side, or NULL for all present.
+#' @param chunk Communities per block on the i side. Default 2000.
+#'
+#' @details
+#' A community's research-area profile is a distribution: the share of its
+#' articles sitting in each area. Two profiles are compared by the Bhattacharyya
+#' coefficient, the sum over areas of the geometric mean of the two shares, which
+#' is one for identical profiles and zero for profiles with no area in common.
+#' Hellinger distance is the square root of one minus that, so it runs from zero
+#' to one in the direction the covariate's name implies -- larger means further
+#' apart.
+#'
+#' Hellinger rather than cosine because these are distributions rather than
+#' directions: it is bounded, it is a metric, and it does not reward a community
+#' for being concentrated. Rows with no shared area are omitted, where the
+#' coefficient is zero and the distance is one; the caller fills them.
+#'
+#' The product is taken in blocks because the dense result for the last era pair
+#' would be 15.3 million doubles, and the sparse one usually is not -- most
+#' community pairs share at least one broad area.
+#'
+#' @return A data.table with community_i, community_j, bhattacharyya and hellinger.
+#'
+#' @examples
+#' distance <- pa_pair_distance(areas_t, areas_prior)
+#'
+#' @export
+pa_pair_distance <- function(sets_i, sets_j, communities_i = NULL,
+							 communities_j = NULL, chunk = 2000L) {
+	#	"""
+	#	Args:
+	#		sets_i: research-area sets for era t
+	#		sets_j: research-area sets for era t-1
+	#		communities_i: ids on the i side, or NULL
+	#		communities_j: ids on the j side, or NULL
+	#		chunk: communities per block on the i side
+	#	Returns:
+	#		data.table(community_i, community_j, bhattacharyya, hellinger)
+	#	"""
+
+	#	Validation
+		si <- as.data.table(sets_i)
+		sj <- as.data.table(sets_j)
+		if (!all(c("community", "value", "n_source") %in% names(si)) ||
+			!all(c("community", "value", "n_source") %in% names(sj))) {
+			stop("pa_pair_distance: the set tables need community, value and ",
+				 "n_source")
+		}
+
+	#	Rows and Columns
+		rows <- if (is.null(communities_i)) sort(unique(si$community)) else
+					as.integer(communities_i)
+		cols <- if (is.null(communities_j)) sort(unique(sj$community)) else
+					as.integer(communities_j)
+		empty <- data.table(community_i = integer(0), community_j = integer(0),
+							bhattacharyya = numeric(0), hellinger = numeric(0))
+		if (length(rows) == 0L || length(cols) == 0L) return(empty)
+
+	#	Only Shared Areas Can Produce a Coefficient
+		vocabulary <- intersect(unique(si$value), unique(sj$value))
+		if (length(vocabulary) == 0L) return(empty)
+
+	#	Root-Share Matrices
+	#	The shares are normalized over the community's whole profile and only then
+	#	narrowed to the shared vocabulary, so that a community whose areas are
+	#	mostly unshared gets the low coefficient it has earned.
+		root <- function(sets, keep, vocab) {
+			dt <- as.data.table(sets)[community %in% keep]
+			dt[, share := n_source / sum(n_source), by = community]
+			dt <- dt[value %in% vocab]
+			if (nrow(dt) == 0L) {
+				return(Matrix::sparseMatrix(i = integer(0), j = integer(0),
+											x = numeric(0),
+											dims = c(length(keep), length(vocab))))
+			}
+			return(Matrix::sparseMatrix(i = match(dt$community, keep),
+										j = match(dt$value, vocab),
+										x = sqrt(dt$share),
+										dims = c(length(keep), length(vocab))))
+		}
+		root_i <- root(si, rows, vocabulary)
+		root_j <- root(sj, cols, vocabulary)
+
+	#	Iterating Over Blocks of the i Side
+		blocks <- split(seq_along(rows),
+						ceiling(seq_along(rows) / as.integer(chunk)))
+		collected <- vector("list", length(blocks))
+		for (b in seq_along(blocks)) {
+			idx <- blocks[[b]]
+			product <- root_i[idx, , drop = FALSE] %*% Matrix::t(root_j)
+			triplet <- as(product, "TsparseMatrix")
+			if (length(triplet@x) == 0L) next
+			collected[[b]] <- data.table(
+				community_i = rows[idx][triplet@i + 1L],
+				community_j = cols[triplet@j + 1L],
+				bhattacharyya = as.numeric(triplet@x))
+		}
+
+	#	Early return
+		out <- rbindlist(collected)
+		if (nrow(out) == 0L) return(empty)
+
+	#	Normalize
+	#	Clamped before the square root: a coefficient a hair above one is floating
+	#	point, and sqrt of a small negative is NaN.
+		out$bhattacharyya <- round(pmin(1, pmax(0, out$bhattacharyya)), 6)
+		out$hellinger <- round(sqrt(1 - out$bhattacharyya), 6)
+
+	#	Assembling Result
+		setorder(out, community_i, community_j)
+		return(out)
+}
+
+##############################
+#   DRAWING THE FOUR-PLOTS   #
+##############################
+
+#' @title pa_four_plot
+#' @description Draw the NIST four-plot for one variable.
+#'
+#' @param x Numeric vector, in the order the run sequence should read.
+#' @param var_name Label printed in each panel title.
+#' @param file Destination png.
+#' @param width Pixels. Default CV_PLOT_WIDTH.
+#' @param height Pixels. Default CV_PLOT_HEIGHT.
+#'
+#' @details
+#' Run sequence, lag, histogram, normal QQ. The four panels check the four
+#' assumptions behind treating a column as a sample from one distribution: that
+#' its level is fixed, that its values are independent, that they come from one
+#' distribution, and that the distribution is the one assumed. A design-matrix
+#' column that fails the first panel has a trend in it, which for a column
+#' ordered by pair_index means the covariate moves with era and will be partly
+#' collinear with the time trend.
+#'
+#' The panels are util$four_plot's panels from R_Plot_Utilities_2Oct2020.R. What
+#' is different is the plumbing: the file is named by the caller rather than
+#' written to a fixed p_1.png in the working directory, there is no round trip
+#' through magick and ggplotify, and nothing is assigned into the global
+#' environment. The path comes back instead.
+#'
+#' @return The path written, or NA_character_ if there was too little to draw.
+#'
+#' @examples
+#' pa_four_plot(profiles$cog_subject, "cog_subject", "cog_subject_4plot.png")
+#'
+#' @export
+pa_four_plot <- function(x, var_name, file, width = CV_PLOT_WIDTH,
+						 height = CV_PLOT_HEIGHT) {
+	#	"""
+	#	Args:
+	#		x: numeric vector in run-sequence order
+	#		var_name: label for the panel titles
+	#		file: destination png
+	#		width, height: pixels
+	#	Returns:
+	#		the path written, or NA_character_
+	#	"""
+
+	#	Validation
+		raw <- suppressWarnings(as.numeric(x))
+		keep <- is.finite(raw)
+		var <- raw[keep]
+		if (length(var) < 8L || length(unique(var)) < 2L) {
+			return(NA_character_)
+		}
+
+	#	Canvas
+		dir.create(dirname(file), recursive = TRUE, showWarnings = FALSE)
+		grDevices::png(file, width = width, height = height)
+		on.exit(grDevices::dev.off(), add = TRUE)
+		graphics::layout(mat = matrix(c(1, 3, 2, 4), nrow = 2, ncol = 2),
+						 heights = c(2, 2), widths = c(2, 2))
+
+	#	Axes, on the Original Index
+	#	The run sequence is drawn against each value's position in the column it
+	#	came from, not against its position among the values that survived.
+	#	Covariates differ in how many communities they are defined for -- cog_subject
+	#	is suppressed below the source-record floor and is NA for 3,060 of 3,557
+	#	-- so renumbering the survivors 1..n gave every covariate a different
+	#	x-axis and slid the era blocks out of register between panels. Against the
+	#	original index every plot in a set shares one axis and the gaps sit where
+	#	the covariate is undefined.
+		x_axis <- pretty(seq_along(raw))
+		y_axis <- pretty(var)
+
+	#	Lag Pairs Must Be Genuinely Adjacent
+	#	Taken from the original series and kept only where both members are
+	#	present. Lagging the compacted series would pair values separated by a run
+	#	of missing ones and plot them as consecutive.
+		y     <- raw[seq_len(length(raw) - 1L)]
+		y_lag <- raw[2:length(raw)]
+		adjacent <- is.finite(y) & is.finite(y_lag)
+		y <- y[adjacent]
+		y_lag <- y_lag[adjacent]
+
+	#	Run Sequence Plot
+		graphics::par(mar = c(4, 7.5, 2, 5), family = CV_PLOT_FAMILY)
+		graphics::plot(0, type = "n", xlim = range(x_axis), ylim = range(y_axis),
+					   xlab = " ", ylab = " ", cex.axis = 1.3, las = 1,
+					   family = CV_PLOT_FAMILY, bty = "n")
+		graphics::grid(lwd = 2)
+		graphics::lines(seq_along(raw), raw, col = CV_PLOT_COLOR)
+		graphics::title(paste("Run Sequence Plot", var_name),
+						family = CV_PLOT_FAMILY, cex.main = 1.9, line = 0.75)
+
+	#	Lag Plot
+		graphics::par(mar = c(4, 7.5, 2, 5), family = CV_PLOT_FAMILY)
+		graphics::plot(0, type = "n", xlim = range(y_axis), ylim = range(y_axis),
+					   xlab = " ", ylab = " ", cex.axis = 1.3, las = 1,
+					   family = CV_PLOT_FAMILY, bty = "n")
+		graphics::grid(lwd = 2)
+		graphics::points(y, y_lag, pch = 4, col = CV_PLOT_COLOR)
+		graphics::title(paste("Lag Plot", var_name), family = CV_PLOT_FAMILY,
+						cex.main = 1.9, line = 0.75)
+
+	#	Histogram
+		graphics::hist(var, main = paste("Histogram of", var_name),
+					   border = CV_PLOT_COLOR, cex.axis = 1.3, cex.main = 1.9,
+					   las = 1, xlab = " ", ylab = " ")
+
+	#	Normal QQ Plot
+		p <- stats::ppoints(length(var))
+		q <- stats::quantile(var, probs = p)
+		stats::qqplot(x = q, y = stats::qnorm(p),
+					  main = paste("Normal QQ Plot", var_name), cex.main = 1.9,
+					  plot.it = TRUE, pch = 21, col = CV_PLOT_COLOR, bg = "grey",
+					  bty = "n", xlab = " ", ylab = " ", cex.axis = 1.3, las = 1,
+					  axes = TRUE)
+		graphics::grid(lwd = 2)
+
+	#	The Reference Line Needs the Quartiles to Differ
+	#	qqline fits through the first and third quartiles, and with datax = TRUE
+	#	the slope is diff(x) / diff(y) -- so a column whose quartiles coincide
+	#	divides by zero and abline rejects a non-finite slope. That is not a
+	#	rare case here: cog_subject is zero for most communities, because most
+	#	communities carry no lexicon term in any title, and a column where more
+	#	than half the rows share one value has no interquartile spread at all.
+	#	The points still say what they say. Only the line is undefined, so only
+	#	the line is dropped, and the panel says which it is rather than looking
+	#	like a plot someone forgot to finish.
+		spread <- diff(as.numeric(stats::quantile(var, c(0.25, 0.75))))
+		if (is.finite(spread) && spread > 0) {
+			stats::qqline(q, distribution = stats::qnorm, datax = TRUE,
+						  col = "black", lty = 2, lwd = 2)
+		} else {
+			graphics::mtext("quartiles coincide; reference line undefined",
+							side = 1, line = 2.4, cex = 0.8,
+							family = CV_PLOT_FAMILY)
+		}
+
+	#	Assembling Result
+		return(file)
+}
+
+#' @title pa_covariate_plots
+#' @description Draw a four-plot for every community-level covariate.
+#'
+#' @param profiles Output of pa_community_profile, bound over eras.
+#' @param output_dir Destination directory.
+#' @param columns Columns to draw, or NULL for the numeric covariates.
+#'
+#' @details
+#' Ordered by era and then by community, so the run-sequence panel reads as seven
+#' blocks and a covariate that shifts between eras shows a step rather than a
+#' trend. That is the ordering that matters at this stage; once the design matrix
+#' exists its columns are drawn in pair_index order instead, which is the ordering
+#' the time trend is fitted against.
+#'
+#' @return A character vector of the files written.
+#'
+#' @examples
+#' pa_covariate_plots(profiles, "plots")
+#'
+#' @export
+pa_covariate_plots <- function(profiles, output_dir, columns = NULL) {
+	#	"""
+	#	Args:
+	#		profiles: community profiles bound over eras
+	#		output_dir: destination directory
+	#		columns: columns to draw, or NULL for the numeric covariates
+	#	Returns:
+	#		character vector of files written
+	#	"""
+
+	#	Scope
+		dt <- as.data.table(profiles)
+		if (is.null(columns)) {
+			columns <- c("n_nodes", "n_source", "n_authors", "n_venues",
+						 "n_areas", "median_year", "cog_venue", "cog_subject",
+						 "cog_subject_text")
+		}
+		columns <- intersect(columns, names(dt))
+		if ("era" %in% names(dt)) setorder(dt, era, community)
+
+	#	Iterating Over Columns
+		written <- character(0)
+		for (col in columns) {
+			file <- file.path(output_dir, paste0(col, "_4plot.png"))
+			path <- pa_four_plot(dt[[col]], col, file)
+			if (!is.na(path)) written <- c(written, path)
+		}
+
+	#	Assembling Result
+		return(written)
+}
+
+####################################
+#   EXECUTING THE COVARIATE LANE   #
+####################################
+
+#' @title pa_run_covariates
+#' @description Build the community-level covariates for every specification and era.
+#'
+#' @param specs A data.frame of specifications, or NULL for pa_cv_specs().
+#' @param eras Integer eras, or NULL for PA_ANALYTIC_ERAS.
+#' @param meta_file Path to the node metadata. Default CV_META_FILE.
+#' @param lexicon_file Path to the frozen lexicon. Default CV_LEXICON_FILE.
+#' @param era_dir Directory holding the node and edge lists. Default CV_ERA_DIR.
+#' @param output_dir Destination root. Default CV_OUT_DIR.
+#' @param verbose Report progress. Default TRUE.
+#'
+#' @details
+#' One pass per specification, one profile table per era, and the set tables
+#' written beside them. Nothing pair-level is computed here; see pa_pair_overlap
+#' and pa_pair_distance, which PathA_ModelI.R calls against these outputs while
+#' the design matrix is in memory.
+#'
+#' The lexicon is optional. Without it the structural covariates are still built
+#' and the cog_ columns come back NA, which is the right behaviour for a rerun
+#' before the keyword lane has been run.
+#'
+#' @return Invisibly, a list with profiles, summary, tests and paths.
+#'
+#' @examples
+#' res <- pa_run_covariates()
+#' res$summary
+#'
+#' @export
+pa_run_covariates <- function(specs = NULL, eras = NULL,
+							  meta_file = CV_META_FILE,
+							  lexicon_file = CV_LEXICON_FILE,
+							  era_dir = CV_ERA_DIR, output_dir = CV_OUT_DIR,
+							  verbose = TRUE) {
+	#	"""
+	#	Args:
+	#		specs: specification table, or NULL for pa_cv_specs()
+	#		eras: integer eras, or NULL for PA_ANALYTIC_ERAS
+	#		meta_file: node metadata path
+	#		lexicon_file: frozen lexicon path
+	#		era_dir: directory holding the node and edge lists
+	#		output_dir: destination root
+	#		verbose: report progress
+	#	Returns:
+	#		invisible list(profiles, summary, tests, paths)
+	#	"""
+
+	#	Resolve the Deferred Defaults
+		if (is.null(specs)) specs <- pa_cv_specs()
+		if (is.null(eras))  eras  <- PA_ANALYTIC_ERAS
+
+	#	Validation
+		need <- c("alpha", "anchor", "anchor_era", "grid")
+		missing <- setdiff(need, names(specs))
+		if (length(missing) > 0L) {
+			stop("pa_run_covariates: specs is missing: ",
+				 paste(missing, collapse = ", "))
+		}
+		for (fn in c("pa_build_era_maps", "pa_spec_tag")) {
+			if (!exists(fn, mode = "function")) {
+				stop("pa_run_covariates: ", fn, "() not found; source ",
+					 "PathA_TieLayer.R first")
+			}
+		}
+
+	#	Load the Node List
+	#	By name, into its own environment, and coerced -- the same three details
+	#	pa_run_tie_layer's loader turns on, and for the same reasons.
+		nf <- file.path(era_dir, "pa_node_list.Rda")
+		if (!file.exists(nf)) stop("pa_run_covariates: file not found: ", nf)
+		env <- new.env(parent = emptyenv())
+		load(nf, envir = env)
+		node_list <- as.data.frame(get("pa_nodes", envir = env, inherits = FALSE))
+
+	#	Load the Metadata
+		if (!file.exists(meta_file)) {
+			stop("pa_run_covariates: node metadata not found at ", meta_file,
+				 ". Run pa_run_node_metadata() first.")
+		}
+		menv <- new.env(parent = emptyenv())
+		found <- load(meta_file, envir = menv)
+		meta <- as.data.table(get(found[1], envir = menv, inherits = FALSE))
+		if (verbose) {
+			cat("Metadata: ", nrow(meta), " nodes, ", ncol(meta), " columns\n",
+				sep = "")
+		}
+
+	#	Load the Lexicon
+		lexicon <- NULL
+		if (file.exists(lexicon_file)) {
+			lexicon <- as.data.frame(readr::read_csv(lexicon_file,
+													 show_col_types = FALSE,
+													 progress = FALSE))
+			if (verbose) {
+				cat("Lexicon: ", nrow(lexicon), " term(s)",
+					if ("is_anchor" %in% names(lexicon))
+						sprintf(", %d anchor(s)", sum(lexicon$is_anchor)) else "",
+					"\n", sep = "")
+			}
+		} else if (verbose) {
+			cat("Lexicon not found at ", lexicon_file,
+				"; the cog_ columns will be NA\n", sep = "")
+		}
+
+	#	Score the Articles Once
+	#	The lexicon flags are a property of an article, not of a community, so
+	#	they are computed before the specification loop and reused. Tokenizing
+	#	590,000 records is the expensive step in this lane and doing it once per
+	#	specification would be doing it for nothing.
+		hits <- NULL
+		if (!is.null(lexicon) && nrow(lexicon) > 0L) {
+			hits <- pa_lexicon_hits(meta, lexicon, eras = eras)
+			if (verbose) {
+				cat("Lexicon hits: ", sum(hits$has_title), " of ", nrow(hits),
+					" article(s) carry a lexicon term in the title, ",
+					sum(hits$has_text), " in any field\n", sep = "")
+			}
+		}
+
+	#	Collect
+		profiles <- list()
+		rows <- list()
+		paths <- character(0)
+
+	#	Iterating Over Specifications
+		for (s in seq_len(nrow(specs))) {
+			tag <- pa_spec_tag(specs$alpha[s], specs$anchor[s], specs$anchor_era[s])
+			if (verbose) cat("\nSpecification ", tag, "\n", sep = "")
+
+			#	Era Maps for This Specification
+				maps <- pa_build_era_maps(node_list, eras = eras,
+										  grid = specs$grid[s],
+										  alpha = specs$alpha[s],
+										  anchor = specs$anchor[s],
+										  anchor_era = specs$anchor_era[s],
+										  verbose = verbose)
+
+			#	Destination
+				spec_dir <- file.path(output_dir, tag)
+				dir.create(spec_dir, recursive = TRUE, showWarnings = FALSE)
+
+			#	Iterating Over Eras
+				spec_profiles <- list()
+				sets <- list(authors = list(), venues = list(), areas = list())
+				for (e in eras) {
+					members <- pa_community_members(maps[[as.character(e)]], meta)
+					profile <- pa_community_profile(members, hits)
+					profile$spec_tag <- tag
+					spec_profiles[[length(spec_profiles) + 1L]] <- profile
+
+					for (spec in list(c("authors", "authors"),
+									  c("journal", "venues"),
+									  c("research_areas", "areas"))) {
+						one <- pa_community_sets(members, spec[1L])
+						one$era <- as.integer(e)
+						sets[[spec[2L]]][[length(sets[[spec[2L]]]) + 1L]] <- one
+					}
+
+					if (verbose) {
+						cat("  era ", e, ": ", nrow(profile), " communities, ",
+							sum(profile$n_source), " source record(s)\n", sep = "")
+					}
+				}
+
+			#	Write
+				spec_profile <- rbindlist(spec_profiles, fill = TRUE)
+				pf <- file.path(spec_dir, "community_profiles.csv")
+				readr::write_csv(spec_profile, pf)
+				paths <- c(paths, pf)
+				for (field in names(sets)) {
+					bound <- rbindlist(sets[[field]], fill = TRUE)
+					setcolorder(bound, c("era", "community"))
+					sf <- file.path(spec_dir, paste0("community_", field, ".rds"))
+					saveRDS(bound, sf, compress = FALSE)
+					paths <- c(paths, sf)
+				}
+				profiles[[length(profiles) + 1L]] <- spec_profile
+
+			#	Draw
+				if (isTRUE(CV_WRITE_PLOTS)) {
+					drawn <- pa_covariate_plots(spec_profile,
+												file.path(spec_dir, "plots"))
+					paths <- c(paths, drawn)
+					if (verbose) {
+						cat("  ", length(drawn), " four-plot(s) written\n",
+							sep = "")
+					}
+				}
+
+			#	One Summary Row per Era
+				for (e in eras) {
+					block <- spec_profile[era == as.integer(e)]
+					rows[[length(rows) + 1L]] <- data.frame(
+						spec_tag       = tag,
+						era            = as.integer(e),
+						n_communities  = nrow(block),
+						n_nodes        = sum(block$n_nodes),
+						n_source     = sum(block$n_source),
+						median_size    = as.numeric(stats::median(block$n_nodes)),
+						max_size       = max(block$n_nodes),
+						n_profiled     = sum(!is.na(block$cog_venue)),
+						mean_cog_subject = round(mean(block$cog_venue,
+													  na.rm = TRUE), 4),
+						mean_cog_subject = round(mean(block$cog_subject,
+													na.rm = TRUE), 4),
+						mean_cog_subject_text = round(mean(block$cog_subject_text,
+														na.rm = TRUE), 4),
+						stringsAsFactors = FALSE)
+				}
+		}
+
+	#	Bind and Write
+		all_profiles <- rbindlist(profiles, fill = TRUE)
+		summary <- do.call(rbind, rows)
+		sf <- file.path(output_dir, "covariate_summary.csv")
+		readr::write_csv(summary, sf)
+		paths <- c(paths, sf)
+
+	#	Check
+		tests <- pa_run_covariate_tests(all_profiles, node_list, meta,
+										hits = hits, output_dir = output_dir)
+		paths <- c(paths, file.path(output_dir, "covariate_tests.csv"))
+
+	#	Report
+		if (isTRUE(verbose)) {
+			cat("\nCommunity covariates by era\n")
+			print(summary, row.names = FALSE)
+			cat("\n")
+			print(tests[c("check", "result", "detail")], row.names = FALSE)
+			n_fail <- sum(tests$result == "FAIL")
+			n_skip <- sum(tests$result == "SKIP")
+			cat("\n", sum(tests$result == "PASS"), " of ",
+				sum(tests$result != "SKIP"), " check(s) passed",
+				if (n_fail > 0L) sprintf(", %d FAILED", n_fail) else "",
+				if (n_skip > 0L) sprintf(", %d reported", n_skip) else "",
+				"\n", sep = "")
+		}
+
+	#	Assembling Result
+		return(invisible(list(profiles = all_profiles, summary = summary,
+							  tests = tests, paths = paths, hits = hits,
+							  lexicon = lexicon)))
+}
+
+#' @title pa_run_covariate_tests
+#' @description Verify the covariates against quantities they did not use.
+#'
+#' @param profiles The bound community profiles.
+#' @param node_list The rebuilt citation node list.
+#' @param meta The node metadata table.
+#' @param hits Output of pa_lexicon_hits, or NULL.
+#' @param output_dir Destination for the test table, or NULL to skip writing.
+#'
+#' @details
+#' The checks that would catch a silent error rather than a loud one. A share
+#' outside [0, 1] means a denominator was wrong. More articles than vertices
+#' means the article flag was read from the wrong table. A community appearing
+#' twice means an era column was dropped somewhere in the bind. And the overlap
+#' functions are checked against a case whose answer is known without computing
+#' it: a community's author set against itself is a Jaccard coefficient of one,
+#' and its area profile against itself is a Hellinger distance of zero.
+#'
+#' @return A data.frame with check, result and detail.
+#'
+#' @examples
+#' tests <- pa_run_covariate_tests(profiles, node_list, meta)
+#'
+#' @export
+pa_run_covariate_tests <- function(profiles, node_list, meta, hits = NULL,
+								   output_dir = CV_OUT_DIR) {
+	#	"""
+	#	Args:
+	#		profiles: the bound community profiles
+	#		node_list: rebuilt citation node list
+	#		meta: the node metadata table
+	#		hits: output of pa_lexicon_hits, or NULL
+	#		output_dir: destination, or NULL to skip writing
+	#	Returns:
+	#		data.frame(check, result, detail)
+	#	"""
+
+	#	Collect
+		rows <- list()
+		record <- function(check, result, detail) {
+			rows[[length(rows) + 1L]] <<- data.frame(
+				check = check, result = result, detail = detail,
+				stringsAsFactors = FALSE)
+		}
+		dt <- as.data.table(profiles)
+
+	#	Early return
+		if (nrow(dt) == 0L) {
+			record("profiles are not empty", "FAIL", "no rows")
+			return(do.call(rbind, rows))
+		}
+
+	#	Articles Cannot Outnumber Vertices
+		excess <- max(dt$n_source - dt$n_nodes)
+		record("source records never outnumber works",
+			   if (excess <= 0L) "PASS" else "FAIL",
+			   sprintf("max excess %d", excess))
+
+	#	Shares Lie in [0, 1]
+		share_cols <- intersect(c("cog_venue", "cog_subject", "cog_subject_text"),
+								names(dt))
+		values <- unlist(lapply(share_cols, function(c) dt[[c]]),
+						 use.names = FALSE)
+		values <- values[!is.na(values)]
+		ok <- length(values) == 0L || (min(values) >= 0 && max(values) <= 1)
+		record("every share lies in [0, 1]",
+			   if (length(values) == 0L) "SKIP" else if (ok) "PASS" else "FAIL",
+			   if (length(values) == 0L) "no shares computed" else
+				   sprintf("%.3f to %.3f over %d value(s)", min(values),
+						   max(values), length(values)))
+
+	#	One Row per Community per Era per Specification
+		keys <- c("spec_tag", "era", "community")
+		keys <- intersect(keys, names(dt))
+		duplicated_rows <- sum(duplicated(dt[, ..keys]))
+		record("one row per community",
+			   if (duplicated_rows == 0L) "PASS" else "FAIL",
+			   sprintf("%d duplicate key(s) over %s", duplicated_rows,
+					   paste(keys, collapse = " + ")))
+
+	#	Vertices Reconcile With the Node List
+	#	Summed over an era's communities, the profile's vertex count is the
+	#	network's vertex count, which is at most the era's node count. More than
+	#	that would mean a vertex was counted in two communities.
+		nl <- as.data.table(node_list)[, .(n_nodes_era = .N), by = era]
+		per_era <- dt[, .(n_profiled = sum(n_nodes)), by = .(spec_tag, era)]
+		per_era[nl, on = "era", n_nodes_era := i.n_nodes_era]
+		over <- per_era[!is.na(n_nodes_era) & n_profiled > n_nodes_era]
+		record("no era profiles more vertices than it has nodes",
+			   if (nrow(over) == 0L) "PASS" else "FAIL",
+			   if (nrow(over) == 0L)
+				   sprintf("max %.1f%% of era nodes",
+						   100 * max(per_era$n_profiled / per_era$n_nodes_era,
+									 na.rm = TRUE))
+			   else sprintf("era %s over by %d", over$era[1L],
+							over$n_profiled[1L] - over$n_nodes_era[1L]))
+
+	#	A Lexicon Hit in the Title Is a Hit in the Wider Field Set
+	#	Titles are one of the wider set's fields, so has_title implies has_text.
+	#	A violation would mean the two tokenizer calls disagreed.
+		if (!is.null(hits) && nrow(hits) > 0L) {
+			violations <- sum(hits$has_title & !hits$has_text)
+			record("a title hit is also a text hit",
+				   if (violations == 0L) "PASS" else "FAIL",
+				   sprintf("%d violation(s) over %d article(s)", violations,
+						   nrow(hits)))
+		} else {
+			record("a title hit is also a text hit", "SKIP",
+				   "no lexicon hits supplied")
+		}
+
+	#	A Set Against Itself
+	#	The overlap and distance functions are checked on the one case whose
+	#	answer is known in advance.
+		one_spec <- dt[spec_tag == dt$spec_tag[1L]]
+		era_used <- one_spec$era[which.max(one_spec$n_source)]
+		members_available <- all(c("node_id") %in% names(meta))
+		if (members_available && !is.na(era_used)) {
+			fake <- data.table(
+				community = rep(c(1L, 2L), each = 3L),
+				value = c("a", "b", "c", "b", "c", "d"),
+				n_source = c(3L, 2L, 1L, 4L, 1L, 1L))
+			self <- pa_pair_overlap(fake, fake)
+			diagonal <- self[community_i == community_j]
+			record("a set against itself has Jaccard one",
+				   if (nrow(diagonal) == 2L && all(abs(diagonal$jaccard - 1) < 1e-9))
+					   "PASS" else "FAIL",
+				   sprintf("%d diagonal cell(s), min %.6f", nrow(diagonal),
+						   if (nrow(diagonal) == 0L) NA_real_ else
+							   min(diagonal$jaccard)))
+
+			distance <- pa_pair_distance(fake, fake)
+			diagonal <- distance[community_i == community_j]
+			record("a profile against itself has Hellinger zero",
+				   if (nrow(diagonal) == 2L && all(diagonal$hellinger < 1e-6))
+					   "PASS" else "FAIL",
+				   sprintf("%d diagonal cell(s), max %.6f", nrow(diagonal),
+						   if (nrow(diagonal) == 0L) NA_real_ else
+							   max(diagonal$hellinger)))
+
+			#	And the Off-Diagonal Is the Hand Calculation
+			#	Communities 1 and 2 share b and c, so the intersection is 2 and
+			#	the union is 4: a Jaccard coefficient of one half.
+				off <- self[community_i == 1L & community_j == 2L]
+				record("the hand-calculated overlap is reproduced",
+					   if (nrow(off) == 1L && abs(off$jaccard - 0.5) < 1e-9)
+						   "PASS" else "FAIL",
+					   sprintf("expected 0.5, got %s",
+							   if (nrow(off) == 0L) "no row" else
+								   format(off$jaccard, digits = 6)))
+		} else {
+			for (check in c("a set against itself has Jaccard one",
+							"a profile against itself has Hellinger zero",
+							"the hand-calculated overlap is reproduced")) {
+				record(check, "SKIP", "no usable era")
+			}
+		}
+
+	#	Assembling Result
+		tests <- do.call(rbind, rows)
+		if (!is.null(output_dir)) {
+			dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+			readr::write_csv(tests, file.path(output_dir, "covariate_tests.csv"))
+		}
+		return(tests)
+}
+
+########################
+#   RUNNING THE LANE   #
+########################
+
+#	Run Under Rscript, Not Under source()
+#	sys.nframe() is 1 when this file is the script Rscript was handed and 5 or
+#	more when the pipeline sources it, so the lane runs on its own and stays
+#	quiet when it is being loaded for its functions.
+#
+#		Rscript scripts/Path_A/PathA_Covariates.R     runs the lane
+#		source("scripts/Path_A/PathA_Covariates.R")   defines the functions only
+	if (sys.nframe() <= 1L) {
+
+		cat("PathA_Covariates.R -- community covariates for Model I\n")
+		cat("======================================================\n\n")
+
+		#	Dependencies
+		#	Sourced explicitly because a script run has no pipeline to have
+		#	loaded them. Each carries its own guard, so sourcing them defines
+		#	their functions without running their lanes. The tie layer brings
+		#	TL_SPECS, pa_spec_tag and pa_build_era_maps; the keyword lane brings
+		#	pa_text_terms, which is the tokenizer the lexicon was built with and
+		#	therefore the only one that can read it back exactly.
+			PA_ROOT    <- Sys.getenv("CAFFEINE_DIR", "/workspace/caffeine_citation")
+			PA_SCRIPTS <- file.path(PA_ROOT, "scripts")
+			deps <- c("RPajekFunctions_30April2023.r",
+					  "Path_A/PathA_PajekReaders.R",
+					  "Path_A/PathA_EraResolution.R",
+					  "Path_A/PathA_TieLayer.R",
+					  "Path_A/PathA_KeywordProfile.R")
+
+			cat("Sourcing dependencies...\n")
+			for (dep in deps) {
+				path <- file.path(PA_SCRIPTS, dep)
+				if (!file.exists(path)) {
+					stop("PathA_Covariates.R: dependency not found: ", path)
+				}
+				source(path)
+				cat("  loaded ", basename(dep), "\n", sep = "")
+			}
+
+		#	Preflight
+		#	The three inputs this lane cannot run without, named before the first
+		#	era map is read rather than after. The lexicon is deliberately not
+		#	among them: without it the structural covariates still build and the
+		#	cog_ columns come back NA, which is the right behaviour for a rerun
+		#	before the keyword lane has been run.
+			cat("\nPreflight...\n")
+			preflight <- data.frame(
+				what = c("node list", "node metadata", "era grid"),
+				path = c(file.path(CV_ERA_DIR, "pa_node_list.Rda"),
+						 CV_META_FILE,
+						 CV_ERA_DIR),
+				stringsAsFactors = FALSE)
+			preflight$found <- file.exists(preflight$path)
+			print(preflight, row.names = FALSE)
+			if (!all(preflight$found)) {
+				stop("PathA_Covariates.R: missing input(s): ",
+					 paste(preflight$what[!preflight$found], collapse = ", "))
+			}
+			cat("  lexicon: ",
+				if (file.exists(CV_LEXICON_FILE)) "found" else
+					"absent, the cog_ columns will be NA", "\n", sep = "")
+			cat("  specifications: ",
+				paste(pa_cv_specs()$spec_role, collapse = ", "),
+				" (", nrow(pa_cv_specs()), " of ", nrow(TL_SPECS), ")\n",
+				sep = "")
+
+		#	Run
+			cat("\n")
+			started <- Sys.time()
+			res <- pa_run_covariates()
+
+			cat("\n======================================================\n")
+			cat("Built in ", round(as.numeric(difftime(Sys.time(), started,
+													   units = "secs")), 1),
+				"s\n", sep = "")
+			cat("Output: ", CV_OUT_DIR, "\n", sep = "")
+			if (any(res$tests$result == "FAIL")) {
+				cat("FAILED checks present\n")
+				quit(status = 1L)
+			}
+			cat("OK\n")
+	}

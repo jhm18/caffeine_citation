@@ -1,0 +1,13 @@
+field,column,found
+doi,DI,TRUE
+journal,SO,TRUE
+journal_abbrev,J9,TRUE
+title,TI,TRUE
+abstract,AB,TRUE
+keywords_author,DE,TRUE
+keywords_index,ID,TRUE
+authors,AU,TRUE
+year,PY,TRUE
+wos_categories,WC,TRUE
+research_areas,SC,TRUE
+accession,UT,TRUE

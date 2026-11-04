@@ -1,0 +1,10 @@
+check,result,detail
+one row per node survives the join,PASS,589784 against 589784
+node_id is unique,PASS,0 duplicate(s)
+author_id reaches every node,PASS,589784 of 589784 (100.0%)
+"coverage percentages lie in [0, 100]",PASS,0.0 to 100.0
+present never exceeds n,PASS,max excess 0
+"reference strings reach article nodes, reported",SKIP,56.5% to 69.0% across 7 era(s)
+"reference strings reach cited nodes, reported",SKIP,67.6% to 95.5% across 7 era(s)
+a record's position resolves to its own DOI,PASS,30042 of 30042 (100.0%)
+articles carry a journal in every analytic era,PASS,"worst era 100.0%, best 100.0%"

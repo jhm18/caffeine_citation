@@ -1,0 +1,121 @@
+term,n_carriers,neighbour,n_shared,share
+memory,334,caffeine,273,0.817
+memory,334,performance,88,0.263
+memory,334,mood,85,0.254
+memory,334,attention,60,0.18
+memory,334,brain,51,0.153
+memory,334,adenosine,44,0.132
+memory,334,coffee,37,0.111
+memory,334,hippocampus,37,0.111
+memory,334,cognition,34,0.102
+memory,334,long term potentiation,30,0.09
+memory,334,cognitive performance,26,0.078
+memory,334,learning,25,0.075
+inhibit,4,caffeine,3,0.75
+inhibit,4,adenosine receptor,1,0.25
+inhibit,4,dopamine,1,0.25
+inhibit,4,microdialysis,1,0.25
+inhibit,4,striatum,1,0.25
+inhibit,4,theophylline,1,0.25
+inhibit,4,adenosine receptors,1,0.25
+inhibit,4,agonists,1,0.25
+inhibit,4,behavior,1,0.25
+inhibit,4,localization,1,0.25
+inhibit,4,methylxanthines,1,0.25
+inhibit,4,neostriatum,1,0.25
+inhibition,1003,caffeine,471,0.47
+inhibition,1003,activation,103,0.103
+inhibition,1003,cells,92,0.092
+inhibition,1003,metabolism,83,0.083
+inhibition,1003,expression,76,0.076
+inhibition,1003,calcium,67,0.067
+inhibition,1003,sarcoplasmic reticulum,64,0.064
+inhibition,1003,adenosine,56,0.056
+inhibition,1003,polyphenols,55,0.055
+inhibition,1003,mechanisms,53,0.053
+inhibition,1003,theophylline,52,0.052
+inhibition,1003,green tea,51,0.051
+affect,11,caffeine,8,0.727
+affect,11,consumption,4,0.364
+affect,11,cognitive performance,4,0.364
+affect,11,vigilance,3,0.273
+affect,11,physical dependence,3,0.273
+affect,11,perceived exertion,3,0.273
+affect,11,impact,3,0.273
+affect,11,mood,3,0.273
+affect,11,blood pressure,2,0.182
+affect,11,drug withdrawal,2,0.182
+affect,11,neuroendocrine responses,2,0.182
+affect,11,endurance,2,0.182
+arousal,132,caffeine,95,0.72
+arousal,132,performance,35,0.265
+arousal,132,mood,31,0.235
+arousal,132,attention,21,0.159
+arousal,132,stress,17,0.129
+arousal,132,personality,15,0.114
+arousal,132,time,15,0.114
+arousal,132,heart rate,14,0.106
+arousal,132,sleep,14,0.106
+arousal,132,cognitive performance,14,0.106
+arousal,132,dopamine,14,0.106
+arousal,132,individual differences,13,0.098
+performance,1422,caffeine,866,0.609
+performance,1422,mood,217,0.153
+performance,1422,exercise,215,0.151
+performance,1422,ingestion,181,0.127
+performance,1422,metabolism,139,0.098
+performance,1422,consumption,131,0.092
+performance,1422,alertness,111,0.078
+performance,1422,responses,111,0.078
+performance,1422,coffee,109,0.077
+performance,1422,endurance,102,0.072
+performance,1422,fatigue,100,0.07
+performance,1422,humans,95,0.067
+learning,49,caffeine,35,0.714
+learning,49,memory,25,0.51
+learning,49,performance,13,0.265
+learning,49,adenosine,13,0.265
+learning,49,mice,8,0.163
+learning,49,brain,8,0.163
+learning,49,stress,8,0.163
+learning,49,acquisition,7,0.143
+learning,49,rats,7,0.143
+learning,49,hippocampus,7,0.143
+learning,49,cocaine,6,0.122
+learning,49,rat,6,0.122
+anxiety,327,caffeine,200,0.612
+anxiety,327,depression,56,0.171
+anxiety,327,stress,44,0.135
+anxiety,327,adenosine,42,0.128
+anxiety,327,mood,39,0.119
+anxiety,327,performance,37,0.113
+anxiety,327,behavior,36,0.11
+anxiety,327,mice,35,0.107
+anxiety,327,elevated plus maze,34,0.104
+anxiety,327,brain,33,0.101
+anxiety,327,withdrawal,29,0.089
+anxiety,327,rats,29,0.089
+mood,541,caffeine,404,0.747
+mood,541,performance,217,0.401
+mood,541,cognitive performance,132,0.244
+mood,541,alertness,94,0.174
+mood,541,coffee,93,0.172
+mood,541,memory,85,0.157
+mood,541,consumption,78,0.144
+mood,541,psychomotor performance,75,0.139
+mood,541,attention,73,0.135
+mood,541,withdrawal,67,0.124
+mood,541,sleep,60,0.111
+mood,541,cognition,60,0.111
+sleep,434,caffeine,239,0.551
+sleep,434,performance,92,0.212
+sleep,434,mood,60,0.138
+sleep,434,adenosine,56,0.129
+sleep,434,insomnia,43,0.099
+sleep,434,alertness,42,0.097
+sleep,434,children,40,0.092
+sleep,434,sleep deprivation,38,0.088
+sleep,434,deprivation,35,0.081
+sleep,434,health,32,0.074
+sleep,434,fatigue,31,0.071
+sleep,434,coffee,30,0.069
