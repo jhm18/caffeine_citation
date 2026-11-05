@@ -1,0 +1,101 @@
+nohup: ignoring input
+fit_literatures.py -- nested degree-corrected SBM
+=================================================
+
+graph-tool 3.9
+communities: 3557
+edges:       36105 distinct pair(s), 583955 citation(s)
+weight range: 1 to 4646
+
+--- minimizing description length ---
+    groups per level: [846, 202, 56, 17, 5, 2, 1, 1, 1, 1, 1, 1, 1]
+    description length: 249624.734
+    45.1s
+
+--- equilibrating (multiflip=True, wait=200, max_niter=5000) ---
+    equilibrate     50   S =    234908.89   best =    234908.89    275.7s
+    equilibrate    100   S =    232547.60   best =    232547.60    606.4s
+    equilibrate    150   S =    231290.30   best =    231290.30    942.0s
+    equilibrate    200   S =    230161.68   best =    230161.68   1280.2s
+    equilibrate    250   S =    229549.75   best =    229549.75   1620.9s
+    equilibrate    300   S =    228767.24   best =    228767.24   1964.6s
+    equilibrate    350   S =    228456.38   best =    228406.97   2329.6s
+    equilibrate    400   S =    228348.49   best =    228231.51   2688.6s
+    equilibrate    450   S =    228048.07   best =    228048.07   3048.8s
+    equilibrate    500   S =    227630.86   best =    227630.86   3443.7s
+    equilibrate    550   S =    227249.45   best =    227234.71   3828.7s
+    equilibrate    600   S =    227256.37   best =    227118.21   4205.2s
+    equilibrate    650   S =    227063.89   best =    226982.13   4577.5s
+    equilibrate    700   S =    226717.97   best =    226717.97   4967.8s
+    equilibrate    750   S =    226827.67   best =    226717.97   5336.8s
+    equilibrate    800   S =    226799.07   best =    226713.97   5721.5s
+    equilibrate    850   S =    226894.74   best =    226637.54   6151.6s
+    equilibrate    900   S =    226685.70   best =    226620.60   6575.5s
+    equilibrate    950   S =    226565.49   best =    226562.93   6961.8s
+    equilibrate   1000   S =    226670.16   best =    226544.36   7343.0s
+    equilibrate   1050   S =    226563.90   best =    226467.07   7745.3s
+    equilibrate   1100   S =    226532.95   best =    226465.13   8129.3s
+    equilibrate   1150   S =    226508.01   best =    226405.34   8518.6s
+    equilibrate   1200   S =    226419.23   best =    226348.38   8965.1s
+    equilibrate   1250   S =    226402.68   best =    226297.35   9396.9s
+    equilibrate   1300   S =    226232.98   best =    226232.98   9819.1s
+    equilibrate   1350   S =    226345.79   best =    226142.32   10234.7s
+    equilibrate   1400   S =    226284.34   best =    226142.32   10644.2s
+    equilibrate   1450   S =    226238.61   best =    226142.32   11073.5s
+    equilibrate   1500   S =    226366.76   best =    226103.91   11530.2s
+    equilibrate   1550   S =    226174.51   best =    226073.00   11999.8s
+    equilibrate   1600   S =    226117.02   best =    226073.00   12428.6s
+    equilibrate   1650   S =    226097.66   best =    225979.85   12868.9s
+    equilibrate   1700   S =    226043.84   best =    225933.37   13259.3s
+    equilibrate   1750   S =    226020.39   best =    225933.25   13634.7s
+    equilibrate   1800   S =    226089.21   best =    225933.25   14018.7s
+    equilibrate   1850   S =    226045.92   best =    225877.44   14402.0s
+    equilibrate   1900   S =    226035.80   best =    225877.44   14825.0s
+    equilibrate   1950   S =    225956.39   best =    225877.44   15259.0s
+    equilibrate   2000   S =    225987.48   best =    225844.12   15698.1s
+    equilibrate   2050   S =    225906.82   best =    225844.12   16136.0s
+    equilibrate   2100   S =    225825.83   best =    225814.29   16568.8s
+    equilibrate   2150   S =    225689.06   best =    225598.09   16996.3s
+    equilibrate   2200   S =    225614.08   best =    225598.09   17429.5s
+    equilibrate   2250   S =    225794.79   best =    225598.09   17850.5s
+    equilibrate   2300   S =    225862.41   best =    225598.09   18288.3s
+    equilibrate   2350   S =    225756.41   best =    225598.09   18731.7s
+    equilibrate   2400   S =    225864.00   best =    225598.09   19178.1s
+    equilibrate   2450   S =    225901.65   best =    225598.09   19624.1s
+    equilibrate   2500   S =    225713.70   best =    225598.09   20024.0s
+    equilibrate   2550   S =    225565.37   best =    225540.63   20414.6s
+    equilibrate   2600   S =    225689.95   best =    225510.75   20802.4s
+    equilibrate   2650   S =    225531.26   best =    225463.16   21193.8s
+    equilibrate   2700   S =    225635.51   best =    225428.61   21604.6s
+    equilibrate   2750   S =    225593.60   best =    225428.61   22018.4s
+    equilibrate   2800   S =    225730.40   best =    225428.61   22432.4s
+    equilibrate   2850   S =    225524.41   best =    225428.61   22862.5s
+    equilibrated in 22895.3s
+
+--- collecting 500 draw(s) ---
+    collect     50   S =    225501.73   best =    225430.31    418.4s
+    collect    100   S =    225481.66   best =    225368.05    842.5s
+    collect    150   S =    225653.11   best =    225368.05   1271.3s
+    collect    200   S =    225386.61   best =    225368.05   1695.7s
+    collect    250   S =    225549.99   best =    225368.05   2114.0s
+    collect    300   S =    225560.89   best =    225368.05   2524.6s
+    collect    350   S =    225511.04   best =    225368.05   2937.5s
+    collect    400   S =    225594.63   best =    225368.05   3369.4s
+    collect    450   S =    225473.72   best =    225368.05   3799.5s
+    collected 499 in 4233.9s
+    draws saved to data/literatures/alpha1.00_g120_e14_fast/posterior_draws.pkl (32.3 MB)
+    aligning every 2th draw: 250 of 499
+
+--- aligning draws (no progress output is available here) ---
+    aligned in 27346.4s
+
+--- consensus ---
+hierarchy depth: 13
+groups per level: [1268, 405, 168, 82, 44, 25, 14, 8, 4, 2, 1, 1, 1]
+communities with a modal literature below 90% of draws: 1771 of 3557 (49.8%)
+
+wrote:
+   data/literatures/alpha1.00_g120_e14_fast/community_literatures.csv
+   data/literatures/alpha1.00_g120_e14_fast/literature_marginals.csv (64792 row(s))
+
+OK

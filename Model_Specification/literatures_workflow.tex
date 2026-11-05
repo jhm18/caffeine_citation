@@ -1,0 +1,1204 @@
+% =====================================================================
+% Checking the Blockmodel: A Bayesian Workflow for the Literatures Step
+% Caffeine Citation project -- working reference, revision 1
+%
+% Compile with XeLaTeX or LuaLaTeX for Palatino Linotype.
+% =====================================================================
+\documentclass[11pt]{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bm}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{ragged2e}
+\usepackage{changepage}
+\usepackage{titling}
+\usepackage{caption}
+\captionsetup{labelfont=bf}
+\usepackage[margin=1in]{geometry}
+\usepackage{underscore}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\algrenewcommand\algorithmicrequire{\textbf{Input:}}
+\algrenewcommand\algorithmicensure{\textbf{Output:}}
+
+\usepackage{fontspec}
+\IfFontExistsTF{Palatino Linotype}{\setmainfont{Palatino Linotype}}{%
+  \IfFontExistsTF{TeX Gyre Pagella}{\setmainfont{TeX Gyre Pagella}}{}}
+
+\usepackage[x11names, svgnames, rgb]{xcolor}
+\definecolor{gray25}{gray}{0.25}
+\definecolor{zred}{rgb}{0.69,0.19,0.19}
+\usepackage{hyperref}
+\definecolor{navlink}{rgb}{0.10,0.22,0.55}
+\hypersetup{
+  colorlinks=true, linkcolor=navlink, citecolor=navlink, urlcolor=navlink,
+  linktoc=all, bookmarksnumbered=true,
+  pdftitle={Checking the Blockmodel: A Bayesian Workflow for the Literatures Step},
+  pdfauthor={Jonathan H. Morgan and Sarah Delmar}
+}
+
+%% Table conventions (applied selectively, table by table).
+%% Double rule under table headers: two 0.5pt rules 1pt apart, pulled 1pt
+%% closer to the header above and given 1pt of air below. Use with booktabs:
+%%   \toprule ... header ... \doublerule ... body ... \bottomrule
+\newcommand{\doublerule}{%
+  \specialrule{0.5pt}{-1pt}{1pt}%
+  \specialrule{0.5pt}{0pt}{1pt}}
+%% Ragged-right paragraph column of a given width: P{2.5cm}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+%% \setlength{\tabcolsep}{4.5pt} is set inside the tables that use the
+%% convention, not globally.
+
+\newcommand{\code}[1]{\texttt{\small #1}}
+
+\newcommand{\customtitle}[1]{%
+  \title{\vspace{-1.5em}#1}
+  \pretitle{\begin{center}\LARGE\bfseries}
+  \posttitle{\par\end{center}\vskip 12pt}
+  \preauthor{\begin{center}\normalsize}
+  \postauthor{\par\end{center}\vskip 4pt}
+  \predate{\begin{center}\small}
+  \postdate{\par\end{center}}
+}
+
+\newenvironment{springerabstract}{
+  \begin{adjustwidth}{2em}{2em}
+  \noindent\textbf{Abstract.}\hspace{0.5em}\justifying
+}{
+  \end{adjustwidth}
+}
+
+\setlength{\droptitle}{0pt}
+\customtitle{Checking the Blockmodel\\
+\large A Bayesian Workflow for the Literatures Step}
+\author{
+  \shortstack{
+    Jonathan H. Morgan, Ph.D.$^{1}$ \quad Sarah Delmar, Ph.D.$^{2}$
+  }
+}
+\date{
+  $^1$\,Duke Network Analysis Center\\
+  $^2$\,Department of Psychology, University of Chicago\\
+  \today
+}
+
+\begin{document}
+\maketitle
+
+\begin{springerabstract}
+The citation blockmodel returned a consensus partition of 1{,}268 groups for
+3{,}557 research communities. Nearly half the communities lacked a stable
+assignment across posterior draws, and two runs from the same random seed
+returned different hierarchies. When we scored cuts of the fitted hierarchy
+with a flat degree-corrected blockmodel, the 405-group cut had the shortest
+description among the cuts examined. Before using any cut to estimate how the
+effect of topical proximity varies across literatures, we need to determine how
+the treatment of citation counts, the hierarchy prior, and the fitting
+procedure each contribute to the result. The description-length audit has been run; everything that follows it here
+has not. What follows is the plan: three stages of checking -- prior
+pushforward, prior predictive, and posterior -- with what each measures, what
+domain knowledge it needs, and what each outcome would oblige us to do.
+\end{springerabstract}
+
+\tableofcontents
+\clearpage
+
+% =====================================================================
+\section{The decision this document serves}
+% =====================================================================
+
+Model~I -- the community-pair model of \S13.2 of the specification outline,
+reproduced as equation (1) below -- cannot be estimated until every research
+community carries a label saying which literature it belongs to. A blockmodel was fitted to supply those
+labels. It returned a hierarchy thirteen levels deep whose base divides 3{,}557
+communities into 1{,}268 groups, left 1{,}771 of those communities without a
+stable assignment across posterior draws, and produced different answers on two
+runs from the same random seed.
+
+Scoring cuts of that hierarchy under a flat degree-corrected blockmodel gives a
+curve with one minimum, at the 405-group cut, and one near-free merge, into 168
+groups. Every coarser cut adds between 19 and 33 percent of the shortest description
+found. The base of the hierarchy -- the 1{,}268 groups -- scores
+80 percent longer than the 405-group cut. (The consensus puts 1{,}268 groups
+at the base; the audit, which works from the posterior draws, scores a median
+of 1{,}256. \S\ref{sec:audit} reconciles the counts.)
+
+Three candidate explanations remain open, and the workflow in
+\S\ref{sec:pushforward} to \S\ref{sec:posterior} exists to separate them: the
+treatment of citation counts, which fixes how much the model believes it has
+seen; the hierarchy prior, which fixes how cheaply fine partitions can be
+described; and the fitting procedure itself, whose non-reproducibility is
+unexplained. The decision that waits on all three is which cut of the hierarchy
+becomes the literature label $\ell$ in Model~I.
+
+% =====================================================================
+\section{What a literature is, and why the model needs one}
+% =====================================================================
+
+Model~I asks a question about pairs of research communities: when two
+communities work on similar questions, do they draw on the same earlier
+literature more often than two communities that do not? Shared citation is the
+observable, topical proximity is the predictor, and the coefficient linking them
+is the quantity of interest.
+
+That coefficient is not allowed to be a single number. It varies two ways. It
+drifts across the six era pairs, which asks whether the field's tendency to
+connect similar work has changed over fifty years. And it varies across
+\emph{literatures}, which asks whether the tendency works the same way
+everywhere in the field or differently in different parts of it. Writing
+$S_{ijp}$ for the topical proximity of communities $i$ and $j$ in era pair $p$,
+
+\begin{equation}
+\log \lambda_{ijp} = \alpha^{K}_{p} + \log E^{K}_{ijp}
+  + \underbrace{\alpha_{S,p}\, S_{ijp}}_{\text{drifts over time}}
+  + \underbrace{\alpha_{S,\ell}\, S_{ijp}}_{\text{varies by literature}}
+  + \bm{z}_{ijp}^{\top}\bm{\gamma} + \theta^{K}_{i} + \psi^{K}_{j}.
+\end{equation}
+
+The superscript $K$ marks the coupling model throughout, distinguishing its
+era baselines, exposures, and community effects from those of the citation
+model that shares the specification. $\theta^{K}_{i}$ and $\psi^{K}_{j}$ are
+random intercepts for the citing and cited communities.
+
+The second of those terms needs an $\ell$: a label on every community saying
+which literature it belongs to. Nothing else in the project supplies one.
+Journals do not, because a cognitive paper can appear in a pharmacology journal.
+Keywords do not, because they describe subject matter rather than position.
+Communities themselves do not, because they are found separately within each
+seven-year era and carry no identity across eras.
+
+A literature, in the sense the model needs, is a group of communities that
+connect to the rest of the field in the same way. Two pharmacokinetics
+communities in adjacent eras may barely cite one another and still belong
+together, because the rest of the field draws on them interchangeably. That
+criterion -- sameness of position rather than density of contact -- is what a
+blockmodel estimates, and it is why a blockmodel is in the pipeline at all.
+
+The specific instrument is a \emph{nested degree-corrected stochastic
+blockmodel}, fitted with the \code{graph-tool} library. Three words in that name
+do real work. \emph{Stochastic blockmodel}: communities are sorted into groups
+so that the citation traffic between any two groups is described by a single
+rate, and the sorting that describes the traffic most economically wins.
+\emph{Degree-corrected}: large communities have more connections by virtue of
+being large, and the model accounts for that so the groups reflect affinity
+rather than volume. \emph{Nested}: the groups are themselves grouped, and those
+groups grouped again, so the result is a hierarchy rather than a single
+partition.
+
+% =====================================================================
+\section{What the fit returned}
+% =====================================================================
+
+The network handed to the blockmodel has one node per community -- 3{,}557 of
+them, across eras 11 to 17 -- and a directed edge wherever one community's works
+cite another's, weighted by the number of citations. It holds 36{,}105 distinct
+community pairs and 583{,}955 citations, with pair weights running from 1 to
+4{,}646.
+
+Table~\ref{tab:symptoms} records what came back. Each row is a result that would
+be unremarkable on its own and is not unremarkable in company.
+
+\begin{table}[!t]
+\centering
+\setlength{\tabcolsep}{4.5pt}
+\caption{What the fit returned, and why each result is a problem}
+\label{tab:symptoms}
+\begin{tabular}{@{}P{3.6cm}P{3.2cm}P{7.4cm}@{}}
+\toprule
+\textbf{Result} & \textbf{Value} & \textbf{Why it is a problem}\\
+\doublerule
+Groups at the base of the hierarchy
+  & 1{,}268
+  & 3{,}557 communities in 1{,}268 groups is 2.8 communities apiece. Most
+    groups would then contribute a handful of pairs over a narrow range of
+    topical proximity, leaving $\sigma_{\ell}$ estimated largely from its
+    prior. See \S\ref{sec:downstream}.\\
+Groups holding one community
+  & 690 (54\%)
+  & Half the groups are not groups. The communities in them are not marginal
+    either: their median degree is 34.5 against 5 for the rest, and their median
+    size is 89 works against 4.\\
+Communities with no settled assignment
+  & 1{,}771 (49.8\%)
+  & Across posterior draws, half the communities fail to place in any one group
+    on 90 percent of draws. The consensus partition is an average of
+    disagreeing answers.\\
+Consensus against point estimate
+  & 1{,}268 vs 846
+  & The consensus is \emph{finer} than the fit it summarizes. Averaging
+    partitions that disagree produces their intersection, and intersections
+    splinter.\\
+Reproducibility
+  & two answers
+  & Two runs on identical input with the same seed returned different
+    hierarchies, 2{,}451 nats -- natural-log units of information -- apart in
+    description length.\\
+Compute
+  & 15--20 hours
+  & Of which 7.6 hours was reconciling draws, a step whose cost scales with
+    the number of groups being matched. 499 were collected, every second one
+    aligned, so 250 entered the consensus.\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% =====================================================================
+\section{The audit that turned a suspicion into a measurement}
+\label{sec:audit}
+% =====================================================================
+
+Three group counts appear in this document and they are three different
+objects. The \emph{point estimate} from the description-length heuristic has
+846 groups at its base. The \emph{consensus}, formed by reconciling 250 of the
+499 posterior draws, has 1{,}268. The \emph{median across the 50 draws} scored in
+the audit below has 1{,}256. Nothing is inconsistent here; a consensus of
+disagreeing partitions tends toward their intersection, which is why it is
+finer than the estimate it summarizes.
+
+A hierarchy offers a choice of granularity, and the obvious question is which
+level to treat as the literature. The hierarchy itself cannot answer: it runs
+1{,}268, 405, 168, 82, 44, 25, 14, 8, 4, 2, 1, with successive ratios of 3.1,
+2.4, 2.0, 1.9, and then 1.8 to 2.0 the rest of the way down. The base thins
+fastest and the lower levels are steady; nowhere is there a plateau or a
+gap. A dendrogram
+drawn from it is no help either, because its horizontal axis is level number
+rather than any measure of dissimilarity -- the branches have no lengths, so
+nothing in the picture marks a natural cut.
+
+Description length supplies the lengths. Take each level's grouping, project it
+back onto the 3{,}557 communities, hold it fixed, and ask what a flat
+degree-corrected blockmodel with that grouping costs to describe. Coarsening
+always loses fit and always saves complexity; the level where the loss begins to
+outrun the saving is the granularity the network supports.
+
+\begin{table}[!t]
+\centering
+\setlength{\tabcolsep}{4.5pt}
+\caption{Flat-model description length of each cut of the fitted hierarchy,
+  median over 50 posterior draws. The three degenerate top levels, all of one
+  group, are omitted.}
+\label{tab:entropy}
+\begin{tabular}{@{}rrrrP{5.4cm}@{}}
+\toprule
+\textbf{Groups} & \textbf{DL (nats)} & \textbf{Merge cost} & \textbf{vs best}
+  & \textbf{Reading}\\
+\doublerule
+1{,}256 & 1{,}327{,}232 & --- & $+80.1\%$
+  & base of the hierarchy\\
+405 & 736{,}908 & $-590{,}324$ & --- & lowest-scoring cut examined\\
+168 & 750{,}206 & $+13{,}298$ & $+1.8\%$
+  & the only near-free merge\\
+82 & 971{,}404 & $+221{,}198$ & $+31.8\%$ & \\
+44 & 1{,}120{,}231 & $+148{,}827$ & $+52.0\%$ & \\
+25 & 1{,}256{,}995 & $+136{,}764$ & $+70.6\%$
+  & assignment confidence stops improving; no singletons\\
+14 & 1{,}463{,}906 & $+206{,}911$ & $+98.7\%$ & \\
+8 & 1{,}646{,}272 & $+182{,}366$ & $+123.4\%$
+  & two groups hold 2 percent between them\\
+4 & 1{,}868{,}082 & $+221{,}810$ & $+153.5\%$ & \\
+2 & 2{,}110{,}950 & $+242{,}868$ & $+186.5\%$ & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Two readings follow, and they point in opposite directions. The base of the
+hierarchy scores \emph{80 percent longer} under the flat model than the
+405-group cut does. Whatever produced 1{,}268 groups, it was not a flat
+accounting of the citation record. But coarsening scores badly too: every merge below 168 groups adds between 19
+and 33 percent of the shortest description found, so a reading of eight
+literatures gives up more than the whole of that description.
+
+Two cautions on reading Table~\ref{tab:entropy}. The comparison is among
+\emph{cuts of the fitted hierarchy}, scored under a flat model; no flat
+partition was optimized independently, so 405 is the lowest-scoring cut examined
+rather than the best flat partition available. And the scoring model is not the
+model that produced the hierarchy -- the nested fit's own description length is
+about 225{,}000 nats, far below anything in the table, because the hierarchical
+prior of \S\ref{sec:model} charges much less for the same granularity. The
+table prices cuts on a common scale; it does not adjudicate between the two
+models.
+
+The fifty posterior draws lie almost on top of one another in this curve. The
+shape is not one fit's idiosyncrasy.
+
+The audit also recorded three facts about particular cuts that description
+length does not capture, and \S\ref{sec:downstream} leans on them. At the
+25-group cut, assignment confidence -- the share of draws placing a community
+in its modal group -- stops improving as the cut coarsens; 24 of the 25 groups
+span more than one era; and no group is a singleton. At the 8-group cut, two
+of the eight groups hold 2 percent of the communities between them, so a
+reading of eight literatures is in practice a reading of six.
+
+% =====================================================================
+\section{The model being fitted}
+\label{sec:model}
+% =====================================================================
+
+The assumptions at issue live in particular terms of this model, so it is set
+out here rather than named. The account is Peixoto's, as implemented in
+\code{graph-tool}; the notation is his.
+
+\subsection{One partition}
+
+Write $N = 3{,}557$ for the number of communities and $\bm{A}$ for the matrix of
+citation counts, so that $A_{ij}$ is the number of citations from community
+$i$'s works to community $j$'s. A partition $\bm{b}$ assigns every community a
+group, $b_i \in \{1, \dots, B\}$. Two quantities summarize what the partition
+sees: the citations running between groups,
+\[
+e_{rs} \;=\; \sum_{ij} A_{ij}\,\delta_{b_i r}\,\delta_{b_j s},
+\]
+with margins $e^{\text{out}}_{r} = \sum_s e_{rs}$ and $e^{\text{in}}_{s} =
+\sum_r e_{rs}$; and the degrees $k^{\text{out}}_{i}$ and $k^{\text{in}}_{i}$ of
+each community.
+
+The generative story is that citations arrive as independent Poisson draws
+whose rate depends on the groups at either end and on how active each community
+is:
+\begin{equation}
+A_{ij} \sim \mathrm{Poisson}\!\left(
+  \theta^{\text{out}}_{i}\,\theta^{\text{in}}_{j}\,\lambda_{b_i b_j}\right).
+\end{equation}
+Here $\lambda_{rs}$ is the affinity between groups $r$ and $s$, and
+$\theta^{\text{out}}_{i}$, $\theta^{\text{in}}_{i}$ are the propensities of the
+individual community. Those $\theta$ terms are the degree correction. Without
+them a community that cites heavily would be grouped with other heavy citers
+whatever it cites, and with community sizes in this corpus running from 2 works
+to 2{,}769, that failure mode is not hypothetical.
+
+Maximizing over $\bm{\theta}$ and $\bm{\lambda}$ leaves a quantity that depends
+only on the partition,
+\begin{equation}
+\mathcal{S}(\bm{b}) \;=\; -\sum_{rs} e_{rs}\,
+  \ln\!\frac{e_{rs}}{e^{\text{out}}_{r} e^{\text{in}}_{s}},
+\label{eq:entropy}
+\end{equation}
+which is how many nats -- units of information, like bits but measured in
+natural logarithms -- it takes to transmit the citation matrix once the
+receiver knows the partition. Smaller is better, and $\mathcal{S}$ falls
+monotonically as groups are added -- a partition with one community per group
+describes the data perfectly and explains nothing.
+
+\subsection{What stops it from using every group it can}
+
+The brake is the cost of transmitting the model itself. The full description
+length adds to \eqref{eq:entropy} the cost of the partition, the between-group
+counts, and the degrees:
+\begin{equation}
+\Sigma \;=\; \underbrace{\mathcal{S}(\bm{b})}_{\text{the data}}
+  \;+\; \underbrace{\mathcal{L}}_{\text{the model}},
+\qquad
+\mathcal{L} = -\ln P(\bm{e}) - \ln P(\bm{k} \mid \bm{e}, \bm{b})
+  - \ln P(\bm{b}).
+\label{eq:dl}
+\end{equation}
+Minimizing $\Sigma$ is identical to maximizing the posterior
+$P(\bm{b} \mid \bm{A})$ under those priors. The three terms of $\mathcal{L}$
+\emph{are} the priors, and they are these:
+\begin{align}
+P(\bm{b}) &= \frac{\prod_r n_r!}{N!}
+  \,\binom{N-1}{B-1}^{\!-1}\,\frac{1}{N},
+  &&\text{group sizes $n_r$, uniform given $B$,}\label{eq:pb}\\[2pt]
+P(\bm{e}) &= \left(\!\!\binom{B^2}{E}\!\!\right)^{\!-1},
+  &&\text{uniform over count matrices,}\label{eq:pe}\\[2pt]
+P(\bm{k} \mid \bm{e}, \bm{b}) &= \prod_r
+  \left(\!\!\binom{n_r}{e^{\text{out}}_{r}}\!\!\right)^{\!-1}
+  \left(\!\!\binom{n_r}{e^{\text{in}}_{r}}\!\!\right)^{\!-1},
+  &&\text{uniform over degree sequences,}\label{eq:pk}
+\end{align}
+where $\left(\!\binom{n}{k}\!\right) = \binom{n+k-1}{k}$ counts the ways to
+choose $k$ items from $n$ types with repetition, and $E$ is the total number of
+edges. The directed model carries separate in- and out-degree terms, as shown.
+
+One caution on equation~\eqref{eq:pk}. It is the \emph{uniform} degree prior, which
+\code{graph-tool} offers as an option; the library's default is
+\code{degree_dl_kind="distributed"}, a non-uniform hyperprior that models the
+degree distribution itself. Which was in force during our fit has not been
+checked, and it should be, because a hyperprior on degrees is one of the few
+places in this model where something resembling domain knowledge could enter.
+
+What the three terms have in common is that each is uniform over some
+combinatorial set, and none of them mentions citation, or science, or anything
+else about where the data came from.
+
+\subsection{From one partition to a hierarchy}
+
+The flat prior $P(\bm{e})$ above has a known and unwanted consequence: it
+cannot resolve more than about $\sqrt{E}$ groups, because the cost of
+describing a $B \times B$ count matrix grows faster than the fit improves.
+The ceiling is a function of how many edges the model believes it has, which
+is why \S\ref{sec:weights} matters here too: at the 36{,}105 distinct pairs
+it is on the order of 190, and at the $E = 583{,}955$ the multiplicity
+treatment declares it is on the order of 760. The constant in front of
+$\sqrt{E}$ depends on the average degree, so these are magnitudes rather than
+values. Peixoto states the limit in the familiar form $O(\sqrt{N})$, which
+coincides with $\sqrt{E}$ only for sparse graphs with $E = O(N)$; under the
+multiplicity treatment ours is not sparse in that sense, and $\sqrt{N} = 60$
+would be off by an order of magnitude. Either way it is a detection limit
+-- a statement about what
+the flat model can resolve, not about how many literatures the field
+contains.
+
+The nested model removes the ceiling by refusing to describe the count matrix
+flatly. Instead it treats $\bm{e}$ as a network in its own right -- one with
+$B_1$ nodes -- and partitions \emph{that}, recursively, until one group remains:
+\begin{equation}
+P(\{\bm{e}_l\}, \{\bm{b}_l\}) \;=\;
+  \prod_{l=1}^{L} P(\bm{e}_l \mid \bm{e}_{l+1}, \bm{b}_{l})\,P(\bm{b}_{l}),
+  \qquad B_L = 1 .
+\label{eq:nested}
+\end{equation}
+Our fit has $L = 13$ levels, with $B_1 = 1{,}268$ at the base. The top three
+collapse to a single group and carry no information, which is why
+Table~\ref{tab:entropy} lists ten cuts rather than thirteen.
+
+Equation~\eqref{eq:nested} is the single most consequential line in this
+document. It is the reason a grouping into 1{,}268 blocks is cheap to transmit:
+the blocks need not be described one by one against a flat background, only
+against the coarser grouping above them. Note where this assumption sits. It
+is a prior over the count matrices, not over the partition -- the marginal
+prior on the number of groups is uniform, as \S\ref{sec:pushforward} shows --
+so it reaches $\bm{b}$ through the marginal likelihood. That is why the
+instrument for probing it is the prior predictive and not a pushforward.
+Equation~\eqref{eq:nested} also fixes the prior over depth: each $B_l$ is
+drawn uniformly from $\{1, \dots, B_{l-1}\}$, so the hierarchy is a chain
+that descends from $N$ to one group in a random number of steps.
+
+\subsection{Weights, and the quantity $E$}
+\label{sec:weights}
+
+Citation counts enter through $E$, and $E$ appears in $P(\bm{e})$. Passing the
+counts as \code{eweight} declares them to be edge multiplicities: a pair joined
+by 4{,}646 citations contributes 4{,}646 to $E$, so $E = 583{,}955$ rather
+than the 36{,}105 distinct community pairs. Since $P(\bm{e})$ is a multiset
+coefficient over $B^2$ cells and $E$ draws, a larger $E$ supports a larger $B$
+at the same cost. The likelihood choice and the prior are therefore coupled
+through a single integer, which is why \S\ref{sec:order} settles the weights
+before checking anything else.
+
+\subsection{How it was fitted, and with what}
+
+The implementation is \code{graph-tool} 3.9, Tiago Peixoto's C\texttt{++}
+library with Python bindings, installed in its own \code{conda} environment at
+\code{/opt/gt-env} and invoked by absolute path. The version string and the
+argument names below were read from the installed library rather than from
+documentation: an earlier script passed \code{state_args}, the name used in
+the 2.x series, and 3.9 warned of \code{unrecognized keyword arguments} and
+discarded it. Every call here is written against signatures confirmed
+by inspection. Four calls do the work:
+
+\begin{itemize}[leftmargin=1.5em, itemsep=0.3em]
+\item \code{minimize_nested_blockmodel_dl} -- an agglomerative heuristic that
+  searches for the partition minimizing \eqref{eq:dl}, returning a point
+  estimate in about 45 seconds. Degree correction and the weights enter here,
+  through \code{base_state_args}.
+\item \code{mcmc_equilibrate}, with merge-and-split proposals -- Markov chain
+  Monte Carlo over partitions. Starting from the heuristic's answer it found a
+  description length 18{,}329 nats lower, so the heuristic alone was well short
+  of the mode.
+\item \code{PartitionModeState} -- group labels are arbitrary and change
+  between draws, so nothing can be averaged until the draws are put on a common
+  labeling. Of the 499 draws collected, every second one was aligned; those
+  250 took 7.6 hours.
+\item \code{get_max_nested} and \code{get_marginal} -- the consensus partition
+  and, for each community, the share of draws placing it in each group.
+\end{itemize}
+
+\code{graph-tool} exposes arguments for the likelihood -- degree correction on
+or off, weights as multiplicities or as covariates, nested or flat. It exposes
+no argument for $P(\bm{b})$. The priors in equations~\eqref{eq:pb} to
+\eqref{eq:pk} are the ones we get.
+
+% =====================================================================
+\section{Where the assumptions are}
+% =====================================================================
+
+Two choices shaped everything above, and neither was examined before the fit.
+
+\subsection{The likelihood: citation counts as multiplicities}
+
+Section~\ref{sec:weights} gave the mechanism; what matters here is that it was
+never examined. \code{eweight} declares the counts to be edge multiplicities,
+so the pair joined by 4{,}646 citations enters the likelihood as 4{,}646
+parallel edges rather than as one relationship of high intensity. That single
+argument fixes $E$, $E$ fixes $P(\bm{e})$, and $P(\bm{e})$ is one of the three
+terms that decides how many groups the model will tolerate.
+
+The alternative treats the count as a covariate attached to one edge, through
+\code{recs} with a discrete Poisson record type. That is a different generative
+story about the same observations, and the one usually preferred when weights
+are heavily skewed. Neither is obviously right. What is wrong is having
+chosen between them in a single unremarked line.
+
+\subsection{The prior: reference priors with no domain content}
+
+\code{graph-tool}'s priors over partitions are uniform within microcanonical
+ensembles -- every arrangement consistent with a fixed set of totals gets equal
+weight -- chosen so that the description length is a clean coding argument with
+nothing tuned. They encode nothing whatever about citation networks. Nothing in
+them says that in-degree is heavy-tailed, that reference lists are bounded, that
+citation runs backwards in time and almost never forwards, or that a field of
+this size holds tens of specialties rather than thousands.
+
+Being empty of domain content does not make them weak in effect. The nested
+prior exists precisely to make deep hierarchies with many small blocks cheap to
+describe, and Table~\ref{tab:entropy} measures how much that costs once the
+subsidy is withdrawn. We therefore have a prior with no knowledge in it and
+large consequences out of it: not uninformative where it matters, and not
+informed where it should be.
+
+There is a domain-informed prior available, and it has been stated in
+conversation without being written down: a field of this size, over fifty years,
+holds something like twenty to thirty literatures. That is a weakly informative
+claim, defensible from the co-citation literature on specialty structure, and
+the model had no access to it. Formalizing it is the business of
+\S\ref{sec:pushforward}.
+
+\subsection{Why the order matters}
+
+The two cannot be checked independently. Informativeness is a property of the
+prior and the likelihood together, not of the prior alone -- a flat prior on a
+logistic regression coefficient is wildly informative about outcomes. Here, the
+same prior over partitions implies one predictive distribution when the model
+believes it has 583{,}955 observations and quite another when it believes it has
+36{,}105. Settling the likelihood therefore comes first, and every check below
+assumes it has been settled.
+
+% =====================================================================
+\section{Stage one: prior pushforward checks}
+\label{sec:pushforward}
+% =====================================================================
+
+A pushforward check pushes the prior through a \emph{function of the
+parameters} and inspects the distribution that comes out. It stops short of
+generating data, which makes it cheap, and it is the natural first instrument
+whenever the quantity in dispute is itself a parameter.
+
+The quantity in dispute is the number of groups. Nobody has intuitions about a
+prior over partitions of 3{,}557 objects; everybody has intuitions about how
+many literatures a field contains. The pushforward is supposed to convert the
+first into the second.
+
+\subsection{What the prior over $B$ actually is}
+
+It can be read off equation~\eqref{eq:pb} without sampling anything. The
+partition prior factors as $P(\bm{b}) = P(\bm{b} \mid \bm{n})\,P(\bm{n} \mid
+B)\,P(B)$ with $P(B) = 1/N$, and the remaining two terms of $\mathcal{L}$ are
+normalized conditionals -- $P(\bm{e})$ given $B$ and $E$, and $P(\bm{k})$
+given $\bm{e}$ and $\bm{b}$ -- so summing them out leaves $P(\bm{b})$
+unchanged. The marginal prior over the number of groups is therefore
+\textbf{uniform on $\{1, \dots, 3{,}557\}$}, with mean $1{,}779$. The same
+holds at every level: $B_l$ is uniform on $\{1, \dots, B_{l-1}\}$.
+
+Three things follow, and together they redirect this stage.
+
+\emph{The pushforward on $B$ cannot discriminate.} A flat distribution has no
+mass to concentrate in the tens or near a thousand, so a question posed as
+``where does the prior put $B$?'' is answered analytically and tells us
+nothing about the fit.
+
+\emph{The count is the likelihood's choice.} The prior has no preference; the
+heuristic returned 846 and the consensus 1{,}268 because the marginal
+likelihood selected them. A fine partition therefore cannot be read as the
+prior's doing, and nothing about the base count was settled before the
+citations were read.
+
+\emph{The expensive assumption is elsewhere.} What makes a fine partition cheap
+is the nested prior over the count matrices, equation~\eqref{eq:nested}: a
+$B \times B$ matrix need not be described against a flat background, only
+against the coarser grouping above it. That is a prior over
+\emph{parameters}, and it acts on $\bm{b}$ only through the marginal
+likelihood. A pushforward on $B$ is the wrong instrument for it. The right one
+is the prior predictive of \S\ref{sec:predictive}, and specifically its
+flat-against-nested arm.
+
+\subsection{What the pushforward is still good for, and why it needs no
+  simulation}
+
+Two quantities are not uniform and are worth having. Both come from
+$P(\bm{b})$ alone -- neither touches $\bm{e}$ or $E$ -- and both have
+closed forms, so Stage one is arithmetic rather than sampling. The figures
+below were computed by the recursion in Algorithm~\ref{alg:pushforward} and
+should be reproduced before they are relied on.
+
+\emph{The share of singleton groups.} $P(\bm{n} \mid B)$ is uniform over
+compositions of $N$ into $B$ positive parts, and under that law the
+probability that a given group has exactly one member is
+\begin{equation}
+P(n_r = 1 \mid B) \;=\; \frac{\binom{N-2}{B-2}}{\binom{N-1}{B-1}}
+  \;=\; \frac{B-1}{N-1},
+\label{eq:singleton}
+\end{equation}
+which by exchangeability is also the expected share of singleton groups.
+Conditional on $B = 1{,}268$ the prior expects $35.6$ percent singletons;
+conditional on $B = 846$, $23.8$ percent. The fit's 54 percent exceeds both.
+The marginal figure, averaged over the uniform $B$, is exactly 50 percent,
+which is close to the fit -- but that closeness is an artifact of the uniform
+$B$, half of whose mass sits above 1{,}779 groups where nearly every group is
+a singleton. The conditional figures are the ones that bear on the fit, and
+they say the prior did not anticipate this many singletons.
+
+\emph{Hierarchy depth.} Write $d$ for the number of levels until the chain
+$B_0 = N,\; B_l \sim \mathrm{Uniform}\{1, \dots, B_{l-1}\}$ first reaches
+one group. A level may repeat the count above it, since the uniform draw
+includes $B_{l-1}$ itself, and such a level still counts toward the depth.
+The distribution of $d$ is a one-dimensional recursion over $B$, exact and
+instantaneous. At $N = 3{,}557$ the mean depth is $9.75$ levels, and the
+probability of eleven or more is $0.38$. Our fit descends through ten
+non-degenerate levels to a single group at the eleventh, so a hierarchy of
+this depth is ordinary under the prior rather than extreme. Conditioning on
+the fitted base count moves the mean to $9.72$ given $B_1 = 1{,}268$ and to
+$9.32$ given $B_1 = 846$; neither makes eleven levels remarkable.
+
+\emph{Some level in the elicited range.} This one needs no recursion. For a
+band $[\mathrm{lo}, \mathrm{hi}]$ and any starting count above it, the
+probability that the chain passes through a level inside the band is
+\begin{equation}
+P\big(\text{some } B_l \in [\mathrm{lo}, \mathrm{hi}]\big)
+  \;=\; \frac{\mathrm{hi} - \mathrm{lo} + 1}{\mathrm{hi}},
+\label{eq:band}
+\end{equation}
+exactly, independent of $N$ and of $B_1$. The identity follows from
+self-consistency: write $v(b)$ for the probability of reaching the band from
+$b > \mathrm{hi}$; the next count is uniform on $\{1, \dots, b\}$, so
+$v(b) = \frac{1}{b}\big[v(b) + \sum_{b' < b} v(b')\big]$, and the constant
+$v = (\mathrm{hi} - \mathrm{lo} + 1)/\mathrm{hi}$ solves this at every $b$
+above the band once it holds at $b = \mathrm{hi} + 1$, where it is immediate.
+For twenty to thirty groups the figure is $11/30 = 0.367$; for the wider band
+of ten to forty it is $31/40 = 0.775$. The prior gives a readable level with
+probability a little over one in three, whatever the fit did, which is neither
+the near-certainty the domain expectation would want nor a rejection of it.
+
+\subsection{The domain threshold}
+
+The threshold cannot be stated as ``$P(B_{\ell} > 100) \approx 0.01$ at the
+cut intended for $\ell$,'' because which cut becomes $\ell$ is the output of
+this whole process; a threshold defined by reference to its own result is
+circular. Two non-circular forms are available. Fix the level in advance --
+declare that $\ell$ will be read from level five, say -- and the threshold
+applies to a well-defined quantity. Or state it as a property of the
+hierarchy: the prior should place substantial mass on hierarchies possessing
+\emph{some} level with between twenty and thirty groups. The second is closer
+to what the domain knowledge actually supports, since the co-citation
+literature speaks to how many specialties a field has and not to the depth at
+which a blockmodel should find them; and it is the form that
+equation~\eqref{eq:band} answers in closed form.
+
+\subsection{What \code{graph-tool} does and does not expose}
+
+The priors in equations~\eqref{eq:pb} to \eqref{eq:pk} are written down, so
+they can be sampled directly in a dozen lines of either language. What cannot
+be replaced from outside the library is the \emph{fitting}: the samplers and
+the heuristic are built against those priors internally, and there is no
+argument for supplying a different $P(\bm{b})$.
+
+Two partial exceptions should be tried before concluding that nothing is
+available. \code{B_min} and \code{B_max} constrain the number of base groups
+directly. \code{clabel} and \code{pclabel} constrain which vertices may share a
+group. Both are crude next to a stated prior -- a hard interval is not a
+distribution -- and \code{B_max} has a further defect: it constrains the
+\emph{base}, while the domain expectation is about some upper level. A model
+can hold a thousand base blocks and still deliver twenty-five literatures five
+levels up, so capping the base at thirty asks for something the expectation
+never demanded. There is no argument for capping an upper level. \code{B_max}
+is therefore used here as a proxy that is known to be too strong, and the
+reading of its result is set accordingly: the quantity recorded is the
+nested model's own description length under the cap against its unconstrained
+value, and a penalty on the scale of the near-free merge in
+Table~\ref{tab:entropy} -- a few percent -- would count as acceptable. A
+penalty on the scale of that table's coarser cuts, tens of percent, would
+not, but because the cap is too strong a large penalty does not by itself
+show that the prior is unrevisable; it shows that this argument cannot do the
+revising.
+
+\begin{algorithm}[!t]
+\caption{Prior pushforward. Every quantity here follows from
+  equation~\eqref{eq:pb} and the level recursion of
+  equation~\eqref{eq:nested}; nothing is sampled and $E$ does not enter.}
+\label{alg:pushforward}
+\begin{algorithmic}[1]
+\Require $N = 3{,}557$; the fitted $B_1$ (846 or 1{,}268) and depth (eleven
+  levels to one group); the elicited band $[20, 30]$
+\Statex \textbf{Number of groups}
+\State $B_1 \sim \mathrm{Uniform}\{1, \dots, N\}$, mean $1{,}779$
+  \Comment{report; it carries no information about the fit}
+\Statex \textbf{Singleton share, by equation~\eqref{eq:singleton}}
+\State $z(B) \gets (B-1)/(N-1)$ for $B \in \{846,\ 1{,}268\}$
+\Comment{35.6 and 23.8 percent; marginal over $B$ is 50 percent}
+\Statex \textbf{Depth, by recursion over $B$}
+\State $p_0 \gets \delta_N$ \Comment{or $\delta_{B_1}$ to condition on the fit}
+\For{$l = 1, 2, \dots$ until the mass at $B = 1$ exceeds $1 - 10^{-6}$}
+  \State $p_l(b) \gets \sum_{b' \ge b} p_{l-1}(b')/b'$ for $b \ge 2$;
+    mass newly arriving at $b = 1$ is $P(d = l)$
+  \Comment{the sum includes $b' = b$: a level may repeat the count above it}
+\EndFor
+\Statex \textbf{A level in the elicited band, by equation~\eqref{eq:band}}
+\State $P(\text{some } B_l \in [20, 30]) \gets 11/30$
+  \Comment{exact; the same for every $N$ and $B_1$ above the band}
+\Ensure $P(d)$ and its mean; $P(d \ge 11)$; $z(B_1)$; $11/30$
+\State \textbf{Decisions:} is 54 percent singletons above $z(B_1)$? is
+  $P(d \ge 11)$ small? is $11/30$ an acceptable chance of a readable level?
+\State \textbf{Then:} rerun the heuristic under \code{B_max} $= 30$ and record
+  the nested description length against the unconstrained fit, reading the
+  result as \S\ref{sec:pushforward} directs
+\end{algorithmic}
+\end{algorithm}
+
+\begin{table}[!t]
+\centering
+\setlength{\tabcolsep}{4.5pt}
+\caption{Outcomes of Stage one and what each requires. The rows concern depth
+  and group sizes; the number of groups is uniform under the prior and is not
+  at issue here.}
+\label{tab:pushforward}
+\begin{tabular}{@{}P{4.4cm}P{4.2cm}P{5.6cm}@{}}
+\toprule
+\textbf{If the prior} & \textbf{Then} & \textbf{And we}\\
+\doublerule
+expects fewer singletons than the fit returned, and depths like the fit's
+  & the singletons are the data or the likelihood talking; the depth is not
+    evidence of anything
+  & carry the singleton question to Stage two, where the nested prior over
+    $\bm{e}$ can be isolated\\
+expects at least as many singletons as the fit returned, conditional on
+  $B_1$
+  & that part of the fit's shape was anticipated by the prior, independent of
+    any citation
+  & report it, and stop treating the base-level group sizes as a finding
+    about the field\\
+gives a level in the elicited band with probability $11/30$, which the
+  domain expectation finds too low, and \code{B_max} cannot reach the band
+  without a penalty of tens of percent
+  & the available arguments cannot bring the model into line with domain
+    knowledge
+  & reimplement the degree-corrected blockmodel with a hand-written sampler and
+    a stated prior\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+On the figures above, the first row is the one the arithmetic already
+selects: 54 percent singletons against an expected 36, and a depth that the
+prior finds unremarkable. The third row remains open until the \code{B_max}
+rerun has been priced. A workflow exists to make assumptions visible and
+revisable; if the only revisions available are a hard interval on $B$ and a
+constraint on which vertices may share a group, then the prior is not
+revisable in the sense the workflow requires, and demonstrating that is more
+useful than suspecting it.
+
+% =====================================================================
+\section{Stage two: prior predictive checks}
+\label{sec:predictive}
+% =====================================================================
+
+A predictive check pushes the prior all the way through the data-generating
+process and asks whether the networks it produces could plausibly be citation
+networks. Where the pushforward asks whether the implied shape of the
+hierarchy is sane, the predictive check asks whether the implied
+\emph{universe of networks} contains anything resembling ours. This is also
+the first stage at which $E$ matters, since the count matrices are drawn
+here and not before.
+
+\paragraph{Procedure.} Draw a partition from the prior, draw the between-group
+counts and the degrees from theirs, generate a network, and compute its
+summary statistics. Repeat a few hundred times. Then overlay the observed
+values. The draws are \emph{ancestral}: each quantity is drawn in the order the
+prior generates it, conditional on the one before.
+
+\paragraph{What to compare, and against what.} The statistics worth checking are
+those the model does not fit by construction. Degree distribution is a poor
+check, because degree correction reproduces it by design. Table~\ref{tab:stats}
+lists the useful ones with their sources.
+
+\begin{table}[!t]
+\centering
+\setlength{\tabcolsep}{4.5pt}
+\caption{Statistics for the prior predictive comparison. Forward-in-time
+  citation is not among them: 37 of the 1{,}098{,}984 arcs between
+  analytic-era works run forwards, but that is a property of the article
+  network, and the community model has no time in it to reproduce.}
+\label{tab:stats}
+\begin{tabular}{@{}P{3.1cm}P{4.6cm}P{6.4cm}@{}}
+\toprule
+\textbf{Statistic} & \textbf{Observed in our network}
+  & \textbf{Domain expectation and source}\\
+\doublerule
+Reciprocal community pairs
+  & to be counted: pairs $(r,s)$ with $e_{rs} > 0$ and $e_{sr} > 0$, out of the
+    36{,}105 pairs in the fitted graph
+  & Low but not zero. Communities in adjacent eras can cite each other in both
+    directions even though individual works cannot. Distinct from the
+    article-level forward-citation count noted in the caption.\\
+In-degree tail
+  & degree 2 to 522, median 5
+  & Heavy-tailed, from cumulative advantage -- Price's account of why
+    well-cited papers attract further citation.\\
+Weight skew
+  & pair weights 1 to 4{,}646
+  & Community-pair intensity inherits the same skew. A prior implying
+    homogeneous weights is at odds with the data by three orders of
+    magnitude.\\
+$k$-core profile
+  & coreness 2 to 74, with 125 communities at 74 and no vertex below 2
+  & A dense core with a connected periphery. This is the one statistic that
+    nothing in the model fits, which makes it the sharpest check available.\\
+Group-size distribution
+  & 54 percent of fitted groups hold one community
+  & Specialty sizes are skewed but not dominated by singletons. A prior that
+    expects half its groups to be singletons expects something unlike a
+    field.\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{algorithm}[!t]
+\caption{Prior predictive check, simulating the hierarchy as fitted. Nothing
+  here fits a model, so it needs no library: \code{generate_sbm} is a
+  convenience, and the statistics are language-neutral.}
+\label{alg:predictive}
+\begin{algorithmic}[1]
+\Require $N$; $M$ draws; observed statistics $\bm{T}_{\text{obs}}$; $E$ held at
+  its observed value
+\For{$m = 1$ to $M$}
+  \State $B \sim P(B)$;\; $\bm{n} \sim P(\bm{n} \mid B)$;\;
+    $\bm{b}_{1,m} \sim P(\bm{b} \mid \bm{n})$
+    \Comment{equation~\eqref{eq:pb}}
+  \State $\bm{e}_{1,m} \sim P(\bm{e} \mid B, E)$, then recurse up the levels
+    of \eqref{eq:nested} until one group remains
+  \Comment{the whole hierarchy, not a base partition with a flat prior bolted on}
+  \State $\bm{k}_m \sim P(\bm{k} \mid \bm{e}_{1,m}, \bm{b}_{1,m})$
+  \State $\bm{A}_m \gets \textsc{GenerateSbm}(\bm{b}_{1,m}, \bm{e}_{1,m},
+    \bm{k}_m)$, directed
+  \State $\bm{T}_m \gets$ the statistics of Table~\ref{tab:stats}
+\EndFor
+\For{each statistic $t$}
+  \State report the quantile of $t_{\text{obs}}$ within $\{t_m\}$
+\EndFor
+\Ensure containment, not agreement: each $t_{\text{obs}}$ should sit inside the
+  bulk of its prior predictive distribution
+\State \textbf{Separate comparison:} repeating steps 2--7 with a flat
+  $P(\bm{e})$ in place of the recursion in step~3 isolates what the nested
+  prior contributes. Run it as its own arm, labeled as such, rather than mixing the
+  two.
+\end{algorithmic}
+\end{algorithm}
+
+\paragraph{The interpretation.} The check is one of containment, not of
+agreement. The prior does not have to generate our network; it has to generate a
+universe of networks that could plausibly include it. If the observed $k$-core
+profile sits far in the tail of the prior predictive distribution, the posterior
+has been straining against the prior from the start -- and the 690 hub
+singletons become a mechanism rather than a mystery.
+
+% =====================================================================
+\section{Stage three: posterior checks}
+\label{sec:posterior}
+% =====================================================================
+
+Two kinds of checking belong here, and they answer different questions. The
+first asks whether the machinery works at all. The second asks whether the
+fitted model can reproduce the world.
+
+\subsection{Three questions, not one}
+
+Three distinct things went wrong or went unverified, and one procedure will not
+settle all of them.
+
+\paragraph{Is the inference calibrated?} Simulate parameters from the prior,
+generate a network, fit, and record where the true value falls among the
+posterior draws. Repeat. If prior, likelihood, and sampler are all correct,
+those ranks are uniform. The summary statistic here is the number of groups,
+which is discrete, so ties must be broken at random; otherwise the ranks come
+out lumpy for reasons that have nothing to do with the model.
+
+The planted-partition test already run is not this. Fitting a planted
+four-block partition of 300 vertices recovered it at an adjusted Rand index of
+0.96, which established that the code calls the right functions. It exercised
+one favorable point in parameter space and says nothing about calibration.
+
+Two practical constraints shape how this can be run. Under the actual prior,
+$B$ is uniform on $\{1, \dots, N\}$, so most simulated networks will have
+around 1{,}800 groups of two nodes each -- far from the regime we care about,
+and a poor use of compute. And a single fit at full size takes 15--20 hours,
+which puts $M = 100$ replications in the range of months. Calibration should
+therefore be run at reduced $N$ -- a few hundred vertices -- with a short
+chain at each replication. The chain is not optional: the ranks in
+Algorithm~\ref{alg:sbc} need $L$ posterior draws, and the heuristic returns a
+single partition. A check that uses the heuristic alone is a recovery or bias
+check, not calibration, and should be named as such if it is what gets run.
+What calibration at reduced $N$ validates is the inference at that scale,
+which is weaker than validating it at ours and is the available option.
+
+\begin{algorithm}[!t]
+\caption{Simulation-based calibration. Answers the first question only;
+  reproducibility and consensus have their own checks. Language follows
+  whichever implementation is being validated.}
+\label{alg:sbc}
+\begin{algorithmic}[1]
+\Require $M$ replications; $L$ posterior draws each; a scalar summary $f$,
+  here the number of groups
+\For{$m = 1$ to $M$}
+  \State $\bm{b}^{*} \sim P(\bm{b})$ \Comment{the prior, not a convenient
+    partition}
+  \State $\bm{e}^{*}, \bm{k}^{*} \gets$ draws from their priors, as in
+    Algorithm~\ref{alg:predictive}
+  \State $\bm{A} \gets \textsc{GenerateSbm}(\bm{b}^{*}, \bm{e}^{*},
+    \bm{k}^{*})$
+  \State $\{\bm{b}^{(1)}, \dots, \bm{b}^{(L)}\} \gets$ posterior draws from
+    fitting $\bm{A}$
+  \State $a \gets \#\{\, l : f(\bm{b}^{(l)}) < f(\bm{b}^{*}) \,\}$;\quad
+    $t \gets \#\{\, l : f(\bm{b}^{(l)}) = f(\bm{b}^{*}) \,\}$
+  \State $r_m \gets a + \textsc{Binomial}(t, 1/2)$
+  \Comment{$f$ is discrete; ties broken at random, or the ranks are lumpy for
+    the wrong reason}
+\EndFor
+\Ensure $\{r_m\}$ uniform on $\{0, \dots, L\}$ if prior, likelihood, and
+  sampler are correct
+\State \textbf{Reading:} ranks bunched in the middle mean the posterior is too
+  wide; ranks at the extremes mean it is too narrow; a consistent skew means a
+  bias
+\State \textbf{Scale:} at $N = 3{,}557$ a full fit is 15--20 hours, so
+  $M = 100$ is months. Run at reduced $N$ -- a few hundred vertices -- with a
+  short chain of $L$ draws at each replication, and say so when reporting.
+  The heuristic alone yields one partition and no ranks
+\end{algorithmic}
+\end{algorithm}
+
+\paragraph{Is the fit reproducible?} Two runs on identical input with the same
+seed returned hierarchies 2{,}451 nats apart. Calibration will not explain
+that, because it averages over replications rather than isolating a
+divergence. Nor is it a mystery. \code{graph-tool}'s sweeps are parallelized with OpenMP,
+and parallel reductions do not sum in a fixed order, so non-determinism under
+more than one thread is documented behavior rather than a fault. The check is
+a controlled repeat, and its first step is therefore
+\code{openmp_set_num_threads(1)}: pin the threads, fix the seed and
+\code{PYTHONHASHSEED}, run the heuristic twice in one process, and record the
+partition after each internal step until the two runs differ. If they no
+longer differ, the cause was the thread count and the fix is to pin it for
+every reported fit. If they still differ, the remaining candidates are an
+unseeded stream and iteration order over an unordered container, and the first
+point of divergence names which.
+
+\paragraph{Does the consensus recover what is there?} The step that reconciles
+250 draws into one partition is the least examined part of the pipeline and the
+most expensive. Algorithm~\ref{alg:sbc} never touches it, since it compares
+draws against the truth directly. Check it on its own terms: simulate a network
+from a known partition, fit it, run the consensus, and measure how well the
+consensus recovers \emph{co-membership} -- for each pair of nodes, whether the
+consensus places them together when the truth does. Co-membership rather than
+labels, because labels are arbitrary and the question is whether the structure
+survives the reconciliation.
+
+\subsection{Posterior predictive checks}
+
+Generate networks from the fitted model and compare them to the observed network
+on the statistics of Table~\ref{tab:stats}. The question is now whether the
+model, having seen the data, can reproduce features of it that it was not fitted
+to. The $k$-core spike at coreness 74 is again the sharpest test.
+
+\subsection{External validation}
+
+Journals give an independent partition of the same communities, derived from
+publication venue rather than from citation, and comparing the two answers the
+second half of RQ7 of the specification outline, which asks whether the field's
+structure follows disciplinary affiliation or cuts across it. Agreement is reported with the adjusted Rand index, computed
+on modal assignments for the headline figure and across posterior draws for the
+accompanying uncertainty. Two cautions belong in the reporting: the index is
+sensitive to the number of groups, so the journal partition should be coarsened
+to comparable granularity first; and a low value is a substantive finding about
+how the field is organized, not a failure of the method.
+
+This stage is substantive rather than diagnostic, and it is the only one of the
+three that produces a result for the paper.
+
+% =====================================================================
+\section{Order of operations}
+\label{sec:order}
+% =====================================================================
+
+\begin{enumerate}[leftmargin=2em, itemsep=0.4em]
+\item \textbf{Settle the likelihood.} Fit twice, once with counts as
+  multiplicities and once with counts as an edge covariate, and compare the
+  resulting group counts and description-length curves. Everything downstream
+  depends on which is in place, so nothing else can be checked first.
+\item \textbf{Pushforward on depth and group sizes.} The marginal over the
+  number of groups is uniform by equation~\eqref{eq:pb}; the expected
+  singleton share is equation~\eqref{eq:singleton}; depth and the chance of a
+  level in the elicited band are a short recursion
+  (Algorithm~\ref{alg:pushforward}). None of it is simulated and none of it
+  depends on $E$. Then rerun the heuristic under \code{B_max} $= 30$ and
+  record the nested description length against the unconstrained fit.
+\item \textbf{Decide the instrument.} If the prior cannot be brought into line
+  with domain knowledge using the arguments \code{graph-tool} exposes --
+  \code{B_min}, \code{B_max}, \code{clabel}, \code{pclabel} -- the blockmodel
+  moves to a hand-written sampler with a stated prior. Make this decision
+  explicitly and write down the reason.
+\item \textbf{Prior predictive.} Generate networks from the prior; compare the
+  statistics of Table~\ref{tab:stats} for containment.
+\item \textbf{Calibration, reproducibility, consensus.} Three separate checks,
+  set out in \S\ref{sec:posterior}. Simulation-based calibration tests the
+  inference; a controlled repeat locates the non-determinism; a co-membership
+  recovery test assesses the consensus step.
+\item \textbf{Posterior predictive, then external validation.} The first checks
+  the model against the data; the second checks the literatures against the
+  journals.
+\end{enumerate}
+
+\begin{algorithm}[!t]
+\caption{Settling the likelihood. Step~1 of the order above, and a
+  prerequisite for Algorithm~\ref{alg:predictive}, which is the first step
+  in which $E$ enters.}
+\label{alg:weights}
+\begin{algorithmic}[1]
+\Require the community network $G$ with citation counts $\bm{w}$
+\For{$\tau \in \{\texttt{eweight},\ \texttt{recs:discrete-poisson}\}$}
+  \State $s_\tau \gets \textsc{MinimizeNestedBlockmodelDl}(G, \tau)$
+  \State record groups per level, $\Sigma$, and $E$ under $\tau$
+  \State $C_\tau \gets$ the flat description-length curve of
+    Table~\ref{tab:entropy}, recomputed under $\tau$
+\EndFor
+\Ensure the two curves, side by side
+\State \textbf{Reading:} $E$ differs by a factor of sixteen between the two
+  and enters $P(\bm{e})$ directly, so a large shift in the group count is
+  expected rather than surprising
+\State \textbf{Note:} this is diagnostic, not decisive. No curve can say
+  whether 4{,}646 citations between two communities are 4{,}646 exchangeable
+  events or one intense relationship; that is a modeling judgment, argued in
+  prose and recorded. The comparison shows what the judgment costs
+\State \textbf{Note:} uses the 45-second heuristic, which sat 18{,}329 nats
+  above the mode on the real fit. Adequate for a gross comparison of group
+  counts, not for anything finer
+\end{algorithmic}
+\end{algorithm}
+
+Steps one and two are inexpensive: a heuristic fit takes forty-five seconds,
+and the Stage one quantities are arithmetic. Steps four through six are the substantial work, and there is no sense in
+starting them before step three has settled which model they apply to.
+
+\subsection{Where each step is implemented}
+
+The work divides cleanly, and the dividing line is whether a step interrogates
+\code{graph-tool}'s assumptions or replaces them.
+
+The priors are written down in equations~\eqref{eq:pb} to \eqref{eq:pk}, so
+nothing that only reads or samples them needs the library.
+Algorithm~\ref{alg:pushforward} is arithmetic, and
+Algorithm~\ref{alg:predictive} is a dozen lines of ancestral sampling in either
+language. What does require Python is anything that \emph{fits}:
+Algorithm~\ref{alg:weights}, the sampler inside Algorithm~\ref{alg:sbc}, and
+the \code{B_max} rerun of step~2 all call \code{graph-tool}'s heuristic or its
+chain, and those are built against the priors internally. The constraint is
+on the fitting, not on the prior.
+
+Anything we build ourselves should be Julia, and the usual argument for Python
+evaporates at exactly the point where we stop using the package. Three reasons,
+in order of force.
+
+\emph{No probabilistic programming language handles this inference well.} A
+partition is a discrete object with $B!$ label symmetry. Hamiltonian Monte
+Carlo cannot move it, and Stan cannot represent discrete parameters at all.
+Turing's composable Gibbs and NumPyro's \code{DiscreteHMCGibbs} can represent
+them, so the door is not closed -- but single-site updates on 3{,}557 discrete
+labels mix badly, the label symmetry still bites, and neither offers the
+merge-and-split proposals that make this tractable. The realistic sampler is a
+bespoke one: collapsed Gibbs over node reassignments, or merge-and-split moves
+of the kind \code{graph-tool} uses. So the comparison is between two languages
+for hand-written Markov chain Monte Carlo, not between two PPLs.
+
+\emph{That sampler is a tight loop.} Each sweep touches 3{,}557 nodes and
+36{,}105 edges, with a bookkeeping update at every reassignment. Julia runs
+such loops at compiled speed as written. Python requires \code{numba},
+\code{cython}, or a C extension to approach it, which means the inner loop
+leaves Python anyway.
+
+\emph{The project already has a Julia lane.} Julia 1.11.9 is in the container,
+the era sweeps run there, and the Pajek readers and era-resolution code sit
+beside them.
+
+So Python's advantage here was always that someone had already written the
+model. Step~3 of the order above is precisely the decision to stop relying on
+that, and once it is taken the advantage is gone.
+
+% =====================================================================
+\section{What is at stake downstream}
+\label{sec:downstream}
+% =====================================================================
+
+Model~I cannot be fitted until $\ell$ exists, so the blockmodel sits on the
+critical path. The shape of what it returns also determines what the model can
+say, and two questions about that shape are still open.
+
+\paragraph{How $\ell$ attaches to a pair.} Every community carries a
+literature label, but the slope $\alpha_{S,\ell}$ multiplies $S_{ijp}$, which
+belongs to a \emph{pair}. Communities $i$ and $j$ will often sit in different
+literatures, and the specification does not say what happens then. Three
+readings are available and they are not equivalent: index the slope by the
+citing community's literature, so $\ell = \ell_i$; index it by whether the pair
+is within or across literatures, giving a two-level contrast; or carry an
+effect for each of the two literatures and let them add. The first is the narrowest reading of the Model~I table in \S13.2 of the
+specification outline, which lists \code{literature_i} and
+\code{literature_j} as separate columns without saying how the slope consumes
+them. This needs settling before any cut is chosen, because the three readings
+make different demands on how many literatures there can usefully be.
+
+\paragraph{Whether a fine cut can be estimated at all.} A grouping into 1{,}268
+literatures is not collinear with the community effects -- $\theta^{K}_{i}$ and
+$\psi^{K}_{j}$ are random intercepts, while $\alpha_{S,\ell}$ is a random slope
+on topical proximity, and those are different objects. The real obstacle is
+replication. Estimating a slope within a literature needs pairs assigned to it,
+and needs those pairs to vary in $S_{ijp}$; with 2.8 communities per group at
+the base, most groups would contribute a handful of pairs spanning a narrow
+range of proximity, and $\sigma_{\ell}$ would be estimated almost entirely from
+the prior. The quantity to report before choosing a cut is therefore simple and
+has not yet been computed: for each candidate cut, the distribution across
+literatures of the number of pairs and the spread of $S_{ijp}$ within them.
+
+\paragraph{Where the candidates come from.} Four numbers have been proposed
+and they have different standing. \textbf{405} is the lowest-scoring cut in
+Table~\ref{tab:entropy} and is a statement about description length alone;
+nobody has argued it is interpretable, and at 8.8 communities per group it
+faces the replication problem above in milder form. \textbf{168} is the
+coarsest cut still within 2 percent of that score. \textbf{25} is the cut at
+which, by the audit of \S\ref{sec:audit}, assignment confidence stops
+improving, 24 of 25 groups span more than one era, and no group is a
+singleton. \textbf{8} is a reading of the hierarchy's shape; the audit prices
+it at 123 percent above the best cut and finds two of its eight groups holding
+2 percent of the communities between them.
+
+The distribution of pairs across literatures, and of $S_{ijp}$ within them,
+is the criterion that would separate these on grounds the model cares about,
+and it is more informative than any of the arguments rehearsed above.
+
+% =====================================================================
+\section*{Sources}
+% =====================================================================
+\addcontentsline{toc}{section}{Sources}
+
+\begin{itemize}[leftmargin=1.5em, itemsep=0.25em]
+\item Betancourt, M. \emph{Towards a Principled Bayesian Workflow}; and
+  \emph{Prior Modeling}. On the distinction between pushforward and predictive
+  checks, and on eliciting priors through thresholds on interpretable
+  quantities.
+\item Gelman, A., Vehtari, A., Simpson, D., et al. \emph{Bayesian Workflow}
+  (2020). On the sequence of checks and on weakly informative priors.
+\item Talts, S., Betancourt, M., Simpson, D., Vehtari, A., \& Gelman, A.
+  \emph{Validating Bayesian Inference Algorithms with Simulation-Based
+  Calibration} (2018).
+\item Peixoto, T. P. \emph{Hierarchical Block Structures and High-Resolution
+  Model Selection in Large Networks}, Phys. Rev. X (2014). The nested
+  degree-corrected blockmodel and its priors.
+\item Karrer, B., \& Newman, M. E. J. \emph{Stochastic Blockmodels and Community
+  Structure in Networks}, Phys. Rev. E (2011). Degree correction.
+\item de Solla Price, D. J. \emph{Networks of Scientific Papers}, Science
+  (1965); and \emph{A General Theory of Bibliometric and Other Cumulative
+  Advantage Processes} (1976). Heavy-tailed citation distributions.
+\item Small, H. \emph{Co-citation in the Scientific Literature} (1973). The
+  specialty-structure tradition from which the twenty-to-thirty expectation
+  comes.
+\end{itemize}
+
+\end{document}
